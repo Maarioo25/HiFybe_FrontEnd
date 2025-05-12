@@ -73,11 +73,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const googleLogin = () => {
-    window.location.href = 'https://hifybebackend-production.up.railway.app/usuarios/google';
+    window.location.href = 'https://api.mariobueno.info/usuarios/google';
   };
 
   const spotifyLogin = () => {
-    window.location.href = 'http://127.0.0.1:5000/usuarios/spotify';
+    window.location.href = 'http://api.mariobueno.info/usuarios/spotify';
   };
 
   const appleLogin = () => {};
