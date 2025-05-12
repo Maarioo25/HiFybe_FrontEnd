@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #202a3a 100%);
+}
+
+/* --- CONTROL DE STACKING MAPA Y BUSQUEDA --- */
+#map {
+  z-index: 0 !important;
+  position: relative;
+  height: 100%;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* --- POPUP DE BUSQUEDA SIEMPRE POR ENCIMA DEL MAPA --- */
+.search-popup, .busqueda-popup, .popup-busqueda {
+  z-index: 70 !important;
+  position: absolute;
+  transition: box-shadow 0.35s cubic-bezier(0.4,0.1,0.2,1), transform 0.35s cubic-bezier(0.4,0.1,0.2,1);
+}
+
+#map, .leaflet-container, .map-container {
+  z-index: 0 !important;
+}
+
+.music-wave {
+    position: relative;
+    height: 4px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.music-wave::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, rgba(165, 180, 252, 0.6), transparent);
+    animation: wave 1.5s linear infinite;
+}
+
+@keyframes wave {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.album-cover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.album-cover:hover {
+    transform: scale(1.03);
+}
+
+.friend-card {
+  transition: transform 0.18s cubic-bezier(0.4,0.1,0.2,1), box-shadow 0.18s cubic-bezier(0.4,0.1,0.2,1);
+  min-height: 16rem;
+  height: 16rem;
+}
+
+.friend-card:hover {
+  transform: scale(1.012);
+  box-shadow: 0 8px 36px 0 rgba(80, 0, 120, 0.16);
+}
+
+.friend-avatar {
+    transition: transform 0.35s cubic-bezier(0.4, 0.1, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0.1, 0.2, 1);
+}
+
+.friend-avatar:hover {
+    transform: translateY(-10px) rotate(5deg) scale(1.07);
+    box-shadow: 0 24px 32px -8px rgba(124, 58, 237, 0.33);
+    transition: transform 0.35s cubic-bezier(0.4, 0.1, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0.1, 0.2, 1);
+}
+
+.playlist-item:hover {
+    background: rgba(124, 58, 237, 0.1);
+    transform: translateX(5px);
+}
+
+.now-playing-bar {
+    backdrop-filter: blur(10px);
+    background: rgba(15, 23, 42, 0.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #a5b4fc;
+    cursor: pointer;
+}
+
+.progress-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #a5b4fc;
+    cursor: pointer;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.45s cubic-bezier(0.4, 0.1, 0.2, 1);
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.45s cubic-bezier(0.4, 0.1, 0.2, 1);
+}
+
+.custom-marker {
+  transition: transform 0.18s cubic-bezier(0.4,0.1,0.2,1);
+}
+
+.custom-marker.bounce {
+  animation: bounce-marker 0.7s cubic-bezier(0.4,0.1,0.2,1);
+}
+
+@keyframes bounce-marker {  
+  0%   { transform: scale(1) translateY(0); }
+  20%  { transform: scale(1.15, 0.85) translateY(-10px); }
+  40%  { transform: scale(0.95, 1.05) translateY(-18px); }
+  60%  { transform: scale(1.05, 0.95) translateY(-12px); }
+  80%  { transform: scale(1.02, 0.98) translateY(-5px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.header-bar {
+  transition: box-shadow 0.35s cubic-bezier(0.4,0.1,0.2,1), transform 0.35s cubic-bezier(0.4,0.1,0.2,1);
+}
+
+/* --- Z-INDEX PARA TOP Y MAIN --- */
+.header-bar, .top-bar, .navbar, .superior, .main-header {
+  z-index: 20 !important;
+  position: relative;
+}
+
+.main-content, .middle, .center-panel, .main-section {
+  z-index: 1 !important;
+  position: relative;
+}
+
+/* Scrollbar bonito para la zona de amigos/recomendaciones */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #327d7d #0000;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 7px;
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: linear-gradient(120deg, #a78bfa 40%, #f472b6 100%);
+  border-radius: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Estilos para el scroll lateral de playlists */
+.playlist-scroll {
+  scrollbar-width: none;
+}
+.playlist-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.playlist-card {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.playlist-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Animación de hover para las tarjetas de recomendaciones */
+.recommendation-card {
+  transition: transform 0.18s cubic-bezier(0.4,0.1,0.2,1), background 0.18s cubic-bezier(0.4,0.1,0.2,1);
+}
+.recommendation-card:hover {
+  transform: scale(1.008);
+  background: linear-gradient(90deg, rgba(167,139,250,0.18) 0%, rgba(236,72,153,0.13) 100%);
+}
+
+/* Barra de progreso personalizada */
+.progress-bar-bg {
+  background: linear-gradient(90deg, #4c4c4c 0%, #292929 100%);
+  opacity: 0.23;
+}

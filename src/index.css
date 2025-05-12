@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-harmony-text-primary;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(rgba(13, 43, 43, 0.7), rgba(13, 43, 43, 0.8)),
+                url('/images/music-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .form-container {
+    @apply backdrop-blur-md bg-harmony-primary/80 shadow-2xl border-l border-harmony-text-secondary/10;
+  }
+
+  .input-group {
+    @apply relative;
+  }
+
+  .input-group input {
+    @apply bg-harmony-secondary/20 border border-harmony-text-secondary/20 
+           text-harmony-text-primary placeholder-harmony-text-muted
+           transition-all duration-300 ease-in-out outline-none
+           pr-10;
+  }
+
+  .input-group input:focus {
+    @apply bg-harmony-secondary/30 border-harmony-accent 
+           ring-2 ring-harmony-accent/20;
+  }
+
+  .input-group input.invalid {
+    @apply border-red-500/50 ring-2 ring-red-500/20
+           transition-all duration-300 ease-in-out;
+  }
+
+  .input-group .icon {
+    @apply absolute right-3 top-1/2 -translate-y-1/2 text-harmony-text-muted
+           pointer-events-none;
+  }
+
+  .input-group input:focus + .icon {
+    @apply text-harmony-accent;
+  }
+
+  .input-group input.invalid + .icon {
+    @apply text-red-500/50;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-harmony-accent to-harmony-light
+           text-harmony-dark font-semibold
+           transition-all duration-300;
+  }
+
+  .btn-primary:hover {
+    @apply -translate-y-0.5 shadow-lg shadow-harmony-accent/40
+           from-harmony-light to-harmony-accent;
+  }
+
+  .social-btn {
+    @apply bg-harmony-secondary/20 border border-harmony-text-secondary/20
+           hover:bg-harmony-secondary/30 transition-all duration-300;
+  }
+
+  .social-btn:hover {
+    @apply -translate-y-0.5 border-harmony-accent/50;
+  }
+
+  .pulse {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(78, 204, 163, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(78, 204, 163, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(78, 204, 163, 0);
+  }
+} 
