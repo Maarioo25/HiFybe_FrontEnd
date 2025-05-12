@@ -10,6 +10,7 @@ import Chats from "./pages/Chats";
 import Playlists from "./pages/Playlists";
 import PlaylistDetail from "./pages/PlaylistDetail";
 import PublicPlaylistDetail from './pages/PublicPlaylistDetail';
+import AuthSuccess from './pages/AuthSuccess';
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
               <Route path="/playlists" element={<Playlists />} />
               <Route path="/playlists/:id" element={<PlaylistDetail />} />
               <Route path="/friends/:id/playlists/:name" element={<PublicPlaylistDetail />} />
+              <Route path="/auth/success" element={<AuthSuccess />} />
 
             </Route>
 
