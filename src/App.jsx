@@ -57,7 +57,6 @@ function App() {
                   <Route path="/friends/:id/playlists/:name" element={<PublicPlaylistDetail />} />
                 </ProtectedRoute>}>
             </Route>
-            <Route path="*" element={<Navigate to="/auth" replace />} />
             </Routes>
           </div>
         </PlayerProvider>
