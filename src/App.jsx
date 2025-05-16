@@ -44,21 +44,19 @@ function App() {
             />
             <Routes>
               <Route path="/auth" element={<AuthForm />} />
-              <Route element={
-                <ProtectedRoute>
-                  {/* Rutas protegidas */}
-                  <Route path="/" element={<MainPage />} />
-                  <Route path="/friends" element={<Friends />} />
-                  <Route path="/friends/:id" element={<FriendDetail />} />
-                  <Route path="/friends/:id/playlists/:name" element={<PlaylistDetail />} />
-                  <Route path="/chats" element={<Chats />} />
-                  <Route path="/playlists" element={<Playlists />} />
-                  <Route path="/playlists/:id" element={<PlaylistDetail />} />
-                  <Route path="/friends/:id/playlists/:name" element={<PublicPlaylistDetail />} />
-                </ProtectedRoute>}>
-            </Route>
-            <Route path="*" element={<Navigate to="/auth" replace />} />
+              <Route element={<ProtectedRoute />}>
+                {/* Rutas protegidas */}
+                <Route path="/" element={<MainPage />} />
+                <Route path="/friends" element={<Friends />} />
+                <Route path="/friends/:id" element={<FriendDetail />} />
+                <Route path="/friends/:id/playlists/:name" element={<PlaylistDetail />} />
+                <Route path="/chats" element={<Chats />} />
+                <Route path="/playlists" element={<Playlists />} />
+                <Route path="/playlists/:id" element={<PlaylistDetail />} />
+                <Route path="/friends/:id/playlists/:name" element={<PublicPlaylistDetail />} />
+              </Route>
             </Routes>
+            <Route path="*" element={<Navigate to="/auth" replace />} />
           </div>
         </PlayerProvider>
       </AuthProvider>
