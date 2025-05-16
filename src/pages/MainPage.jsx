@@ -1,101 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FRIENDS } from "../data/friends";
 import { useAuth } from "../context/AuthContext";
-import { FaSignOutAlt, FaUserCircle, FaBell, FaPlay, FaPause, FaStepBackward, FaStepForward, FaShareAlt, FaRedo, FaHome, FaMusic, FaUserFriends, FaSearch, FaComments } from "react-icons/fa";
 import "./style.css";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useNavigate } from "react-router-dom";
 import HeaderBar from "../components/HeaderBar";
 import FooterPlayer from '../components/FooterPlayer';
+import { usePlayer } from '../context/PlayerContext';
+import { SONGS } from '../data/songs';
 
-// Usar los datos de FRIENDS directamente
+
+
+
 const USERS = FRIENDS.map(friend => ({
   name: friend.name,
   song: friend.song.title + " - " + friend.song.artist,
   songImg: friend.song.img,
   avatarImg: friend.photo,
-  coords: [40.4168, -3.7038], // Coordenadas por defecto
+  coords: [40.4168, -3.7038],
   online: friend.online,
   color: friend.online ? "from-indigo-400 to-purple-500" : "from-gray-400 to-gray-500"
 }));
 
-const RECOMMENDATIONS = [
-  {
-    title: "As It Was",
-    artist: "Harry Styles",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/as-it-was.mp3"
-  },
-  {
-    title: "Peaches",
-    artist: "Justin Bieber",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/peaches.mp3"
-  },
-  {
-    title: "Stay",
-    artist: "The Kid LAROI, Justin Bieber",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/stay.mp3"
-  },
-  {
-    title: "MONTERO (Call Me By Your Name)",
-    artist: "Lil Nas X",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/montero.mp3"
-  },
-  {
-    title: "Levitating",
-    artist: "Dua Lipa",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/levitating.mp3"
-  },
-  {
-    title: "Blinding Lights",
-    artist: "The Weeknd",
-    img: "https://i.scdn.co/image",
-    audioUrl: "C:\Users\maari\Desktop\I Thought About Killing You.mp3"
-  },
-  {
-    title: "Save Your Tears",
-    artist: "The Weeknd",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/save-your-tears.mp3"
-  },
-  {
-    title: "Watermelon Sugar",
-    artist: "Harry Styles",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/watermelon-sugar.mp3"
-  },
-  {
-    title: "good 4 u",
-    artist: "Olivia Rodrigo",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/good-4-u.mp3"
-  },
-  {
-    title: "drivers license",
-    artist: "Olivia Rodrigo",
-    img: "https://i.scdn.co/image",
-    audioUrl: "https://example.com/drivers-license.mp3"
-  }
-];
 
 export default function MainPage() {
 
-  const [setDuration] = useState(0);
-  const { user, loading, logout } = useAuth();
+
+  const { setCurrentSong, setIsPlaying, setProgress } = usePlayer();
+  const { loading } = useAuth();
   const navigate = useNavigate();
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const menuRef = useRef(null);
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
-  const searchInputRef = useRef(null);
 
   // --- Estado para usuario seleccionado en el mapa ---
   const [selectedUser, setSelectedUser] = useState(null);
@@ -203,117 +139,6 @@ export default function MainPage() {
     });
   }, [selectedUser]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowProfileMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!showSearch) {
-      setSearchValue("");
-      setSearchResults([]);
-    }
-  }, [showSearch]);
-
-  useEffect(() => {
-    if (!searchValue) {
-      setSearchResults([]);
-      return;
-    }
-    // Buscar tanto en RECOMMENDATIONS como en USERS
-    const songResults = RECOMMENDATIONS.filter(song =>
-      song.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-      song.artist.toLowerCase().includes(searchValue.toLowerCase())
-    ).map(song => ({
-      ...song,
-      _type: 'recommendation'
-    }));
-    const userSongs = USERS.filter(u =>
-      u.song && (
-        u.song.toLowerCase().includes(searchValue.toLowerCase()) ||
-        u.name.toLowerCase().includes(searchValue.toLowerCase())
-      )
-    ).map(u => ({
-      title: u.song.split(' - ')[0] || u.song,
-      artist: (u.song.split(' - ')[1] || '').trim() || '',
-      img: u.songImg,
-      audioUrl: u.audioUrl,
-      listenedBy: u.name,
-      _type: 'userSong'
-    }));
-    setSearchResults([...songResults, ...userSongs].slice(0, 5));
-  }, [searchValue]);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch {}
-  };
-
-  const [isPlaying, setIsPlaying] = useState(true);
-  const handlePlayPause = () => setIsPlaying(p => !p);
-
-  const [volume, setVolume] = useState(70);
-  const handleVolumeChange = (e) => setVolume(Number(e.target.value));
-
-  // Estado y lógica para la barra de progreso
-  const [progress, setProgress] = useState(45); // en segundos
-  const duration = 200; // duración total en segundos (ejemplo: 3:20)
-
-  // Actualiza la barra cada segundo si está reproduciendo
-  useEffect(() => {
-    if (!isPlaying) return;
-    if (progress >= duration) return;
-    const interval = setInterval(() => {
-      setProgress((p) => (p < duration ? p + 1 : p));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isPlaying, progress, duration]);
-
-  // Formatea segundos a mm:ss
-  function formatTime(secs) {
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  }
-
-  // Drag manual para el thumb
-  function startDrag(e) {
-    e.preventDefault();
-    const isTouch = e.type === 'touchstart';
-    const moveEvent = isTouch ? 'touchmove' : 'mousemove';
-    const upEvent = isTouch ? 'touchend' : 'mouseup';
-    const bar = e.target.closest('.group');
-    if (!bar) return;
-    const rect = bar.getBoundingClientRect();
-    function getX(ev) {
-      if (isTouch) return ev.touches[0].clientX;
-      return ev.clientX;
-    }
-    function onMove(ev) {
-      const x = getX(ev);
-      let percent = (x - rect.left) / rect.width;
-      percent = Math.max(0, Math.min(1, percent));
-      setProgress(Math.round(percent * duration));
-    }
-    function onUp() {
-      window.removeEventListener(moveEvent, onMove);
-      window.removeEventListener(upEvent, onUp);
-    }
-    window.addEventListener(moveEvent, onMove);
-    window.addEventListener(upEvent, onUp);
-  }
-
-  const [currentSong, setCurrentSong] = useState(null);
-  const audioRef = useRef(null);
-
   // --- Estado para pestaña activa en la zona de amigos/recomendaciones ---
   const [activeTab, setActiveTab] = useState('friends'); // 'amigos' o 'recomendaciones'
 
@@ -327,26 +152,7 @@ export default function MainPage() {
 
   return (
     <div className="text-harmony-text-primary min-h-screen bg-harmony-primary">
-      {/* Barra de navegación */}
-      <HeaderBar
-        onSongSelect={(song) => {
-          // Reiniciar el progreso y pausar la canción anterior
-          setProgress(0);
-          setIsPlaying(false);
-          
-          // Establecer la nueva canción y comenzar a reproducir
-          setCurrentSong(song);
-          setIsPlaying(true);
-          
-          // Reiniciar el audio si existe
-          if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-          }
-        }}
-      >
-        {/* Aquí puedes incluir la barra de búsqueda y otros elementos específicos de MainPage si lo necesitas */}
-      </HeaderBar>
+      <HeaderBar />
 
       <div className="container mx-auto px-6 z-0">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -452,146 +258,41 @@ export default function MainPage() {
                   </div>
                 )}
                 {activeTab === 'recomendaciones' && (
-                  <div className="flex flex-col gap-3">
-                    {RECOMMENDATIONS.map((rec, idx) => (
-                      <div key={rec.title} className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer select-none w-full"
-                        style={{ minWidth: 0 }}
-                        onClick={() => {
-                          setIsPlaying(true);
-                          setCurrentSong(rec);
-                          setProgress(0);
-                        }}
-                      >
-                        <img src={rec.img} alt={rec.title} className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-harmony-text-primary truncate max-w-full">{rec.title}</div>
-                          <div className="text-xs text-harmony-text-secondary truncate max-w-full">{rec.artist}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+  <div className="flex flex-col gap-3">
+    {SONGS.map((song) => (
+      <div
+        key={song.title}
+        className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
+        onClick={() => {
+          setProgress(0);
+          setCurrentSong(song);
+          setIsPlaying(true);
+        }}
+      >
+        <img
+          src={song.img}
+          alt={song.title}
+          className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
+        />
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold text-harmony-text-primary truncate">
+            {song.title}
+          </div>
+          <div className="text-xs text-harmony-text-secondary truncate">
+            {song.artist}
           </div>
         </div>
       </div>
-      {/* Reproductor de música fijo abajo */}
-      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl">
-        <div className="mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-4 px-4 py-3 relative">
-          {/* Imagen de fondo degradada de la canción */}
-          <div
-            className="absolute left-0 top-0 h-full pointer-events-none select-none overflow-hidden"
-            style={{ 
-              width: '40%', // Constrain to 20% of the screen
-              height: '100%',
-            }}
-          >
-            <div
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                width: '100%',
-                height: '100%',
-                backgroundImage: `url(${currentSong?.img})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'left',
-                filter: 'blur(12px) brightness(0.7)',
-                maskImage: `linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.3) 75%, rgba(0, 0, 0, 0) 100%)`, // Gradient mask for fade
-                WebkitMaskImage: `linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.3) 75%, rgba(0, 0, 0, 0) 100%)`, // Vendor prefix for broader compatibility
-              }}
-            />
-          </div>
+    ))}
+  </div>
+)}
 
-          {/* Portada y título */}
-          <div className="flex items-center gap-4 min-w-[200px] max-w-[320px] w-[320px] relative overflow-hidden">
-            <img src={currentSong?.img} alt="Album cover" className="w-14 h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg shrink-0" />
-            <div className="truncate">
-              <div className="font-semibold text-harmony-text-primary leading-tight truncate max-w-[210px]" title={currentSong?.title}>{currentSong?.title}</div>
-              <div className="text-xs text-harmony-text-secondary truncate max-w-[210px]" title={currentSong?.artist}>{currentSong?.artist}</div>
-            </div>
-          </div>
-          {/* Centro: barra y controles */}
-          <div className="flex-1 flex flex-col items-center justify-center min-w-0">
-            {/* Barra de progreso */}
-            <div className="w-full flex items-center gap-3 mb-2">
-              <span className="text-xs text-harmony-text-secondary w-10 text-right select-none">{formatTime(progress)}</span>
-              <div className="relative flex-1 h-3 flex items-center group"
-                onClick={e => {
-                  if (e.target.closest('.cursor-pointer')) return;
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = (e.clientX - rect.left) / rect.width;
-                  setProgress(Math.round(x * duration));
-                }}
-              >
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 progress-bar-bg rounded-full" />
-                <div
-                  className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-harmony-accent rounded-full transition-all"
-                  style={{ width: `${(progress/duration)*100}%` }}
-                />
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 cursor-pointer"
-                  style={{ left: `calc(${(progress/duration)*100}% - 10px)` }}
-                  tabIndex={0}
-                  role="slider"
-                  aria-valuenow={progress}
-                  aria-valuemin={0}
-                  aria-valuemax={duration}
-                  onMouseDown={startDrag}
-                  onTouchStart={startDrag}
-                >
-                  <div className="w-4 h-4 bg-harmony-accent border-2 border-white rounded-full shadow transition-all group-hover:scale-110" />
-                </div>
               </div>
-              <span className="text-xs text-harmony-text-secondary w-10 text-left select-none">{formatTime(duration)}</span>
             </div>
-            {/* Controles */}
-            <div className="flex items-center justify-center gap-4 w-full">
-              <button className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg" aria-label="Repetir">
-                <FaRedo className="text-lg" />
-              </button>
-              <button className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg" aria-label="Anterior">
-                <FaStepBackward className="text-lg" />
-              </button>
-              <button className="w-12 h-12 rounded-full bg-harmony-accent flex items-center justify-center hover:bg-harmony-accent/80 transition shadow-xl mx-2" onClick={handlePlayPause} aria-label="Play/Pause">
-                {isPlaying ? <FaPause className="text-2xl" /> : <FaPlay className="text-2xl" />}
-              </button>
-              <button className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg" aria-label="Siguiente">
-                <FaStepForward className="text-lg" />
-              </button>
-              <button className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg" aria-label="Compartir">
-                <FaShareAlt className="text-lg" />
-              </button>
-            </div>
-          </div>
-          {/* Volumen a la derecha */}
-          <div className="flex items-center gap-2 min-w-[120px] justify-end">
-            <input
-              type="range"
-              className="volume-slider w-24 h-2 accent-harmony-accent bg-harmony-secondary/20 rounded-full"
-              min="0"
-              max="100"
-              value={volume}
-              onChange={handleVolumeChange}
-              aria-label="Volumen"
-            />
-            <span className="text-xs text-harmony-text-secondary w-8 text-center select-none">{volume}</span>
           </div>
         </div>
       </div>
-      <FooterPlayer 
-            currentSong={currentSong}
-            setCurrentSong={setCurrentSong}
-            isPlaying={isPlaying}
-            setIsPlaying={setIsPlaying}
-            progress={progress}
-            setProgress={setProgress}
-            volume={volume}
-            setVolume={setVolume}
-            duration={duration}
-            setDuration={setDuration}
-          />
+      <FooterPlayer />
     </div>
   );
 }
