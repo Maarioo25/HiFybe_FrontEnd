@@ -2,16 +2,23 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   FaPlay,
+  FaPause,
+  FaStepBackward,
+  FaStepForward,
+  FaRedo,
   FaShareAlt,
   FaArrowLeft,
+  FaPen,
 } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
+import FooterPlayer from '../components/FooterPlayer';
+import { usePlayer } from '../context/PlayerContext';
 import { FRIENDS } from '../data/friends';
 
 export default function PublicPlaylistDetail() {
   const { id, name } = useParams();
   const navigate = useNavigate();
-
+  const { currentSong, setCurrentSong, isPlaying, setIsPlaying } = usePlayer();
   const friend = FRIENDS.find(f => f.id === parseInt(id, 10));
   const decodedName = decodeURIComponent(name || '');
 
@@ -83,7 +90,13 @@ export default function PublicPlaylistDetail() {
                       </div>
                       <p className="text-harmony-text-secondary line-clamp-2">{playlist.descripcion}</p>
                       <div className="flex items-center gap-4">
-                        <button className="text-harmony-accent hover:text-harmony-accent/80">
+                        <button 
+                          className="text-harmony-accent hover:text-harmony-accent/80"
+                          onClick={() => {
+                            setCurrentSong(playlist.songs[0]);
+                            setIsPlaying(true);
+                          }}
+                        >
                           <FaPlay className="text-xl" />
                         </button>
                         <button className="text-harmony-accent hover:text-harmony-accent/80">
@@ -117,7 +130,13 @@ export default function PublicPlaylistDetail() {
                           <span>{song.duration}</span>
                         </div>
                       </div>
-                      <button className="text-harmony-accent hover:text-harmony-accent/80">
+                      <button 
+                        className="text-harmony-accent hover:text-harmony-accent/80"
+                        onClick={() => {
+                          setCurrentSong(song);
+                          setIsPlaying(true);
+                        }}
+                      >
                         <FaPlay className="text-lg" />
                       </button>
                     </div>
@@ -128,6 +147,7 @@ export default function PublicPlaylistDetail() {
           </div>
         </div>
       </div>
+      <FooterPlayer />
     </div>
   );
 }

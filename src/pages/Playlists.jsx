@@ -2,6 +2,8 @@ import React from 'react';
 import { FaPlus, FaEllipsisH, FaPlay } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import { Link } from 'react-router-dom';
+import FooterPlayer from '../components/FooterPlayer';
+import { usePlayer } from '../context/PlayerContext';
 
 
 const PLAYLISTS = [
@@ -99,6 +101,8 @@ const PLAYLISTS = [
 
 
 export default function Playlists() {
+  const { currentSong, setCurrentSong, isPlaying, setIsPlaying, progress, setProgress, volume, setVolume, duration, setDuration } = usePlayer();
+
   return (
     <div className="min-h-screen bg-harmony-primary">
       <HeaderBar />
@@ -123,7 +127,14 @@ export default function Playlists() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-2">
                     <div className="flex flex-col items-center gap-2">
-                      <button className="text-harmony-accent hover:text-harmony-accent/80">
+                      <button 
+                        className="text-harmony-accent hover:text-harmony-accent/80"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentSong(SONGS[0]); // Aquí deberías obtener la primera canción de la playlist
+                          setIsPlaying(true);
+                        }}
+                      >
                         <FaPlay className="text-xl" />
                       </button>
                       <span className="text-sm text-harmony-accent/80">Reproducir</span>
@@ -144,6 +155,7 @@ export default function Playlists() {
           </div>
         </div>
       </div>
+      <FooterPlayer />
     </div>
   );
 }

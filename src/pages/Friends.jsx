@@ -3,6 +3,9 @@ import { FaUser, FaMusic, FaPlay, FaPlus } from 'react-icons/fa';
 import { FRIENDS } from '../data/friends';
 import HeaderBar from '../components/HeaderBar';
 import { Link } from 'react-router-dom';
+import FooterPlayer from '../components/FooterPlayer';
+import { usePlayer } from '../context/PlayerContext';
+
 
 
 const friendsList = FRIENDS.map(friend => ({
@@ -105,6 +108,7 @@ export default function Friends() {
           </div>
         </div>
       </div>
+          <FooterPlayer />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useNavigate } from "react-router-dom";
 import HeaderBar from "../components/HeaderBar";
+import FooterPlayer from '../components/FooterPlayer';
 
 // Usar los datos de FRIENDS directamente
 const USERS = FRIENDS.map(friend => ({
@@ -83,6 +84,8 @@ const RECOMMENDATIONS = [
 ];
 
 export default function MainPage() {
+
+  const [setDuration] = useState(0);
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -577,8 +580,18 @@ export default function MainPage() {
           </div>
         </div>
       </div>
-      {/* Reproductor de audio */}
-      <audio ref={audioRef} src={currentSong?.audioUrl || 'https://example.com/default.mp3'} autoPlay={isPlaying} style={{display:'none'}} onEnded={()=>setIsPlaying(false)} />
+      <FooterPlayer 
+            currentSong={currentSong}
+            setCurrentSong={setCurrentSong}
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
+            progress={progress}
+            setProgress={setProgress}
+            volume={volume}
+            setVolume={setVolume}
+            duration={duration}
+            setDuration={setDuration}
+          />
     </div>
   );
 }
