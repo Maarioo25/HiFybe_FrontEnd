@@ -9,7 +9,16 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
-      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      document.cookie = [
+        `token=`,
+        `Domain=.mariobueno.info`,
+        `Path=/`,
+        `Expires=Thu, 01 Jan 1970 00:00:00 GMT`,
+        `Secure`,
+        `SameSite=None`
+      ].join('; ');
+      localStorage.removeItem('sp_token');
+      localStorage.removeItem('sp_refresh');
       return Promise.reject({
         response: {
           data: {
