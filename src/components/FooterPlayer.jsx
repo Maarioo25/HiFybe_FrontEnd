@@ -21,7 +21,8 @@ const FooterPlayer = () => {
     duration,
     playTrack,
     player,
-    // Optional: volume control if exposed
+    volume,
+    setVolume
   } = usePlayer();
 
   // Formatea ms a mm:ss
@@ -32,42 +33,50 @@ const FooterPlayer = () => {
     return `${minutes}:${seconds}`;
   };
 
-  // Toggle play/pause
+  // Si no hay pista seleccionada
+  if (!currentTrack) {
+    return (
+      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
+        <span className="text-harmony-text-primary">Selecciona una canción para reproducir</span>
+      </div>
+    );
+  }
+
+  // Play/Pause
   const togglePlay = () => {
     if (player) {
-      player.togglePlay();
+      if (isPlaying) player.pause(); else player.resume();
     }
-    setIsPlaying(prev => !prev);
+    setIsPlaying(!isPlaying);
   };
 
   // Next track
   const handleNextSong = () => {
-    if (player?.nextTrack) {
-      player.nextTrack();
-    }
+    if (player?.nextTrack) player.nextTrack();
   };
 
   // Previous track
   const handlePreviousSong = () => {
-    if (player?.previousTrack) {
-      player.previousTrack();
-    }
-  };
-
-  // Seek handler
-  const seek = (e) => {
-    const value = Number(e.target.value);
-    const ms = (value / 100) * duration;
-    if (player) {
-      player.seek(ms);
-    }
+    if (player?.previousTrack) player.previousTrack();
   };
 
   // Replay
   const handleReplay = () => {
-    if (player) {
-      player.seek(0);
-    }
+    if (player) player.seek(0);
+  };
+
+  // Seek
+  const seek = (e) => {
+    const pct = Number(e.target.value);
+    const ms = (pct / 100) * duration;
+    if (player) player.seek(ms);
+  };
+
+  // Volume change
+  const changeVol = (e) => {
+    const vol = Number(e.target.value) / 100;
+    setVolume(vol * 100);
+    if (player) player.setVolume(vol);
   };
 
   return (
@@ -84,16 +93,11 @@ const FooterPlayer = () => {
         >
           <div
             style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              width: '100%',
-              height: '100%',
-              backgroundImage: `url(${currentTrack?.album.images[0]?.url})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'left',
-              filter: 'blur(12px) brightness(0.7)',
-              maskImage: 'linear-gradient(to right, rgba(0,0,0,1) 0%,rgba(0,0,0,0.7) 50%,rgba(0,0,0,0) 100%)',
+              position: 'absolute', left:0, top:0, width:'100%', height:'100%',
+              backgroundImage: `url(${currentTrack.album.images[0].url})`,
+              backgroundSize:'cover', backgroundPosition:'left',
+              filter:'blur(12px) brightness(0.7)',
+              maskImage:'linear-gradient(to right, rgba(0,0,0,1) 0%,rgba(0,0,0,0.7) 50%,rgba(0,0,0,0) 100%)',
             }}
           />
         </div>
@@ -101,22 +105,16 @@ const FooterPlayer = () => {
         {/* Portada y texto */}
         <div className="flex items-center z-10 gap-4 min-w-[200px] max-w-[320px] w-[320px] overflow-hidden">
           <img
-            src={currentTrack?.album.images[0]?.url}
+            src={currentTrack.album.images[0].url}
             alt="Album cover"
             className="w-14 h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg"
           />
           <div className="truncate text-harmony-text-primary">
-            <div
-              className="font-semibold truncate max-w-[210px]"
-              title={currentTrack?.name}
-            >
-              {currentTrack?.name}
+            <div className="font-semibold truncate max-w-[210px]" title={currentTrack.name}>
+              {currentTrack.name}
             </div>
-            <div
-              className="text-xs text-harmony-text-secondary truncate max-w-[210px]"
-              title={currentTrack?.artists.map(a => a.name).join(', ')}
-            >
-              {currentTrack?.artists.map(a => a.name).join(', ')}
+            <div className="text-xs text-harmony-text-secondary truncate max-w-[210px]" title={currentTrack.artists.map(a=>a.name).join(', ')}>
+              {currentTrack.artists.map(a=>a.name).join(', ')}
             </div>
           </div>
         </div>
@@ -132,7 +130,7 @@ const FooterPlayer = () => {
               className="flex-1 h-1 accent-harmony-accent bg-harmony-secondary/20 rounded-full"
               min={0}
               max={100}
-              value={duration ? (position / duration) * 100 : 0}
+              value={duration ? (position/duration)*100 : 0}
               onChange={seek}
             />
             <span className="text-xs text-harmony-text-secondary w-10 text-left select-none">
@@ -163,19 +161,16 @@ const FooterPlayer = () => {
 
         {/* Control de volumen */}
         <div className="flex items-center gap-2 min-w-[120px] justify-end">
-          {currentTrack && <FaVolumeUp className="text-xs text-harmony-text-secondary" />}
-          {/* Spotify SDK controla volumen por separado; este input es decorativo */}
+          {volume > 0 ? <FaVolumeUp className="text-xs text-harmony-text-secondary" /> : <FaVolumeMute className="text-xs text-harmony-text-secondary" />}
           <input
             type="range"
             className="w-24 h-2 accent-harmony-accent bg-harmony-secondary/20 rounded-full"
             min={0}
             max={100}
-            value={100}
-            readOnly
+            value={volume}
+            onChange={changeVol}
           />
-          <span className="text-xs text-harmony-text-secondary w-8 text-center select-none">
-            --
-          </span>
+          <span className="text-xs text-harmony-text-secondary w-8 text-center select-none">{volume}</span>
         </div>
       </div>
     </div>
