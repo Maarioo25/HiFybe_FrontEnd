@@ -18,8 +18,21 @@ export const PlayerProvider = ({ children }) => {
 
   // Cargar token de Spotify desde localStorage (obtenido en proceso de OAuth)
   useEffect(() => {
-    const t = localStorage.getItem('sp_token');
-    if (t) setToken(t);
+    // 1) Mira en query string
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('spotify_token');
+    const r = params.get('spotify_refresh');
+    if (t) {
+      localStorage.setItem('sp_token', t);
+      if (r) localStorage.setItem('sp_refresh', r);
+      setToken(t);
+      // limpia la URL
+      window.history.replaceState({}, '', window.location.pathname);
+      return;
+    }
+    // 2) Si no, carga el que hubiera
+    const saved = localStorage.getItem('sp_token');
+    if (saved) setToken(saved);
   }, []);
 
   // Cargar SDK de Spotify y crear player
