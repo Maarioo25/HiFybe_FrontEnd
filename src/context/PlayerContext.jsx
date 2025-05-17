@@ -1,116 +1,110 @@
 // context/PlayerContext.js
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { SONGS } from '../data/songs';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Un único objeto Audio global que persiste entre vistas
-const globalAudio = new Audio();
 const PlayerContext = createContext();
 
 export const PlayerProvider = ({ children }) => {
-  const audioRef = useRef(globalAudio);
-  const [currentSong, setCurrentSong] = useState(SONGS[0]);
+  const [token, setToken] = useState(null);
+  const [player, setPlayer] = useState(null);
+  const [deviceId, setDeviceId] = useState(null);
+  const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [volume, setVolume] = useState(50);
+  const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
+  
+  console.log('Spotify Web Playback listo en device:', deviceId);
 
-  // Carga inicial de estado
+
+
+  // Cargar token de Spotify desde localStorage (obtenido en proceso de OAuth)
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('playerState'));
-    if (saved) {
-      setCurrentSong(saved.currentSong);
-      setProgress(saved.progress);
-      setVolume(saved.volume);
-      setIsPlaying(saved.isPlaying);
-    }
+    const t = localStorage.getItem('sp_token');
+    if (t) setToken(t);
   }, []);
 
-  // Persistir estado en localStorage
+  // Cargar SDK de Spotify y crear player
   useEffect(() => {
-    localStorage.setItem(
-      'playerState',
-      JSON.stringify({ currentSong, progress, volume, isPlaying })
-    );
-  }, [currentSong, progress, volume, isPlaying]);
+    if (!token) return;
+    const script = document.createElement('script');
+    script.src = 'https://sdk.scdn.co/spotify-player.js';
+    script.async = true;
+    document.body.appendChild(script);
 
-  // Registrar listeners solo una vez
-  useEffect(() => {
-    const audio = audioRef.current;
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
-    const onTimeUpdate = () => setProgress(audio.currentTime);
-    const onDurationChange = () => setDuration(audio.duration);
-    const onEnded = () => setIsPlaying(false);
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      const spotifyPlayer = new window.Spotify.Player({
+        name: 'Harmony Spotify Player',
+        getOAuthToken: cb => cb(token),
+        volume: 0.5
+      });
 
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
-    audio.addEventListener('timeupdate', onTimeUpdate);
-    audio.addEventListener('durationchange', onDurationChange);
-    audio.addEventListener('ended', onEnded);
+      // Conectar el player
+      spotifyPlayer.connect();
+      setPlayer(spotifyPlayer);
+
+      // Listeners de estado
+      spotifyPlayer.addListener('ready', ({ device_id }) => {
+        console.log('Spotify Web Playback listo en device:', device_id);
+        setDeviceId(device_id);
+        // Transferir playback al dispositivo Web Playback SDK:
+        fetch('https://api.spotify.com/v1/me/player', {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ device_ids: [device_id], play: false })
+        })
+        .then(() => console.log('Playback transferido al Web Playback SDK'))
+        .catch(err => console.error('Error transfiriendo playback:', err));
+      });
+
+      
+  spotifyPlayer.addListener('authentication_error', ({ message }) => console.error('Auth error:', message));
+  spotifyPlayer.addListener('account_error', ({ message }) => console.error('Account error:', message));
+      
+      spotifyPlayer.addListener('player_state_changed', state => {
+        if (!state) return;
+        setCurrentTrack(state.track_window.current_track);
+        setIsPlaying(!state.paused);
+        setPosition(state.position);
+        setDuration(state.duration);
+      });
+    };
 
     return () => {
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
-      audio.removeEventListener('timeupdate', onTimeUpdate);
-      audio.removeEventListener('durationchange', onDurationChange);
-      audio.removeEventListener('ended', onEnded);
+      if (player) player.disconnect();
     };
-  }, []);
+  }, [token]);
 
-  // Actualizar src y mantener posición al cambiar de canción
-  useEffect(() => {
-    const audio = audioRef.current;
-    audio.src = currentSong.audioUrl;
-    audio.currentTime = progress;
-  }, [currentSong]);
-
-  // Reproducir o pausar según isPlaying
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (isPlaying) {
-      audio.play().catch(err => {
-        console.error('Error al reproducir:', err);
-      });
-    } else {
-      audio.pause();
-    }
-  }, [isPlaying, currentSong]);
-
-  // Seek manual
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (Math.abs(audio.currentTime - progress) > 0.5) {
-      audio.currentTime = progress;
-    }
-  }, [progress]);
-
-  // Volumen
-  useEffect(() => {
-    audioRef.current.volume = volume / 100;
-  }, [volume]);
+  // Función para reproducir una URI de Spotify
+  const playTrack = async (spotifyUri) => {
+    if (!deviceId || !token) return;
+    await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ uris: [spotifyUri] })
+    });
+  };
 
   return (
     <PlayerContext.Provider value={{
-      currentSong,
-      setCurrentSong,
+      currentTrack,
       isPlaying,
-      setIsPlaying,
-      progress,
-      setProgress,
-      volume,
-      setVolume,
+      position,
       duration,
-      setDuration,
-      audioRef,
+      setIsPlaying,
+      playTrack
     }}>
       {children}
-      <audio ref={audioRef} hidden />
     </PlayerContext.Provider>
   );
 };
 
 export const usePlayer = () => {
   const ctx = useContext(PlayerContext);
-  if (!ctx) throw new Error('usePlayer must usarse dentro de PlayerProvider');
+  if (!ctx) throw new Error('usePlayer must be used within PlayerProvider');
   return ctx;
 };

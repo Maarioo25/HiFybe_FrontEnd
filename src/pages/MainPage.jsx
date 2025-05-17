@@ -13,6 +13,7 @@ import { SONGS } from '../data/songs';
 
 
 
+
 const USERS = FRIENDS.map(friend => ({
   name: friend.name,
   song: friend.song.title + " - " + friend.song.artist,
@@ -26,8 +27,7 @@ const USERS = FRIENDS.map(friend => ({
 
 export default function MainPage() {
 
-
-  const { setCurrentSong, setIsPlaying, setProgress } = usePlayer();
+  const { playTrack, isPlaying, position, duration } = usePlayer();
   const { loading } = useAuth();
   const navigate = useNavigate();
   const mapRef = useRef(null);
@@ -259,14 +259,19 @@ export default function MainPage() {
                 )}
                 {activeTab === 'recomendaciones' && (
   <div className="flex flex-col gap-3">
-    {SONGS.map((song) => (
+    {SONGS.map(song => (
       <div
-        key={song.title}
+        key={song.spotifyUri}
         className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
-        onClick={() => {
-          setProgress(0);
-          setCurrentSong(song);
-          setIsPlaying(true);
+        onClick={async () => {
+          console.log('click!', song.spotifyUri);
+          try {
+            await playTrack(song.spotifyUri);
+            console.log('playTrack invoked');
+          } catch (err) {
+            console.error('Error en playTrack:', err);
+            alert('No se pudo reproducir: ' + err.message);
+          }
         }}
       >
         <img
