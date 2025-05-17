@@ -16,16 +16,19 @@ const FooterPlayer = () => {
   const {
     currentTrack,
     isPlaying,
-    setIsPlaying,
+    pause,
+    resume,
+    nextTrack,
+    previousTrack,
     position,
     duration,
-    playTrack,
-    player,
+    seek,
     volume,
-    setVolume
+    changeVolume,
+    setIsPlaying,
   } = usePlayer();
 
-  // Formatea ms a mm:ss
+  // Formatea tiempo en mm:ss
   const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -33,7 +36,6 @@ const FooterPlayer = () => {
     return `${minutes}:${seconds}`;
   };
 
-  // Si no hay pista seleccionada
   if (!currentTrack) {
     return (
       <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
@@ -42,51 +44,33 @@ const FooterPlayer = () => {
     );
   }
 
-  // Play/Pause
-  const togglePlay = () => {
-    if (player) {
-      if (isPlaying) player.pause(); else player.resume();
+  // Handlers
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      pause();
+      setIsPlaying(false);
+    } else {
+      resume();
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
   };
 
-  // Next track
-  const handleNextSong = () => {
-    if (player?.nextTrack) player.nextTrack();
-  };
-
-  // Previous track
-  const handlePreviousSong = () => {
-    if (player?.previousTrack) player.previousTrack();
-  };
-
-  // Replay
-  const handleReplay = () => {
-    if (player) player.seek(0);
-  };
-
-  // Seek
-  const seek = (e) => {
+  const handleSeek = (e) => {
     const pct = Number(e.target.value);
     const ms = (pct / 100) * duration;
-    if (player) player.seek(ms);
+    seek(ms);
   };
 
-  // Volume change
-  const changeVol = (e) => {
-    const vol = Number(e.target.value) / 100;
-    setVolume(vol * 100);
-    if (player) player.setVolume(vol);
+  const handleVolumeChange = (e) => {
+    const vol = Number(e.target.value);
+    changeVolume(vol);
   };
 
   return (
     <div className="now-playing-bar fixed left-0 bottom-0 w-full shadow-2xl">
-      {/* Fondo semitransparente y desenfoque */}
       <div className="absolute inset-0 bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 z-0" />
-
-      {/* Contenido del footer */}
       <div className="relative mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-4 px-4 py-3">
-        {/* Imagen de fondo degradada parcial */}
+        {/* Fondo degradado borroso */}
         <div
           className="absolute left-0 top-0 h-full pointer-events-none overflow-hidden z-0"
           style={{ width: '40%', height: '100%' }}
@@ -102,7 +86,7 @@ const FooterPlayer = () => {
           />
         </div>
 
-        {/* Portada y texto */}
+        {/* Portada y meta */}
         <div className="flex items-center z-10 gap-4 min-w-[200px] max-w-[320px] w-[320px] overflow-hidden">
           <img
             src={currentTrack.album.images[0].url}
@@ -119,8 +103,8 @@ const FooterPlayer = () => {
           </div>
         </div>
 
-        {/* Barra de progreso y controles */}
-        <div className="flex-1 flex flex-col items-center justify-center min-w-0">
+        {/* Barra y controles */}
+        <div className="flex-1 flex flex-col items-center justify-center min-w-0 z-10">
           <div className="w-full flex items-center gap-3 mb-2">
             <span className="text-xs text-harmony-text-secondary w-10 text-right select-none">
               {formatTime(position)}
@@ -131,44 +115,41 @@ const FooterPlayer = () => {
               min={0}
               max={100}
               value={duration ? (position/duration)*100 : 0}
-              onChange={seek}
+              onChange={handleSeek}
             />
             <span className="text-xs text-harmony-text-secondary w-10 text-left select-none">
               {formatTime(duration)}
             </span>
           </div>
           <div className="flex items-center justify-center gap-4">
-            <button onClick={handleReplay} aria-label="replay">
+            <button onClick={()=>seek(0)} aria-label="replay" className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg">
               <FaRedo className="text-lg" />
             </button>
-            <button onClick={handlePreviousSong} aria-label="prev">
+            <button onClick={previousTrack} aria-label="prev" className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg">
               <FaStepBackward className="text-lg" />
             </button>
-            <button
-              onClick={togglePlay}
-              className="w-12 h-12 rounded-full bg-harmony-accent flex items-center justify-center hover:bg-harmony-accent/80 transition"
-            >
-              {isPlaying ? <FaPause className="text-2xl" /> : <FaPlay className="text-2xl" />}
+            <button onClick={handlePlayPause} className="w-12 h-12 rounded-full bg-harmony-accent flex items-center justify-center hover:bg-harmony-accent/80 transition shadow-xl mx-2" aria-label="play/pause">
+              {isPlaying ? <FaPause className="text-2xl"/> : <FaPlay className="text-2xl"/>}
             </button>
-            <button onClick={handleNextSong} aria-label="next">
+            <button onClick={nextTrack} aria-label="next" className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg">
               <FaStepForward className="text-lg" />
             </button>
-            <button aria-label="share">
+            <button aria-label="share" className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg">
               <FaShareAlt className="text-lg" />
             </button>
           </div>
         </div>
 
-        {/* Control de volumen */}
-        <div className="flex items-center gap-2 min-w-[120px] justify-end">
-          {volume > 0 ? <FaVolumeUp className="text-xs text-harmony-text-secondary" /> : <FaVolumeMute className="text-xs text-harmony-text-secondary" />}
+        {/* Volumen */}
+        <div className="flex items-center gap-2 min-w-[120px] justify-end z-10">
+          {volume>0 ? <FaVolumeUp className="text-xs text-harmony-text-secondary"/> : <FaVolumeMute className="text-xs text-harmony-text-secondary"/>}
           <input
             type="range"
             className="w-24 h-2 accent-harmony-accent bg-harmony-secondary/20 rounded-full"
             min={0}
             max={100}
             value={volume}
-            onChange={changeVol}
+            onChange={handleVolumeChange}
           />
           <span className="text-xs text-harmony-text-secondary w-8 text-center select-none">{volume}</span>
         </div>
