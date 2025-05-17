@@ -55,8 +55,8 @@ function App() {
                 <Route path="/playlists/:id" element={<PlaylistDetail />} />
                 <Route path="/friends/:id/playlists/:name" element={<PublicPlaylistDetail />} />
               </Route>
-              <Route path="*" element={<Navigate to="/auth" replace />} />
             </Routes>
+            <Route path="*" element={<Navigate to="/auth" replace />} />
           </div>
         </PlayerProvider>
       </AuthProvider>
