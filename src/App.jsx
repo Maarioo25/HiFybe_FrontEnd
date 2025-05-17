@@ -16,7 +16,8 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        
+        <PlayerProvider>
+          
         <div className="min-h-screen bg-gradient-to-br from-harmony-primary via-harmony-secondary to-harmony-accent">
           <Toaster
             position="top-right"
@@ -65,7 +66,7 @@ function App() {
             <Route path="*" element={<Navigate to="/auth" replace />} />
           </Routes>
         </div>
-               
+        </PlayerProvider>        
       </AuthProvider>
     </Router>
   );
