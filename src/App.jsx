@@ -52,11 +52,7 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              
-
-            </Route>
-
-            <Route path="/" element={<MainPage />} />
+              <Route path="/" element={<MainPage />} />
               <Route path="/friends" element={<Friends />} />
               <Route path="/friends/:id" element={<FriendDetail />} />
               <Route path="/friends/:id/playlists/:name" element={<PlaylistDetail />} />
@@ -64,6 +60,10 @@ function App() {
               <Route path="/playlists" element={<Playlists />} />
               <Route path="/playlists/:id" element={<PlaylistDetail />} />
               <Route path="/friends/:id/playlists/:name" element={<PublicPlaylistDetail />} />
+
+            </Route>
+
+            
 
 
             <Route path="*" element={<Navigate to="/auth" replace />} />
