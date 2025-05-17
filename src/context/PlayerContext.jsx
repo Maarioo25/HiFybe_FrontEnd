@@ -13,7 +13,7 @@ export const PlayerProvider = ({ children }) => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(100);
 
-  // Obtener token de URL o localStorage
+  // 1) Obtener token de URL o localStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const t = params.get('spotify_token');
@@ -27,11 +27,12 @@ export const PlayerProvider = ({ children }) => {
     if (saved) setToken(saved);
   }, []);
 
-  // Cargar SDK y crear player
+  // 2) Cargar SDK y crear player
   useEffect(() => {
     if (!token) return;
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
+    script.async = true;
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
@@ -40,12 +41,14 @@ export const PlayerProvider = ({ children }) => {
         getOAuthToken: cb => cb(token),
         volume: volume / 100
       });
+
       spotifyPlayer.connect();
       setPlayer(spotifyPlayer);
 
+      // Ready
       spotifyPlayer.addListener('ready', ({ device_id }) => {
         setDeviceId(device_id);
-        // transferir playback
+        // Transferir playback al SDK
         fetch('https://api.spotify.com/v1/me/player', {
           method: 'PUT',
           headers: {
@@ -56,6 +59,7 @@ export const PlayerProvider = ({ children }) => {
         });
       });
 
+      // State Changed
       spotifyPlayer.addListener('player_state_changed', state => {
         if (!state) return;
         setCurrentTrack(state.track_window.current_track);
@@ -64,20 +68,37 @@ export const PlayerProvider = ({ children }) => {
         setDuration(state.duration);
       });
 
-      // error listeners (opcional)
-      spotifyPlayer.addListener('initialization_error', ({ message }) => console.error(message));
-      spotifyPlayer.addListener('authentication_error', ({ message }) => console.error(message));
-      spotifyPlayer.addListener('account_error', ({ message }) => console.error(message));
-      spotifyPlayer.addListener('playback_error', ({ message }) => console.error(message));
+      // Error listeners
+      ['initialization_error', 'authentication_error', 'account_error', 'playback_error'].forEach(evt =>
+        spotifyPlayer.addListener(evt, ({ message }) => console.error(
+          `Spotify Player ${evt}:`, message
+        ))
+      );
     };
 
     return () => {
-      if (player) player.disconnect();
+      if (player) {
+        player.disconnect();
+      }
     };
   }, [token]);
 
+  // 3) Polling para actualizar posición cada segundo
+  useEffect(() => {
+    if (!player || !isPlaying) return;
+    const interval = setInterval(async () => {
+      const state = await player.getCurrentState();
+      if (state) {
+        setPosition(state.position);
+        setDuration(state.duration);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [player, isPlaying]);
+
+  // Funciones de control
   const playTrack = async (spotifyUri) => {
-    if (!deviceId || !token) return;
+    if (!deviceId) return;
     await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
       method: 'PUT',
       headers: {
@@ -88,9 +109,14 @@ export const PlayerProvider = ({ children }) => {
     });
   };
 
-  const changeVolume = (volPercent) => {
-    setVolume(volPercent);
-    if (player) player.setVolume(volPercent / 100);
+  const pause = () => player && player.pause();
+  const resume = () => player && player.resume();
+  const nextTrack = () => player && player.nextTrack();
+  const previousTrack = () => player && player.previousTrack();
+  const seekTo = (ms) => player && player.seek(ms);
+  const changeVolume = (vol) => {
+    setVolume(vol);
+    if (player) player.setVolume(vol / 100);
   };
 
   return (
@@ -100,10 +126,14 @@ export const PlayerProvider = ({ children }) => {
       position,
       duration,
       volume,
-      player,
-      setIsPlaying,
       playTrack,
-      changeVolume
+      pause,
+      resume,
+      nextTrack,
+      previousTrack,
+      seek: seekTo,
+      changeVolume,
+      setIsPlaying
     }}>
       {children}
     </PlayerContext.Provider>
