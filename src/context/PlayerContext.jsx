@@ -1,5 +1,5 @@
 // context/PlayerContext.js
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const PlayerContext = createContext();
 
@@ -11,54 +11,41 @@ export const PlayerProvider = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
-  
-  console.log('Spotify Web Playback listo en device:', deviceId);
+  const [volume, setVolume] = useState(100);
 
-
-
-  // Cargar token de Spotify desde localStorage (obtenido en proceso de OAuth)
+  // Obtener token de URL o localStorage
   useEffect(() => {
-    // 1) Mira en query string
     const params = new URLSearchParams(window.location.search);
     const t = params.get('spotify_token');
-    const r = params.get('spotify_refresh');
     if (t) {
       localStorage.setItem('sp_token', t);
-      if (r) localStorage.setItem('sp_refresh', r);
       setToken(t);
-      // limpia la URL
       window.history.replaceState({}, '', window.location.pathname);
       return;
     }
-    // 2) Si no, carga el que hubiera
     const saved = localStorage.getItem('sp_token');
     if (saved) setToken(saved);
   }, []);
 
-  // Cargar SDK de Spotify y crear player
+  // Cargar SDK y crear player
   useEffect(() => {
     if (!token) return;
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
-    script.async = true;
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
       const spotifyPlayer = new window.Spotify.Player({
         name: 'Harmony Spotify Player',
         getOAuthToken: cb => cb(token),
-        volume: 0.5
+        volume: volume / 100
       });
-
-      // Conectar el player
       spotifyPlayer.connect();
       setPlayer(spotifyPlayer);
 
-      // Listeners de estado
       spotifyPlayer.addListener('ready', ({ device_id }) => {
-        console.log('Spotify Web Playback listo en device:', device_id);
         setDeviceId(device_id);
-        // Transferir playback al dispositivo Web Playback SDK:
+        // transferir playback
         fetch('https://api.spotify.com/v1/me/player', {
           method: 'PUT',
           headers: {
@@ -66,15 +53,9 @@ export const PlayerProvider = ({ children }) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ device_ids: [device_id], play: false })
-        })
-        .then(() => console.log('Playback transferido al Web Playback SDK'))
-        .catch(err => console.error('Error transfiriendo playback:', err));
+        });
       });
 
-      
-  spotifyPlayer.addListener('authentication_error', ({ message }) => console.error('Auth error:', message));
-  spotifyPlayer.addListener('account_error', ({ message }) => console.error('Account error:', message));
-      
       spotifyPlayer.addListener('player_state_changed', state => {
         if (!state) return;
         setCurrentTrack(state.track_window.current_track);
@@ -82,6 +63,12 @@ export const PlayerProvider = ({ children }) => {
         setPosition(state.position);
         setDuration(state.duration);
       });
+
+      // error listeners (opcional)
+      spotifyPlayer.addListener('initialization_error', ({ message }) => console.error(message));
+      spotifyPlayer.addListener('authentication_error', ({ message }) => console.error(message));
+      spotifyPlayer.addListener('account_error', ({ message }) => console.error(message));
+      spotifyPlayer.addListener('playback_error', ({ message }) => console.error(message));
     };
 
     return () => {
@@ -89,7 +76,6 @@ export const PlayerProvider = ({ children }) => {
     };
   }, [token]);
 
-  // Función para reproducir una URI de Spotify
   const playTrack = async (spotifyUri) => {
     if (!deviceId || !token) return;
     await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
@@ -102,14 +88,22 @@ export const PlayerProvider = ({ children }) => {
     });
   };
 
+  const changeVolume = (volPercent) => {
+    setVolume(volPercent);
+    if (player) player.setVolume(volPercent / 100);
+  };
+
   return (
     <PlayerContext.Provider value={{
       currentTrack,
       isPlaying,
       position,
       duration,
+      volume,
+      player,
       setIsPlaying,
-      playTrack
+      playTrack,
+      changeVolume
     }}>
       {children}
     </PlayerContext.Provider>
