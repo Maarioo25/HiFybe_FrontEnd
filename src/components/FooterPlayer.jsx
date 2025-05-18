@@ -26,6 +26,7 @@ const FooterPlayer = () => {
     volume,
     changeVolume,
     setIsPlaying,
+    isPremium,
   } = usePlayer();
 
   // Formatea tiempo en mm:ss
@@ -100,6 +101,11 @@ const FooterPlayer = () => {
             <div className="text-xs text-harmony-text-secondary truncate max-w-[210px]" title={currentTrack.artists.map(a=>a.name).join(', ')}>
               {currentTrack.artists.map(a=>a.name).join(', ')}
             </div>
+            {!isPremium && (
+              <div className="text-xs text-yellow-500 mt-1">
+                Estás usando una cuenta gratuita. Solo puedes ver lo que se está reproduciendo.
+              </div>
+            )}
           </div>
         </div>
 
@@ -114,9 +120,11 @@ const FooterPlayer = () => {
               className="flex-1 h-1 accent-harmony-accent bg-harmony-secondary/20 rounded-full"
               min={0}
               max={100}
-              value={duration ? (position/duration)*100 : 0}
+              value={duration ? (position / duration) * 100 : 0}
               onChange={handleSeek}
+              disabled={!isPremium}
             />
+
             <span className="text-xs text-harmony-text-secondary w-10 text-left select-none">
               {formatTime(duration)}
             </span>
@@ -125,13 +133,19 @@ const FooterPlayer = () => {
             <button onClick={()=>seek(0)} aria-label="replay" className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg">
               <FaRedo className="text-lg" />
             </button>
-            <button onClick={previousTrack} aria-label="prev" className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg">
+            <button onClick={previousTrack} disabled={!isPremium} className={`w-9 h-9 rounded-full ${isPremium ? 'bg-harmony-secondary/50 hover:bg-harmony-secondary/60' : 'bg-gray-300 cursor-not-allowed'} flex items-center justify-center transition shadow-lg`}>
               <FaStepBackward className="text-lg" />
             </button>
-            <button onClick={handlePlayPause} className="w-12 h-12 rounded-full bg-harmony-accent flex items-center justify-center hover:bg-harmony-accent/80 transition shadow-xl mx-2" aria-label="play/pause">
+            <button
+              onClick={handlePlayPause}
+              disabled={!isPremium}
+              className={`w-12 h-12 rounded-full ${isPremium ? 'bg-harmony-accent hover:bg-harmony-accent/80' : 'bg-gray-400 cursor-not-allowed'} flex items-center justify-center transition shadow-xl mx-2`}
+              aria-label="play/pause"
+            >
               {isPlaying ? <FaPause className="text-2xl"/> : <FaPlay className="text-2xl"/>}
             </button>
-            <button onClick={nextTrack} aria-label="next" className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg">
+
+            <button onClick={nextTrack} disabled={!isPremium} className={`w-9 h-9 rounded-full ${isPremium ? 'bg-harmony-secondary/50 hover:bg-harmony-secondary/60' : 'bg-gray-300 cursor-not-allowed'} flex items-center justify-center transition shadow-lg`}>
               <FaStepForward className="text-lg" />
             </button>
             <button aria-label="share" className="w-9 h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg">
@@ -145,12 +159,14 @@ const FooterPlayer = () => {
           {volume>0 ? <FaVolumeUp className="text-xs text-harmony-text-secondary"/> : <FaVolumeMute className="text-xs text-harmony-text-secondary"/>}
           <input
             type="range"
-            className="w-24 h-2 accent-harmony-accent bg-harmony-secondary/20 rounded-full"
+            disabled={!isPremium}
+            className={`w-24 h-2 rounded-full ${isPremium ? 'accent-harmony-accent' : 'bg-gray-300 cursor-not-allowed'}`}
             min={0}
             max={100}
             value={volume}
             onChange={handleVolumeChange}
           />
+
           <span className="text-xs text-harmony-text-secondary w-8 text-center select-none">{volume}</span>
         </div>
       </div>

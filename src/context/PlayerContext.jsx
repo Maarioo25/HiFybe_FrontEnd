@@ -1,4 +1,3 @@
-// context/PlayerContext.js
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const PlayerContext = createContext();
@@ -12,6 +11,7 @@ export const PlayerProvider = ({ children }) => {
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(100);
+  const [isPremium, setIsPremium] = useState(null); // <- nuevo
 
   // 1) Obtener token de URL o localStorage
   useEffect(() => {
@@ -27,9 +27,30 @@ export const PlayerProvider = ({ children }) => {
     if (saved) setToken(saved);
   }, []);
 
-  // 2) Cargar SDK y crear player
+  // 2) Verificar si el usuario es Premium
   useEffect(() => {
     if (!token) return;
+
+    const checkPremiumStatus = async () => {
+      try {
+        const res = await fetch('https://api.spotify.com/v1/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setIsPremium(data.product === 'premium');
+      } catch (err) {
+        console.error('[Spotify] Error al verificar Premium:', err);
+        setIsPremium(false);
+      }
+    };
+
+    checkPremiumStatus();
+  }, [token]);
+
+  // 3) Cargar SDK solo si es Premium
+  useEffect(() => {
+    if (!token || isPremium !== true) return;
+
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
@@ -45,10 +66,8 @@ export const PlayerProvider = ({ children }) => {
       spotifyPlayer.connect();
       setPlayer(spotifyPlayer);
 
-      // Ready
       spotifyPlayer.addListener('ready', ({ device_id }) => {
         setDeviceId(device_id);
-        // Transferir playback al SDK
         fetch('https://api.spotify.com/v1/me/player', {
           method: 'PUT',
           headers: {
@@ -59,7 +78,6 @@ export const PlayerProvider = ({ children }) => {
         });
       });
 
-      // State Changed
       spotifyPlayer.addListener('player_state_changed', state => {
         if (!state) return;
         setCurrentTrack(state.track_window.current_track);
@@ -68,11 +86,8 @@ export const PlayerProvider = ({ children }) => {
         setDuration(state.duration);
       });
 
-      // Error listeners
       ['initialization_error', 'authentication_error', 'account_error', 'playback_error'].forEach(evt =>
-        spotifyPlayer.addListener(evt, ({ message }) => console.error(
-          `Spotify Player ${evt}:`, message
-        ))
+        spotifyPlayer.addListener(evt, ({ message }) => console.error(`Spotify Player ${evt}:`, message))
       );
     };
 
@@ -81,9 +96,9 @@ export const PlayerProvider = ({ children }) => {
         player.disconnect();
       }
     };
-  }, [token]);
+  }, [token, isPremium]);
 
-  // 3) Polling para actualizar posición cada segundo
+  // 4) Polling para posición (Premium)
   useEffect(() => {
     if (!player || !isPlaying) return;
     const interval = setInterval(async () => {
@@ -96,7 +111,38 @@ export const PlayerProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, [player, isPlaying]);
 
-  // Funciones de control
+  // 5) Polling alternativo para usuarios Free
+  useEffect(() => {
+    if (!token || isPremium === null || isPremium) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (res.status === 204) {
+          setCurrentTrack(null);
+          setIsPlaying(false);
+          return;
+        }
+
+        const data = await res.json();
+        if (data && data.item) {
+          setCurrentTrack(data.item);
+          setIsPlaying(data.is_playing ?? false);
+          setPosition(data.progress_ms || 0);
+          setDuration(data.item.duration_ms || 0);
+        }
+      } catch (err) {
+        console.error('[Spotify] Error obteniendo track actual (free):', err);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [token, isPremium]);
+
+  // Funciones de control (solo válidas si hay player activo)
   const playTrack = async (spotifyUri) => {
     if (!deviceId) return;
     await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
@@ -126,6 +172,7 @@ export const PlayerProvider = ({ children }) => {
       position,
       duration,
       volume,
+      isPremium,
       playTrack,
       pause,
       resume,

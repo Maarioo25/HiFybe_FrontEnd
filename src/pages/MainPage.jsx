@@ -258,40 +258,39 @@ export default function MainPage() {
                   </div>
                 )}
                 {activeTab === 'recomendaciones' && (
-  <div className="flex flex-col gap-3">
-    {SONGS.map(song => (
-      <div
-        key={song.spotifyUri}
-        className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
-        onClick={async () => {
-          console.log('click!', song.spotifyUri);
-          try {
-            await playTrack(song.spotifyUri);
-            console.log('playTrack invoked');
-          } catch (err) {
-            console.error('Error en playTrack:', err);
-            alert('No se pudo reproducir: ' + err.message);
-          }
-        }}
-      >
-        <img
-          src={song.img}
-          alt={song.title}
-          className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
-        />
-        <div className="min-w-0 flex-1">
-          <div className="font-semibold text-harmony-text-primary truncate">
-            {song.title}
-          </div>
-          <div className="text-xs text-harmony-text-secondary truncate">
-            {song.artist}
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-)}
-
+                  <div className="flex flex-col gap-3">
+                    {SONGS.map(song => (
+                      <div
+                        key={song.spotifyUri}
+                        className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
+                        onClick={async () => {
+                          console.log('click!', song.spotifyUri);
+                          try {
+                            await playTrack(song.spotifyUri);
+                            console.log('playTrack invoked');
+                          } catch (err) {
+                            console.error('Error en playTrack:', err);
+                            alert('No se pudo reproducir: ' + err.message);
+                          }
+                        }}
+                      >
+                        <img
+                          src={song.img}
+                          alt={song.title}
+                          className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-harmony-text-primary truncate">
+                            {song.title}
+                          </div>
+                          <div className="text-xs text-harmony-text-secondary truncate">
+                            {song.artist}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
