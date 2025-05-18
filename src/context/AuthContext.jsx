@@ -62,15 +62,17 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       await userService.logout();
+      localStorage.removeItem('sp_token');
       setUser(null);
       toast.success('¡Sesión cerrada!');
       navigate('/auth');
     } catch (error) {
-      toast.error(error.response?.data?.mensaje || 'Error al cerrar sesión');
+      toast.error(error?.response?.data?.mensaje || 'Error al cerrar sesión');
     } finally {
       setLoading(false);
     }
   };
+  
 
   const googleLogin = () => {
     window.location.href = 'https://api.mariobueno.info/usuarios/google';
