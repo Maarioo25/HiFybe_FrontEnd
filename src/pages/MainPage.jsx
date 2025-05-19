@@ -30,7 +30,7 @@ export default function MainPage() {
         try {
           // 1) Guardar ubicación
           let res = await fetch(
-            `${process.env.REACT_APP_API_URL}/usuarios/ubicacion`,
+            `${process.env.VITE_API_URL}/usuarios/ubicacion`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -45,7 +45,7 @@ export default function MainPage() {
   
           // 2) Obtener usuarios cercanos
           res = await fetch(
-            `${process.env.REACT_APP_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=10`,
+            `${process.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=10`,
             { credentials: 'include' }
           );
           if (!res.ok) {
