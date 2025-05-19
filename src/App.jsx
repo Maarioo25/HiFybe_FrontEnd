@@ -12,14 +12,6 @@ import PlaylistDetail from "./pages/PlaylistDetail";
 import PublicPlaylistDetail from './pages/PublicPlaylistDetail';
 import { PlayerProvider } from './context/PlayerContext';
 
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('spotify_token');
-  if (token) {
-    localStorage.setItem('sp_token', token);
-    window.history.replaceState({}, '', window.location.pathname);
-  }
-}, []);
 
 function App() {
   return (
