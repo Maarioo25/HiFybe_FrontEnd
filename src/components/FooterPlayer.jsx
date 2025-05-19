@@ -1,5 +1,6 @@
 // components/FooterPlayer.jsx
 import React from 'react';
+import {handleConnectSpotify} from '../context/AuthContext';
 import {
   FaPlay,
   FaPause,
@@ -12,6 +13,7 @@ import {
 } from 'react-icons/fa';
 import { usePlayer } from '../context/PlayerContext';
 
+const spotifyToken = localStorage.getItem('sp_token');
 const FooterPlayer = () => {
   const {
     currentTrack,
@@ -36,6 +38,23 @@ const FooterPlayer = () => {
     const seconds = (totalSeconds % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
   };
+
+  
+
+  if (!spotifyToken) {
+    return (
+      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex flex-col items-center justify-center p-4 text-center">
+        <span className="text-harmony-text-primary mb-2">Debes conectar tu cuenta de Spotify para usar el reproductor</span>
+        <button
+          onClick={handleConnectSpotify}
+          className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
+        >
+          Conectar con Spotify
+        </button>
+      </div>
+    );
+  }
+
 
   if (!currentTrack) {
     return (
