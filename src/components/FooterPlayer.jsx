@@ -39,7 +39,7 @@ const FooterPlayer = () => {
 
   const spotifyToken = localStorage.getItem('sp_token');
   const handleConnectSpotify = () => {
-    window.location.href = 'https://api.mariobueno.info/usuarios/spotify';
+    window.location.href = 'https://api.mariobueno.info/usuarios/spotify/connect';
   };
 
   if (!spotifyToken) {
