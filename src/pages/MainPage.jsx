@@ -28,6 +28,9 @@ export default function MainPage() {
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude, longitude } }) => {
+        if (mapInstance.current) {
+          mapInstance.current.setView([latitude, longitude], 13);
+        }
         try {
           let res = await fetch(
             `${import.meta.env.VITE_API_URL}/usuarios/ubicacion`,
