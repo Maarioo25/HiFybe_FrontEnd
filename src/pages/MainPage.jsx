@@ -1,4 +1,3 @@
-// src/pages/MainPage.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { FRIENDS } from "../data/friends";
 import { SONGS } from "../data/songs";
@@ -23,48 +22,50 @@ export default function MainPage() {
   const [usuariosCercanos, setUsuariosCercanos] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState('friends');
+  const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
 
-  // 1) Geolocalización y usuarios cercanos
+  // Función para obtener usuarios cercanos en unas coordenadas dadas
+  const fetchUsersAtPosition = async (latitude, longitude) => {
+    try {
+      // POST ubicación
+      let res = await fetch(
+        `${import.meta.env.VITE_API_URL}/usuarios/ubicacion`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ latitude, longitude })
+        }
+      );
+      if (!res.ok) console.error('POST /ubicacion fallo:', await res.text());
+
+      // GET usuarios cerca
+      res = await fetch(
+        `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
+        { credentials: 'include' }
+      );
+      if (!res.ok) {
+        console.error('GET /cerca fallo:', await res.text());
+        return;
+      }
+
+      const data = await res.json();
+      if (Array.isArray(data)) setUsuariosCercanos(data);
+      else console.error('GET /cerca devolvió data no-array:', data);
+    } catch (err) {
+      console.error("Error al obtener usuarios cercanos:", err);
+    }
+  };
+
+  // 1) Geolocalización y carga inicial (incluye centrar mapa)
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
-      async ({ coords: { latitude, longitude } }) => {
+      ({ coords: { latitude, longitude } }) => {
+        setCurrentPosition([latitude, longitude]);
         if (mapInstance.current) {
           mapInstance.current.setView([latitude, longitude], 13);
         }
-        try {
-          let res = await fetch(
-            `${import.meta.env.VITE_API_URL}/usuarios/ubicacion`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
-              body: JSON.stringify({ latitude, longitude })
-            }
-          );
-          if (!res.ok) {
-            console.error('POST /ubicacion fallo:', await res.text());
-            return;
-          }
-
-          res = await fetch(
-            `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
-            { credentials: 'include' }
-          );
-          if (!res.ok) {
-            console.error('GET /cerca fallo:', await res.text());
-            return;
-          }
-
-          const data = await res.json();
-          if (!Array.isArray(data)) {
-            console.error('GET /cerca devolvió data no-array:', data);
-            return;
-          }
-          setUsuariosCercanos(data);
-
-        } catch (err) {
-          console.error("Error en geolocalización:", err);
-        }
+        fetchUsersAtPosition(latitude, longitude);
       },
       (error) => {
         console.error("Error al pedir permiso de geolocalización:", error);
@@ -79,7 +80,7 @@ export default function MainPage() {
     mapInstance.current = L.map(mapRef.current, {
       preferCanvas: false,
       zoomControl: false
-    }).setView([40.4165, -3.7026], 13);
+    }).setView(currentPosition, 13);
 
     ['tilePane','shadowPane','overlayPane','markerPane','popupPane'].forEach(name => {
       const pane = mapInstance.current.getPane(name);
@@ -102,16 +103,13 @@ export default function MainPage() {
   useEffect(() => {
     if (!mapInstance.current) return;
 
-    // Limpiar
     markerRefs.current.forEach(m => mapInstance.current.removeLayer(m));
     markerRefs.current = [];
 
-    // Añadir
     markerRefs.current = usuariosCercanos.map((user) => {
       const coords = user.ubicacion?.coordinates;
       if (!coords) return null;
 
-      // tamaños según móvil/sm+
       const isSmall = window.innerWidth < 640;
       const sizeClass = isSmall ? 'w-8 h-8' : 'w-10 h-10';
       const posClass = isSmall ? 'top-1 right-1' : 'top-2 right-2';
@@ -181,6 +179,23 @@ export default function MainPage() {
     );
   }
 
+  // Handlers para botones
+  const reloadMap = () => {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords: { latitude, longitude } }) => {
+        setCurrentPosition([latitude, longitude]);
+        fetchUsersAtPosition(latitude, longitude);
+      },
+      (error) => console.error("Error al recargar usuarios:", error)
+    );
+  };
+
+  const centerMap = () => {
+    if (mapInstance.current) {
+      mapInstance.current.setView(currentPosition, 13);
+    }
+  };
+
   return (
     <div className="text-harmony-text-primary min-h-screen bg-harmony-primary">
       <HeaderBar />
@@ -195,6 +210,25 @@ export default function MainPage() {
               <h2 className="text-lg sm:text-xl font-bold mb-4 text-harmony-accent">
                 Usuarios escuchando cerca
               </h2>
+
+              {/* Botones recargar y centrar */}
+              <div className="absolute top-4 right-4 flex space-x-2 z-20">
+                <button
+                  onClick={reloadMap}
+                  className="p-2 h-10 w-10 bg-harmony-secondary rounded-full shadow hover:bg-harmony-secondary/80"
+                  title="Recargar mapa"
+                >
+                  ⟳
+                </button>
+                <button
+                  onClick={centerMap}
+                  className="p-2 h-10 w-10 bg-harmony-secondary rounded-full shadow hover:bg-harmony-secondary/80"
+                  title="Centrar en mi posición"
+                >
+                  ⊕
+                </button>
+              </div>
+
               <div ref={mapRef} id="map" className="rounded-2xl shadow-lg h-full" />
 
               {selectedUser && (
