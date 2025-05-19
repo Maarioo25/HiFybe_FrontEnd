@@ -12,6 +12,28 @@ import { SONGS } from '../data/songs';
 
 
 
+useEffect(() => {
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+        await fetch(`${process.env.REACT_APP_API_URL || ''}/usuarios/ubicacion`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ latitude, longitude })
+        });
+        console.log("Ubicación guardada con éxito");
+      } catch (error) {
+        console.error("Error guardando ubicación:", error);
+      }
+    },
+    (error) => {
+      console.error("Error al obtener la geolocalización:", error);
+    }
+  );
+}, []);
 
 
 const USERS = FRIENDS.map(friend => ({
@@ -27,6 +49,23 @@ const USERS = FRIENDS.map(friend => ({
 
 export default function MainPage() {
 
+  const [usuariosCercanos, setUsuariosCercanos] = useState([]);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+  
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=10`, {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        setUsuariosCercanos(data);
+      } catch (err) {
+        console.error("Error cargando usuarios cercanos:", err);
+      }
+    });
+  }, []);
   const { playTrack, isPlaying, position, duration } = usePlayer();
   const { loading } = useAuth();
   const navigate = useNavigate();
@@ -80,28 +119,34 @@ export default function MainPage() {
     }).addTo(mapInstance.current);
 
     // Añadir marcadores para cada amigo
-    markerRefs.current = FRIENDS.map((friend, idx) => {
+    markerRefs.current = usuariosCercanos.map((user, idx) => {
       const icon = L.divIcon({
         className: `custom-icon`,
         html: `
-          <div class='w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br ${friend.online ? 'from-indigo-400 to-purple-500' : 'from-gray-400 to-gray-500'} custom-marker'>
-            <img src='${friend.photo}' alt='${friend.name}' class='w-10 h-10 object-cover rounded-full border-2 border-white shadow' style='display:block'/>
-            <span style='position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;background:${friend.online ? '#22c55e' : '#64748b'};border:2px solid #fff;box-shadow:0 1px 3px #0002;display:block;'></span>
+          <div class='w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-400 to-purple-500 custom-marker'>
+            <img src='${user.foto_perfil || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.nombre)}' alt='${user.nombre}' class='w-10 h-10 object-cover rounded-full border-2 border-white shadow' />
+            <span style='position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;background:#22c55e;border:2px solid #fff;box-shadow:0 1px 3px #0002;display:block;'></span>
           </div>
         `
       });
-      
-      const marker = L.marker(friend.coords, { icon }).addTo(mapInstance.current);
-      
-      // Solo manejar el clic para seleccionar el usuario
+    
+      const coords = user.ubicacion?.coordinates;
+      if (!coords) return null;
+    
+      const marker = L.marker([coords[1], coords[0]], { icon }).addTo(mapInstance.current);
+    
       marker.on('click', () => {
-        setSelectedUser(friend);
-        // Centrar el mapa en el amigo seleccionado
-        mapInstance.current.setView(friend.coords, 15);
+        setSelectedUser({
+          name: user.nombre,
+          avatarImg: user.foto_perfil,
+          song: { title: "No disponible", artist: "", img: "" } // Si tienes canción, puedes añadirla aquí
+        });
+        mapInstance.current.setView([coords[1], coords[0]], 15);
       });
-      
+    
       return marker;
     });
+    
 
 
 
