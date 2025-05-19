@@ -82,6 +82,8 @@ export const AuthProvider = ({ children }) => {
     window.location.href = 'http://api.mariobueno.info/usuarios/spotify';
   };
 
+  const appleLogin = () => {};
+
   const value = {
     user,
     loading,
