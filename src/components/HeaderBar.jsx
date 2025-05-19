@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { FaUserFriends, FaMusic, FaSearch, FaHome, FaComments } from "react-icons/fa";
+import React, { useState, useRef, useEffect } from "react";
+import { FaUserFriends, FaMusic, FaSearch, FaHome, FaComments, FaUserCircle, FaSignOutAlt, FaCog } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -24,7 +24,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     setSearchValue(value);
     if (value.trim()) {
       setSearchResults(
-        SONGS.filter(song => 
+        SONGS.filter(song =>
           song.title.toLowerCase().includes(value) || song.artist.toLowerCase().includes(value)
         )
       );
@@ -101,8 +101,8 @@ export default function HeaderBar({ children, onSongSelect }) {
       )}
 
       {/* Navegación */}
-      <div className="w-full md:w-auto flex flex-wrap md:flex-nowrap items-center justify-center gap-2 mt-4 md:mt-0 transition-all duration-300 ${showSearch ? 'translate-y-20 md:translate-x-64' : ''}">
-        {[
+      <div className={`w-full md:flex-1 flex flex-nowrap items-center justify-center gap-2 mt-4 md:mt-0 transition-all duration-300 ${showSearch ? 'translate-y-20 md:translate-x-64' : ''}`}>
+        {[ 
           { icon: <FaHome />, label: 'Inicio', to: '/' },
           { icon: <FaUserFriends />, label: 'Amigos', to: '/friends' },
           { icon: <FaMusic />, label: 'Playlists', to: '/playlists' },
@@ -113,17 +113,14 @@ export default function HeaderBar({ children, onSongSelect }) {
             <button
               key={to}
               onClick={() => navigate(to)}
-              className={`px-3 py-1 rounded-full text-harmony-text-primary hover:bg-harmony-accent/10 hover:text-harmony-accent font-semibold flex items-center gap-2 ${active ? 'bg-harmony-accent/20 text-harmony-accent' : ''}`}
+              className={`px-3 py-1 rounded-full text-harmony-text-primary hover:bg-harmony-accent/10 hover:text-harmony-accent font-semibold flex items-center justify-center gap-2 ${active ? 'bg-harmony-accent/20 text-harmony-accent' : ''}`}
             >
               {icon}
               <span className="hidden md:inline">{label}</span>
             </button>
           );
         })}
-      </div>
-
-      {/* Perfil */}
-      <div className="relative flex items-center mt-4 md:mt-0 md:ml-4">
+        {/* Perfil */}
         <ProfileMenu user={user} logout={logout} />
       </div>
 
@@ -133,13 +130,11 @@ export default function HeaderBar({ children, onSongSelect }) {
 }
 
 // --- Menú de perfil desplegable ---
-import { FaUserCircle, FaSignOutAlt, FaCog } from "react-icons/fa";
-
 function ProfileMenu({ user, logout }) {
-  const [open, setOpen] = React.useState(false);
-  const menuRef = React.useRef(null);
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setOpen(false);
@@ -152,7 +147,7 @@ function ProfileMenu({ user, logout }) {
   return (
     <div className="relative" ref={menuRef}>
       <button
-        className="ml-4 text-harmony-accent hover:text-harmony-accent/80 focus:outline-none text-2xl md:text-3xl"
+        className="p-2 text-harmony-accent hover:text-harmony-accent/80 focus:outline-none text-2xl"
         onClick={() => setOpen(v => !v)}
         aria-label="Opciones de perfil"
       >
