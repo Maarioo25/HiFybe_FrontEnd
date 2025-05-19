@@ -1,7 +1,5 @@
 // components/FooterPlayer.jsx
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
-const {handleConnectSpotify} = useAuth();
 import {
   FaPlay,
   FaPause,
@@ -14,7 +12,6 @@ import {
 } from 'react-icons/fa';
 import { usePlayer } from '../context/PlayerContext';
 
-const spotifyToken = localStorage.getItem('sp_token');
 const FooterPlayer = () => {
   const {
     currentTrack,
@@ -40,7 +37,10 @@ const FooterPlayer = () => {
     return `${minutes}:${seconds}`;
   };
 
-  
+  const spotifyToken = localStorage.getItem('sp_token');
+  const handleConnectSpotify = () => {
+    window.location.href = 'https://api.mariobueno.info/usuarios/spotify/connect';
+  };
 
   if (!spotifyToken) {
     return (
