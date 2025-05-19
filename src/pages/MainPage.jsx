@@ -47,7 +47,7 @@ export default function MainPage() {
           }
 
           res = await fetch(
-            `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=10`,
+            `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
             { credentials: 'include' }
           );
           if (!res.ok) {
