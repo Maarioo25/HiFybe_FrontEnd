@@ -1,6 +1,7 @@
 // components/FooterPlayer.jsx
 import React from 'react';
-import {handleConnectSpotify} from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+const {handleConnectSpotify} = useAuth();
 import {
   FaPlay,
   FaPause,
