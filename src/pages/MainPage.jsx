@@ -28,9 +28,9 @@ export default function MainPage() {
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude, longitude } }) => {
         try {
-          // Guardar ubicación
-          await fetch(
-            'https://api.mariobueno.info/usuarios/ubicacion',
+          // 1) Guardar ubicación
+          let res = await fetch(
+            `${process.env.REACT_APP_API_URL}/usuarios/ubicacion`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -38,23 +38,38 @@ export default function MainPage() {
               body: JSON.stringify({ latitude, longitude })
             }
           );
-
-          // Traer usuarios cercanos
-          const res = await fetch(
-            'https://api.mariobueno.info/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=10',
+          if (!res.ok) {
+            console.error('POST /ubicacion fallo:', await res.text());
+            return;
+          }
+  
+          // 2) Obtener usuarios cercanos
+          res = await fetch(
+            `${process.env.REACT_APP_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=10`,
             { credentials: 'include' }
           );
+          if (!res.ok) {
+            console.error('GET /cerca fallo:', await res.text());
+            return;
+          }
+  
           const data = await res.json();
+          if (!Array.isArray(data)) {
+            console.error('GET /cerca devolvió data no-array:', data);
+            return;
+          }
           setUsuariosCercanos(data);
+  
         } catch (err) {
           console.error("Error en geolocalización:", err);
         }
       },
       (error) => {
-        console.error("Error al obtener geolocalización:", error);
+        console.error("Error al pedir permiso de geolocalización:", error);
       }
     );
   }, []);
+  
 
   // 2) Inicializar Leaflet solo una vez
   useEffect(() => {
