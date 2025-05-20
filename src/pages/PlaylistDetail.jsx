@@ -207,7 +207,7 @@ export default function PlaylistDetail() {
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
       <HeaderBar />
       <div className="flex-1 container mx-auto px-6 pt-8 pb-6">
-        <div className="h-[calc(100vh-244px)] bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
+        <div className="max-h-[calc(100vh-244px)] bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col">
             {/* Imagen y detalles */}
             <div className="flex items-center gap-6 mb-6">
@@ -287,7 +287,7 @@ export default function PlaylistDetail() {
             </div>
 
             {/* Stats */}
-            <div className="px-6 mb-4">
+            <div className="flex-none px-6 mb-4">
               <div className="flex items-center gap-4 text-harmony-text-secondary">
                 <span>{tracks.length} canciones</span>
                 <span>•</span>
