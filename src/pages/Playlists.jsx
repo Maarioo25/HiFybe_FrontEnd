@@ -1,107 +1,57 @@
-import React from 'react';
-import { FaPlus, FaEllipsisH, FaPlay } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { FaPlus, FaPlay, FaSpotify } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import { Link } from 'react-router-dom';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
-
-
-const PLAYLISTS = [
-  {
-    id: 1,
-    name: "Mis Favoritas",
-    cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a",
-    songs: 25,
-    duration: "2h 30m",
-    created: "2024",
-    description: "Mis canciones favoritas de todos los tiempos"
-  },
-  {
-    id: 2,
-    name: "Workout",
-    cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a",
-    songs: 30,
-    duration: "1h 45m",
-    created: "2024",
-    description: "Música para entrenar con energía"
-  },
-  {
-    id: 3,
-    name: "Relax",
-    cover: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1080&h=1080",
-    songs: 15,
-    duration: "1h 15m",
-    created: "2024",
-    description: "Música para desconectar y relajarse"
-  },
-  {
-    id: 4,
-    name: "Pop Hits",
-    cover: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=1080&h=1080",
-    songs: 20,
-    duration: "1h 30m",
-    created: "2024",
-    description: "Los mejores hits del momento"
-  },
-  {
-    id: 5,
-    name: "Rap & Hip-Hop",
-    cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a",
-    songs: 45,
-    duration: "3h 15m",
-    created: "2024",
-    description: "Los mejores temas de rap y hip-hop"
-  },
-  {
-    id: 6,
-    name: "Rock Classics",
-    cover: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1080&h=1080",
-    songs: 35,
-    duration: "2h 45m",
-    created: "2024",
-    description: "Los clásicos del rock que nunca pasan de moda"
-  },
-  {
-    id: 7,
-    name: "Party Mix",
-    cover: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=1080&h=1080",
-    songs: 50,
-    duration: "3h 30m",
-    created: "2024",
-    description: "Música para fiestas y reuniones"
-  },
-  {
-    id: 8,
-    name: "Study Focus",
-    cover: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1080&h=1080",
-    songs: 25,
-    duration: "2h 15m",
-    created: "2024",
-    description: "Música para concentrarse y estudiar"
-  },
-  {
-    id: 9,
-    name: "Sleep Well",
-    cover: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1080&h=1080",
-    songs: 20,
-    duration: "1h 45m",
-    created: "2024",
-    description: "Música relajante para dormir"
-  },
-  {
-    id: 10,
-    name: "Travel Vibes",
-    cover: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=1080&h=1080",
-    songs: 30,
-    duration: "2h 30m",
-    created: "2024",
-    description: "Música perfecta para viajes"
-  }
-];
-
+import { useAuth } from '../context/AuthContext';
 
 export default function Playlists() {
-  const { currentSong, setCurrentSong, isPlaying, setIsPlaying, progress, setProgress, volume, setVolume, duration, setDuration } = usePlayer();
+  const {
+    currentSong,
+    setCurrentSong,
+    isPlaying,
+    setIsPlaying,
+  } = usePlayer();
+  const { spotifyToken, connectSpotifyUrl } = useAuth();
+  const [playlists, setPlaylists] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleConnectSpotify = () => {
+    window.location.href = 'https://api.mariobueno.info/usuarios/spotify/connect';
+  };
+
+  // 1) Al montar, si hay token, pedir playlists a Spotify
+  useEffect(() => {
+    async function fetchPlaylists() {
+      if (!spotifyToken) return;
+      setLoading(true);
+      try {
+        const res = await fetch('https://api.spotify.com/v1/me/playlists?limit=50', {
+          headers: { Authorization: `Bearer ${spotifyToken}` }
+        });
+        const data = await res.json();
+        // Mapear al shape que usas
+        const pls = data.items.map(pl => ({
+          id: pl.id,
+          name: pl.name,
+          cover: pl.images[0]?.url,
+          songs: pl.tracks.total,
+          // Spotify no da duración total sin pedir cada playlist; puedes omitir o calcular aparte
+          duration: '',
+          description: pl.description || ''
+        }));
+        setPlaylists(pls);
+      } catch (err) {
+        console.error('Spotify playlists error:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPlaylists();
+  }, [spotifyToken]);
+
+  const isConnected = Boolean(spotifyToken);
 
   return (
     <div className="min-h-screen bg-harmony-primary">
@@ -110,48 +60,100 @@ export default function Playlists() {
         <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
           <div className="flex items-center justify-between mb-4 p-6">
             <h2 className="text-xl font-bold text-harmony-accent">Playlists</h2>
-            <button className="flex items-center gap-2 px-4 py-2 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-white font-semibold">
-              <FaPlus className="text-lg" />
-              <span>Nueva Playlist</span>
-            </button>
+            {isConnected && (
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-white font-semibold"
+              >
+                <FaPlus className="text-lg" />
+                <span>Nueva Playlist</span>
+              </button>
+            )}
           </div>
 
-          <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-28px)] px-6 pb-2">
-            {PLAYLISTS.map((playlist) => (
-              <Link to={`/playlists/${encodeURIComponent(playlist.name)}`} key={playlist.id} className="playlist-card relative group w-full flex items-center gap-4 p-4 rounded-xl bg-harmony-secondary/20 cursor-pointer hover:bg-harmony-secondary/30 transition-colors duration-200">
-                <div className="relative w-20 h-20 rounded-lg overflow-hidden shadow-md">
-                  <img
-                    src={playlist.cover}
-                    alt={playlist.name}
-                    className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:blur-sm group-hover:opacity-80"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-2">
-                    <div className="flex flex-col items-center gap-2">
-                      <button 
-                        className="text-harmony-accent hover:text-harmony-accent/80"
-                        onClick={(e) => {
+          {/* Contenedor scrollable y relative para el overlay */}
+          <div className="relative overflow-y-auto scrollbar-thin h-[calc(60vh-28px)] px-6 pb-2">
+            {/* GRID DE PLAYLISTS */}
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4
+                          transition-all duration-300
+                          ${!isConnected ? 'filter blur-sm pointer-events-none' : ''}`}
+            >
+              {(isConnected ? playlists : []).map(playlist => (
+                <Link
+                  to={`/playlists/${encodeURIComponent(playlist.id)}`}
+                  key={playlist.id}
+                  className="playlist-card relative group flex items-center gap-4 p-4 rounded-xl
+                             bg-harmony-secondary/20 cursor-pointer hover:bg-harmony-secondary/30
+                             transition-colors duration-200"
+                >
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden shadow-md">
+                    <img
+                      src={playlist.cover}
+                      alt={playlist.name}
+                      className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100
+                                    flex items-center justify-center transition-opacity duration-300">
+                      <button
+                        className="text-white"
+                        onClick={e => {
                           e.preventDefault();
-                          setCurrentSong(SONGS[0]); // Aquí deberías obtener la primera canción de la playlist
+                          // Aquí puedes fetchear la primera canción de la playlist
+                          // Para demo uso currentSong blanco:
+                          setCurrentSong({ title: '', artist: '', img: '' });
                           setIsPlaying(true);
                         }}
                       >
                         <FaPlay className="text-xl" />
                       </button>
-                      <span className="text-sm text-harmony-accent/80">Reproducir</span>
                     </div>
                   </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-harmony-text-primary truncate">{playlist.name}</h3>
-                  <div className="flex items-center gap-2 text-sm text-harmony-text-secondary mt-1">
-                    <span>{playlist.songs} canciones</span>
-                    <span>•</span>
-                    <span>{playlist.duration}</span>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-harmony-text-primary truncate">
+                      {playlist.name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-harmony-text-secondary mt-1">
+                      <span>{playlist.songs} canciones</span>
+                      {playlist.duration && <>•<span>{playlist.duration}</span></>}
+                    </div>
+                    {playlist.description && (
+                      <p className="text-sm text-harmony-text-secondary mt-1 line-clamp-2">
+                        {playlist.description}
+                      </p>
+                    )}
                   </div>
-                  <p className="text-sm text-harmony-text-secondary mt-1 line-clamp-2">{playlist.description}</p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+
+              {/* Si no está conectado, mostramos una tarjeta vacía para el grid */}
+              {!isConnected && Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-32 rounded-xl bg-harmony-secondary/20"
+                />
+              ))}
+            </div>
+
+            {/* OVERLAY DE CONEXIÓN */}
+            {!isConnected && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 rounded-2xl">
+                <FaSpotify className="text-4xl text-white mb-2" />
+                <button className="text-white font-semibold mb-4">Conecta tu cuenta de Spotify</button>
+                <button
+                  onClick={handleConnectSpotify}
+                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full"
+                >
+                  Conectar
+                </button>
+              </div>
+            )}
+
+            {/* Carga */}
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-harmony-text-secondary">Cargando...</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
