@@ -4,6 +4,9 @@ import { FaPlay, FaTrashAlt, FaShareAlt, FaArrowLeft, FaEdit, FaCheck, FaTimes }
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 export default function PlaylistDetail() {
   const { id } = useParams();
@@ -44,29 +47,49 @@ export default function PlaylistDetail() {
     fetchPlaylist();
   }, [id, token]);
 
-  // Guardar cambio de nombre
   const handleSaveName = async () => {
+    if (!newName.trim()) {
+      toast.error('El nombre no puede estar vacío');
+      return;
+    }
+  
     try {
+      console.log('Patch playlist:', id, '→ new name:', newName);
       const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
         },
         body: JSON.stringify({ name: newName })
       });
+  
+      const text = await res.text();
+      console.log('Spotify status:', res.status);
+      console.log('Spotify body:', text);
+  
       if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
+        // Intentamos extraer un mensaje de JSON si lo hay
+        let msg = text;
+        try {
+          const errJson = JSON.parse(text);
+          msg = errJson.error?.message || text;
+        } catch (e) { /* no es JSON */ }
+        throw new Error(`(${res.status}) ${msg}`);
       }
+  
+      // Si todo OK, actualizamos estado
       setPlaylist(prev => ({ ...prev, name: newName }));
       setEditMode(false);
-      alert('Nombre de la playlist actualizado');
+      toast.success('Nombre de la playlist actualizado');
+  
     } catch (err) {
       console.error('Rename playlist error:', err);
-      alert('No se pudo renombrar: ' + err.message);
+      toast.error('No se pudo renombrar: ' + err.message);
     }
   };
+  
 
   // Estadísticas
   const totalDurationMin = Math.floor(
