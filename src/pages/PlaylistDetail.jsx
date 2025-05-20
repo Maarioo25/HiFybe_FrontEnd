@@ -111,6 +111,7 @@ export default function PlaylistDetail() {
       <div className="container mx-auto px-6 pt-8">
         <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
           <div className="p-6">
+            {/* Header Top: back and title/edit */}
             <div className="flex items-center justify-between mb-6">
               <button
                 onClick={() => navigate(-1)}
@@ -125,35 +126,24 @@ export default function PlaylistDetail() {
                     value={newName}
                     onChange={e => setNewName(e.target.value)}
                   />
-                  <button
-                    onClick={handleRename}
-                    className="px-3 py-1 bg-harmony-accent text-white rounded"
-                  >
+                  <button onClick={handleRename} className="px-3 py-1 bg-harmony-accent text-white rounded">
                     Guardar
                   </button>
-                  <button
-                    onClick={() => setEditing(false)}
-                    className="px-3 py-1 bg-gray-500 text-white rounded"
-                  >
+                  <button onClick={() => setEditing(false)} className="px-3 py-1 bg-gray-500 text-white rounded">
                     Cancelar
                   </button>
                 </div>
               ) : (
                 <h1 className="text-3xl font-bold text-harmony-accent flex items-center gap-2">
                   {playlist?.name}
-                  {isConnected && (
-                    <FaPen
-                      className="cursor-pointer"
-                      onClick={() => setEditing(true)}
-                    />
-                  )}
+                  {isConnected && <FaPen className="cursor-pointer" onClick={() => setEditing(true)} />}
                 </h1>
               )}
             </div>
 
+            {/* Main content: image, name, stats, description */}
             <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-44px)] px-6 pb-6 space-y-6">
-              {/* Header Info */}
-              <div className="flex gap-6">
+              <div className="flex gap-6 items-center">
                 <div className="relative w-48 h-48 rounded-xl overflow-hidden group">
                   <img
                     src={playlist?.images[0]?.url}
@@ -161,30 +151,20 @@ export default function PlaylistDetail() {
                     className="w-full h-full object-cover transition-all duration-300 group-hover:blur-sm group-hover:opacity-80"
                   />
                   <div className="absolute bottom-2 left-2 flex gap-2">
-                    <button
-                      onClick={handlePlayAll}
-                      className="text-harmony-accent hover:text-harmony-accent/80"
-                    >
+                    <button onClick={handlePlayAll} className="text-harmony-accent hover:text-harmony-accent/80">
                       <FaPlay className="text-xl" />
                     </button>
-                    <button
-                      onClick={handleShare}
-                      className="text-harmony-accent hover:text-harmony-accent/80"
-                    >
+                    <button onClick={handleShare} className="text-harmony-accent hover:text-harmony-accent/80">
                       <FaShareAlt className="text-xl" />
                     </button>
                   </div>
                 </div>
                 <div className="flex-1 flex flex-col justify-center">
-                  <div className="flex items-center gap-4 text-harmony-text-secondary">
+                  <h2 className="text-2xl font-semibold text-harmony-text-primary mb-2">{playlist?.name}</h2>
+                  <div className="flex items-center gap-4 text-harmony-text-secondary mb-2">
                     <span>{playlist?.tracks.total} canciones</span>
                     <span>•</span>
-                    <span>
-                      {Math.floor(
-                        tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) /
-                          60000
-                      )}{' '}min
-                    </span>
+                    <span>{Math.floor(tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000)} min</span>
                   </div>
                   {playlist?.description && (
                     <p className="text-harmony-text-secondary mt-2 line-clamp-2">
@@ -197,37 +177,44 @@ export default function PlaylistDetail() {
               {/* Track list */}
               <div className="space-y-4">
                 {tracks.map((song, idx) => (
-                  <button
+                  <div
                     key={song.id + idx}
-                    onClick={() => playTrack(song.uri)}
-                    className="w-full group text-left flex items-center gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+                    className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
                   >
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
-                      <img
-                        src={song.album.images[0]?.url}
-                        alt={song.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-harmony-text-primary truncate">
-                        {song.name}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
-                        <span className="truncate">
-                          {song.artists.map(a => a.name).join(', ')}
-                        </span>
-                        <span>•</span>
-                        <span>
-                          {Math.floor((song.duration_ms || 0) / 60000)}:{
-                            String(
-                              Math.floor(((song.duration_ms || 0) % 60000) / 1000)
-                            ).padStart(2, '0')
-                          }
-                        </span>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
+                        <img
+                          src={song.album.images[0]?.url}
+                          alt={song.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-harmony-text-primary truncate">{song.name}</h3>
+                        <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
+                          <span className="truncate">{song.artists.map(a => a.name).join(', ')}</span>
+                          <span>•</span>
+                          <span>{Math.floor((song.duration_ms || 0) / 60000)}:{String(Math.floor(((song.duration_ms || 0) % 60000) / 1000)).padStart(2,'0')}</span>
+                        </div>
                       </div>
                     </div>
-                  </button>
+                    <div className="flex items-center gap-2">
+                      {isConnected && (
+                        <button
+                          onClick={() => handleRemoveTrack(song.uri)}
+                          className="text-red-500 hover:text-red-600 p-1"
+                        >
+                          <FaTrashAlt />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => playTrack(song.uri)}
+                        className="text-harmony-accent hover:text-harmony-accent/80 p-1"
+                      >
+                        <FaPlay />
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
