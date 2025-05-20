@@ -196,6 +196,10 @@ export default function PlaylistDetail() {
                 {tracks.map((song, idx) => (
                   <div
                     key={song.id + idx}
+                    onClick={() => { 
+                      setCurrentSong(song); 
+                      setIsPlaying(true); 
+                    }}
                     className="group flex items-center gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
                   >
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
