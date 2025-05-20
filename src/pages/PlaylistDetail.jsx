@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaPlay, FaTrashAlt, FaShareAlt, FaArrowLeft, FaEdit } from 'react-icons/fa';
+import { FaPlay, FaTrashAlt, FaShareAlt, FaArrowLeft, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
@@ -14,6 +14,8 @@ export default function PlaylistDetail() {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [snapshotId, setSnapshotId] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [newName, setNewName] = useState('');
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -30,6 +32,7 @@ export default function PlaylistDetail() {
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         setPlaylist(data);
+        setNewName(data.name);
         setTracks(data.tracks.items.map(item => item.track));
         setSnapshotId(data.snapshot_id);
       } catch (err) {
@@ -40,6 +43,30 @@ export default function PlaylistDetail() {
     }
     fetchPlaylist();
   }, [id, token]);
+
+  // Guardar cambio de nombre
+  const handleSaveName = async () => {
+    try {
+      const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: newName })
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+      setPlaylist(prev => ({ ...prev, name: newName }));
+      setEditMode(false);
+      alert('Nombre de la playlist actualizado');
+    } catch (err) {
+      console.error('Rename playlist error:', err);
+      alert('No se pudo renombrar: ' + err.message);
+    }
+  };
 
   // Estadísticas
   const totalDurationMin = Math.floor(
@@ -127,11 +154,11 @@ export default function PlaylistDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-harmony-primary">
+    <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
       <HeaderBar />
-      <div className="container mx-auto px-6 pt-8">
-        <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
-          <div className="p-6">
+      <div className="flex-1 overflow-hidden container mx-auto px-6 pt-8">
+        <div className="h-full bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
+          <div className="p-6 flex-1 flex flex-col">
             {/* Imagen y detalles */}
             <div className="flex items-center gap-6 mb-6">
               <div
@@ -155,9 +182,35 @@ export default function PlaylistDetail() {
                 />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-harmony-accent">
-                  {playlist?.name}
-                </h1>
+                <div className="flex items-center gap-2">
+                  {editMode ? (
+                    <>
+                      <input
+                        type="text"
+                        value={newName}
+                        onChange={e => setNewName(e.target.value)}
+                        className="border-b border-harmony-text-secondary bg-transparent focus:outline-none text-4xl font-bold text-harmony-accent"
+                      />
+                      <button onClick={handleSaveName} title="Guardar">
+                        <FaCheck />
+                      </button>
+                      <button onClick={() => { setEditMode(false); setNewName(playlist.name); }} title="Cancelar">
+                        <FaTimes />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="text-4xl font-bold text-harmony-accent">{playlist?.name}</h1>
+                      <button
+                        onClick={() => setEditMode(true)}
+                        className="text-harmony-accent hover:text-harmony-accent/80"
+                        title="Editar nombre"
+                      >
+                        <FaEdit />
+                      </button>
+                    </>
+                  )}
+                </div>
                 <p className="mt-2 text-harmony-text-secondary truncate">
                   {playlist?.description || 'Sin descripción'}
                 </p>
@@ -193,7 +246,7 @@ export default function PlaylistDetail() {
             </div>
 
             {/* Lista de canciones */}
-            <div className="overflow-y-auto scrollbar-thin h-[60vh] px-6 pb-6 space-y-4">
+            <div className="overflow-y-auto flex-1 px-6 pb-6 space-y-4">
               {tracks.map((song, idx) => (
                 <div
                   key={song.id + idx}
