@@ -55,11 +55,11 @@ export default function PlaylistDetail() {
     try {
       console.log('Updating playlist via PUT:', id, '→', newName);
       const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
-        method: 'PUT',                        // ← cambio clave
+        method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-          Accept: 'application/json'          // ← recomendado
+          Accept: 'application/json'
         },
         body: JSON.stringify({ name: newName })
       });
@@ -85,7 +85,7 @@ export default function PlaylistDetail() {
       toast.error('No se pudo renombrar: ' + err.message);
     }
   };
-      
+
   
 
   // Estadísticas
@@ -98,27 +98,44 @@ export default function PlaylistDetail() {
     const file = e.target.files[0];
     if (!file) return;
   
-    try {
-      const arrayBuffer = await file.arrayBuffer();
+    // Validación básica de tipo
+    if (!file.type.startsWith('image/')) {
+      toast.error('El archivo debe ser una imagen');
+      return;
+    }
   
+    try {
+      console.log('PUT playlist image:', id, '– type:', file.type);
+  
+      const arrayBuffer = await file.arrayBuffer();
       const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/images`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': file.type,
+          Accept: 'application/json'
         },
         body: arrayBuffer
       });
   
+      console.log('Spotify image update status:', res.status);
+      const text = await res.text();
+      console.log('Spotify image update body:', text);
+  
       if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(errText);
+        // Intentamos extraer mensaje de error JSON si existe
+        let msg = text;
+        try {
+          const errJson = JSON.parse(text);
+          msg = errJson.error?.message || text;
+        } catch {}
+        throw new Error(`(${res.status}) ${msg}`);
       }
   
-      alert('Portada de la playlist actualizada correctamente');
+      toast.success('Portada de la playlist actualizada correctamente');
     } catch (err) {
       console.error('Error al actualizar la portada:', err);
-      alert('No se pudo actualizar la portada: ' + err.message);
+      toast.error('No se pudo actualizar la portada: ' + err.message);
     }
   };
   
