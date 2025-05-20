@@ -4,8 +4,7 @@ import { FaPlay, FaTrashAlt, FaShareAlt, FaArrowLeft, FaEdit, FaCheck, FaTimes }
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-hot-toast';
 
 
 export default function PlaylistDetail() {
