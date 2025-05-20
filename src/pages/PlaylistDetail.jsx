@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  FaPlay,
-  FaShareAlt,
-  FaArrowLeft,
-  FaPen,
-  FaPlus,
-  FaTrashAlt
-} from 'react-icons/fa';
+import { FaPlay, FaShareAlt, FaArrowLeft, FaPen, FaTrashAlt } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
@@ -16,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 export default function PlaylistDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { setCurrentSong, setIsPlaying } = usePlayer();
+  const { playTrack } = usePlayer();
   const { connectSpotifyUrl } = useAuth();
   const token = localStorage.getItem('sp_token');
   const [playlist, setPlaylist] = useState(null);
@@ -38,7 +31,6 @@ export default function PlaylistDetail() {
         });
         const data = await res.json();
         setPlaylist(data);
-        // flatten track items
         setTracks(data.tracks.items.map(item => item.track));
         setNewName(data.name);
       } catch (err) {
@@ -53,15 +45,11 @@ export default function PlaylistDetail() {
   const isConnected = Boolean(token);
 
   const handlePlayAll = () => {
-    if (tracks.length) {
-      setCurrentSong(tracks[0]);
-      setIsPlaying(true);
-    }
+    if (tracks.length) playTrack(tracks[0].uri);
   };
 
   const handleShare = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(window.location.href);
     alert('Enlace copiado al portapapeles');
   };
 
@@ -79,15 +67,13 @@ export default function PlaylistDetail() {
       if (res.ok) {
         setPlaylist(prev => ({ ...prev, name: newName }));
         setEditing(false);
-      } else {
-        console.error('Rename failed');
       }
     } catch (err) {
       console.error('Rename error:', err);
     }
   };
 
-  const handleRemoveTrack = async (uri) => {
+  const handleRemoveTrack = async uri => {
     try {
       const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/tracks`, {
         method: 'DELETE',
@@ -97,9 +83,7 @@ export default function PlaylistDetail() {
         },
         body: JSON.stringify({ tracks: [{ uri }] })
       });
-      if (res.ok) {
-        setTracks(prev => prev.filter(t => t.uri !== uri));
-      }
+      if (res.ok) setTracks(prev => prev.filter(t => t.uri !== uri));
     } catch (err) {
       console.error('Remove track error:', err);
     }
@@ -141,17 +125,28 @@ export default function PlaylistDetail() {
                     value={newName}
                     onChange={e => setNewName(e.target.value)}
                   />
-                  <button onClick={handleRename} className="px-3 py-1 bg-harmony-accent text-white rounded">
+                  <button
+                    onClick={handleRename}
+                    className="px-3 py-1 bg-harmony-accent text-white rounded"
+                  >
                     Guardar
                   </button>
-                  <button onClick={() => setEditing(false)} className="px-3 py-1 bg-gray-500 text-white rounded">
+                  <button
+                    onClick={() => setEditing(false)}
+                    className="px-3 py-1 bg-gray-500 text-white rounded"
+                  >
                     Cancelar
                   </button>
                 </div>
               ) : (
                 <h1 className="text-3xl font-bold text-harmony-accent flex items-center gap-2">
                   {playlist?.name}
-                  {isConnected && <FaPen className="cursor-pointer" onClick={() => setEditing(true)} />}
+                  {isConnected && (
+                    <FaPen
+                      className="cursor-pointer"
+                      onClick={() => setEditing(true)}
+                    />
+                  )}
                 </h1>
               )}
             </div>
@@ -166,10 +161,16 @@ export default function PlaylistDetail() {
                     className="w-full h-full object-cover transition-all duration-300 group-hover:blur-sm group-hover:opacity-80"
                   />
                   <div className="absolute bottom-2 left-2 flex gap-2">
-                    <button onClick={handlePlayAll} className="text-harmony-accent hover:text-harmony-accent/80">
+                    <button
+                      onClick={handlePlayAll}
+                      className="text-harmony-accent hover:text-harmony-accent/80"
+                    >
                       <FaPlay className="text-xl" />
                     </button>
-                    <button onClick={handleShare} className="text-harmony-accent hover:text-harmony-accent/80">
+                    <button
+                      onClick={handleShare}
+                      className="text-harmony-accent hover:text-harmony-accent/80"
+                    >
                       <FaShareAlt className="text-xl" />
                     </button>
                   </div>
@@ -179,8 +180,10 @@ export default function PlaylistDetail() {
                     <span>{playlist?.tracks.total} canciones</span>
                     <span>•</span>
                     <span>
-                      {/* calcular duración total */}
-                      {tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 1000 / 60 | 0} min
+                      {Math.floor(
+                        tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) /
+                          60000
+                      )}{' '}min
                     </span>
                   </div>
                   {playlist?.description && (
@@ -194,13 +197,10 @@ export default function PlaylistDetail() {
               {/* Track list */}
               <div className="space-y-4">
                 {tracks.map((song, idx) => (
-                  <div
+                  <button
                     key={song.id + idx}
-                    onClick={() => { 
-                      setCurrentSong(song); 
-                      setIsPlaying(true); 
-                    }}
-                    className="group flex items-center gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+                    onClick={() => playTrack(song.uri)}
+                    className="w-full group text-left flex items-center gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
                   >
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
                       <img
@@ -210,33 +210,24 @@ export default function PlaylistDetail() {
                       />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-harmony-text-primary truncate">{song.name}</h3>
+                      <h3 className="font-semibold text-harmony-text-primary truncate">
+                        {song.name}
+                      </h3>
                       <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
-                        <span className="truncate">{song.artists.map(a => a.name).join(', ')}</span>
+                        <span className="truncate">
+                          {song.artists.map(a => a.name).join(', ')}
+                        </span>
                         <span>•</span>
-                        <span>{Math.floor((song.duration_ms || 0) / 60000)}:{String(Math.floor(((song.duration_ms || 0) % 60000) / 1000)).padStart(2,'0')}</span>
+                        <span>
+                          {Math.floor((song.duration_ms || 0) / 60000)}:{
+                            String(
+                              Math.floor(((song.duration_ms || 0) % 60000) / 1000)
+                            ).padStart(2, '0')
+                          }
+                        </span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      {isConnected && (
-                        <button
-                          className="text-red-500 hover:text-red-600"
-                          onClick={() => handleRemoveTrack(song.uri)}
-                        >
-                          <FaTrashAlt />
-                        </button>
-                      )}
-                      <button
-                        className="text-harmony-accent hover:text-harmony-accent/80"
-                        onClick={() => {
-                          setCurrentSong(song);
-                          setIsPlaying(true);
-                        }}
-                      >
-                        <FaPlay className="text-lg" />
-                      </button>
-                    </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -246,4 +237,4 @@ export default function PlaylistDetail() {
       <FooterPlayer />
     </div>
   );
-} 
+}
