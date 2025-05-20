@@ -14,6 +14,9 @@ export default function PlaylistDetail() {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Almacena el snapshot_id que necesitaremos para borrar
+  const [snapshotId, setSnapshotId] = useState('');
+
   useEffect(() => {
     async function fetchPlaylist() {
       if (!token) {
@@ -25,9 +28,11 @@ export default function PlaylistDetail() {
         const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         setPlaylist(data);
         setTracks(data.tracks.items.map(item => item.track));
+        setSnapshotId(data.snapshot_id);
       } catch (err) {
         console.error('Fetch playlist error:', err);
       } finally {
@@ -36,6 +41,43 @@ export default function PlaylistDetail() {
     }
     fetchPlaylist();
   }, [id, token]);
+
+  // Estadísticas
+  const totalDurationMin = Math.floor(
+    tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000
+  );
+
+  // Borrar pista
+  const handleRemoveTrack = async (e, trackUri) => {
+    e.stopPropagation();
+    if (!window.confirm('¿Eliminar esta canción de la playlist?')) return;
+
+    try {
+      const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/tracks`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tracks: [{ uri: trackUri }],
+          snapshot_id: snapshotId
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || res.statusText);
+      }
+      const result = await res.json();
+      // Spotify devuelve nueva snapshot_id
+      setSnapshotId(result.snapshot_id);
+      // Actualizamos la lista local
+      setTracks(prev => prev.filter(t => t.uri !== trackUri));
+    } catch (err) {
+      console.error('Remove track error:', err);
+      alert('No se pudo eliminar la canción: ' + err.message);
+    }
+  };
 
   if (!playlist && !loading) {
     return (
@@ -57,17 +99,13 @@ export default function PlaylistDetail() {
     );
   }
 
-  const totalDurationMin = Math.floor(
-    tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000
-  );
-
   return (
     <div className="min-h-screen bg-harmony-primary">
       <HeaderBar />
       <div className="container mx-auto px-6 pt-8">
         <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
           <div className="p-6">
-            {/* Header Controls */}
+            {/* Header Controls + Título */}
             <div className="flex items-center justify-between mb-6">
               <button
                 onClick={() => navigate(-1)}
@@ -96,11 +134,8 @@ export default function PlaylistDetail() {
               </div>
             </div>
 
-            {/* Info: Name Above Stats */}
+            {/* Stats (sin título duplicado) */}
             <div className="px-6 mb-4">
-              <h2 className="text-2xl font-semibold text-harmony-accent mb-2">
-                {playlist?.name}
-              </h2>
               <div className="flex items-center gap-4 text-harmony-text-secondary">
                 <span>{tracks.length} canciones</span>
                 <span>•</span>
@@ -108,7 +143,7 @@ export default function PlaylistDetail() {
               </div>
             </div>
 
-            {/* Track List */}
+            {/* Lista de canciones */}
             <div className="overflow-y-auto scrollbar-thin h-[60vh] px-6 pb-6 space-y-4">
               {tracks.map((song, idx) => (
                 <div
@@ -116,7 +151,7 @@ export default function PlaylistDetail() {
                   onClick={() => playTrack(song.uri)}
                   className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer"
                 >
-                  {/* Song Info */}
+                  {/* Info de la canción */}
                   <div className="flex items-center gap-3 flex-1">
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
                       <img
@@ -143,19 +178,19 @@ export default function PlaylistDetail() {
                       </div>
                     </div>
                   </div>
-                  {/* Action Buttons */}
+                  {/* Botones a la derecha */}
                   <div className="flex items-center gap-4">
                     <button
-                      onClick={e => { e.stopPropagation(); /* remove logic */ }}
+                      onClick={e => handleRemoveTrack(e, song.uri)}
                       className="text-red-500 hover:text-red-600 p-2 rounded-full transition"
-                      title="Eliminar"
+                      title="Eliminar canción"
                     >
                       <FaTrashAlt />
                     </button>
                     <button
                       onClick={e => { e.stopPropagation(); playTrack(song.uri); }}
                       className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full transition"
-                      title="Reproducir"
+                      title="Reproducir canción"
                     >
                       <FaPlay />
                     </button>
@@ -168,5 +203,5 @@ export default function PlaylistDetail() {
       </div>
       <FooterPlayer />
     </div>
-);
+  );
 }
