@@ -53,41 +53,39 @@ export default function PlaylistDetail() {
     }
   
     try {
-      console.log('Patch playlist:', id, '→ new name:', newName);
+      console.log('Updating playlist via PUT:', id, '→', newName);
       const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
-        method: 'PATCH',
+        method: 'PUT',                        // ← cambio clave
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-          Accept: 'application/json'
+          Accept: 'application/json'          // ← recomendado
         },
         body: JSON.stringify({ name: newName })
       });
   
-      const text = await res.text();
       console.log('Spotify status:', res.status);
-      console.log('Spotify body:', text);
   
       if (!res.ok) {
-        // Intentamos extraer un mensaje de JSON si lo hay
+        const text = await res.text();
         let msg = text;
         try {
-          const errJson = JSON.parse(text);
-          msg = errJson.error?.message || text;
-        } catch (e) { /* no es JSON */ }
+          const j = JSON.parse(text);
+          msg = j.error?.message || text;
+        } catch {}
         throw new Error(`(${res.status}) ${msg}`);
       }
   
-      // Si todo OK, actualizamos estado
+      // Spotify responde 200 OK sin cuerpo
       setPlaylist(prev => ({ ...prev, name: newName }));
       setEditMode(false);
       toast.success('Nombre de la playlist actualizado');
-  
     } catch (err) {
       console.error('Rename playlist error:', err);
       toast.error('No se pudo renombrar: ' + err.message);
     }
   };
+      
   
 
   // Estadísticas
