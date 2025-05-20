@@ -86,9 +86,6 @@ export default function PlaylistDetail() {
     }
   };
 
-  
-
-  // Estadísticas
   const totalDurationMin = Math.floor(
     tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000
   );
@@ -115,7 +112,6 @@ export default function PlaylistDetail() {
       }
     
       try {
-        // Convertimos a Base64 y comprobamos tamaño
         const b64 = await toBase64(file);
         // 256 KB max → en Base64 ~256 000 * (4/3) ≈ 341 000 chars
         if (b64.length > 350000) {
@@ -300,7 +296,7 @@ export default function PlaylistDetail() {
             </div>
 
             {/* Lista de canciones */}
-            <div className="overflow-y-auto flex-1 px-6 pb-6 space-y-4">
+            <div className="flex-none h-96 overflow-y-auto px-6 pb-6 space-y-4">
               {tracks.map((song, idx) => (
                 <div
                   key={song.id + idx}
