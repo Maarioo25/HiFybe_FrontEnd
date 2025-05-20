@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaPlay, FaTrashAlt, FaShareAlt, FaArrowLeft } from 'react-icons/fa';
+import { FaPlay, FaTrashAlt, FaShareAlt, FaArrowLeft, FaEdit } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
@@ -13,9 +13,8 @@ export default function PlaylistDetail() {
   const [playlist, setPlaylist] = useState(null);
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Almacena el snapshot_id que necesitaremos para borrar
   const [snapshotId, setSnapshotId] = useState('');
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     async function fetchPlaylist() {
@@ -47,6 +46,36 @@ export default function PlaylistDetail() {
     tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000
   );
 
+  // Subir nueva imagen
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+  
+      const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/images`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': file.type,
+        },
+        body: arrayBuffer
+      });
+  
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText);
+      }
+  
+      alert('Portada de la playlist actualizada correctamente');
+    } catch (err) {
+      console.error('Error al actualizar la portada:', err);
+      alert('No se pudo actualizar la portada: ' + err.message);
+    }
+  };
+  
+
   // Borrar pista
   const handleRemoveTrack = async (e, trackUri) => {
     e.stopPropagation();
@@ -69,9 +98,7 @@ export default function PlaylistDetail() {
         throw new Error(err.error?.message || res.statusText);
       }
       const result = await res.json();
-      // Spotify devuelve nueva snapshot_id
       setSnapshotId(result.snapshot_id);
-      // Actualizamos la lista local
       setTracks(prev => prev.filter(t => t.uri !== trackUri));
     } catch (err) {
       console.error('Remove track error:', err);
@@ -105,36 +132,58 @@ export default function PlaylistDetail() {
       <div className="container mx-auto px-6 pt-8">
         <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
           <div className="p-6">
-            {/* Header Controls + Título */}
-            <div className="flex items-center justify-between mb-6">
-              <button
-                onClick={() => navigate(-1)}
-                className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
+            {/* Imagen y detalles */}
+            <div className="flex items-center gap-6 mb-6">
+              <div
+                className="relative w-48 h-48 rounded-lg overflow-hidden shadow-md cursor-pointer group"
+                onClick={() => fileInputRef.current.click()}
               >
-                <FaArrowLeft className="text-lg" />
-              </button>
-              <h1 className="text-3xl font-bold text-harmony-accent">
-                {playlist?.name}
-              </h1>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={e => { e.stopPropagation(); playTrack(tracks[0]?.uri); }}
-                  className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
-                  title="Reproducir todo"
-                >
-                  <FaPlay className="text-xl" />
-                </button>
-                <button
-                  onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(window.location.href); alert('Enlace copiado'); }}
-                  className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
-                  title="Compartir playlist"
-                >
-                  <FaShareAlt className="text-xl" />
-                </button>
+                <img
+                  src={playlist?.images[0]?.url}
+                  alt={playlist?.name}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                  <FaEdit className="text-white text-2xl" />
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-harmony-accent">
+                  {playlist?.name}
+                </h1>
+                <p className="mt-2 text-harmony-text-secondary truncate">
+                  {playlist?.description || 'Sin descripción'}
+                </p>
+                <div className="mt-1 text-sm text-harmony-text-secondary">
+                  Creada por {playlist?.owner.display_name}
+                </div>
+                <div className="mt-4 flex items-center gap-4">
+                  <button
+                    onClick={() => playTrack(tracks[0]?.uri)}
+                    className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
+                    title="Reproducir todo"
+                  >
+                    <FaPlay className="text-xl" />
+                  </button>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(window.location.href); alert('Enlace copiado'); }}
+                    className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
+                    title="Compartir playlist"
+                  >
+                    <FaShareAlt className="text-xl" />
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Stats (sin título duplicado) */}
+            {/* Stats */}
             <div className="px-6 mb-4">
               <div className="flex items-center gap-4 text-harmony-text-secondary">
                 <span>{tracks.length} canciones</span>
@@ -151,7 +200,6 @@ export default function PlaylistDetail() {
                   onClick={() => playTrack(song.uri)}
                   className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer"
                 >
-                  {/* Info de la canción */}
                   <div className="flex items-center gap-3 flex-1">
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
                       <img
@@ -178,7 +226,6 @@ export default function PlaylistDetail() {
                       </div>
                     </div>
                   </div>
-                  {/* Botones a la derecha */}
                   <div className="flex items-center gap-4">
                     <button
                       onClick={e => handleRemoveTrack(e, song.uri)}
