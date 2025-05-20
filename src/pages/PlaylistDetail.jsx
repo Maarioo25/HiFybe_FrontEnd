@@ -206,8 +206,8 @@ export default function PlaylistDetail() {
   return (
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
       <HeaderBar />
-      <div className="flex-1 overflow-hidden container mx-auto px-6 pt-8">
-        <div className="max-h-[70vh] bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col overflow-y-auto">
+      <div className="overflow-hidden container mx-auto px-6 pt-8 mb-24">
+        <div className="h-[calc(100vh-200px)] bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col">
             {/* Imagen y detalles */}
             <div className="flex items-center gap-6 mb-6">
@@ -296,7 +296,7 @@ export default function PlaylistDetail() {
             </div>
 
             {/* Lista de canciones */}
-            <div className="flex-none h-96 overflow-y-auto scrollbar-thin scrollbar-track-harmony-secondary/30 scrollbar-thumb-harmony-accent hover:scrollbar-thumb-harmony-accent/80 transition px-6 pb-6 space-y-4">
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-harmony-secondary/30 scrollbar-thumb-harmony-accent hover:scrollbar-thumb-harmony-accent/80 transition px-6 pb-6 space-y-4">
               {tracks.map((song, idx) => (
                 <div
                   key={song.id + idx}
