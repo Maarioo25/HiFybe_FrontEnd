@@ -239,7 +239,7 @@ export default function PlaylistDetail() {
           </div>
         </div>
       </div>
-      {(!token) && <FooterPlayer />}
+      <FooterPlayer />
     </div>
   );
 } 
