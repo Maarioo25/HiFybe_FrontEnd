@@ -1,189 +1,118 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaPlay, FaPause, FaStepBackward, FaStepForward, FaRedo, FaShareAlt, FaArrowLeft, FaPen } from 'react-icons/fa';
+import {
+  FaPlay,
+  FaShareAlt,
+  FaArrowLeft,
+  FaPen,
+  FaPlus,
+  FaTrashAlt
+} from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
+import { useAuth } from '../context/AuthContext';
 
-const PLAYLISTS = [
-  {
-    name: "Mis Favoritas",
-    cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a",
-    description: "Mis canciones favoritas de todos los tiempos",
-    totalSongs: 8,
-    totalDuration: "2h 30m",
-    created: "2024",
-    songs: [
-      {
-        id: 1,
-        title: "Stronger",
-        artist: "Kanye West",
-        album: "Late Registration",
-        duration: "3:45",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 2,
-        title: "Blinding Lights",
-        artist: "The Weeknd",
-        album: "After Hours",
-        duration: "3:20",
-        cover: "https://upload.wikimedia.org/wikipedia/en/e/e6/The_Weeknd_-_Blinding_Lights.png"
-      },
-      {
-        id: 3,
-        title: "Bad Guy",
-        artist: "Billie Eilish",
-        album: "When We All Fall Asleep, Where Do We Go?",
-        duration: "3:14",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 4,
-        title: "Shape of You",
-        artist: "Ed Sheeran",
-        album: "÷",
-        duration: "3:54",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 5,
-        title: "Bohemian Rhapsody",
-        artist: "Queen",
-        album: "A Night at the Opera",
-        duration: "5:55",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 6,
-        title: "Sweet Child o' Mine",
-        artist: "Guns N' Roses",
-        album: "Appetite for Destruction",
-        duration: "5:55",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 7,
-        title: "Hotel California",
-        artist: "Eagles",
-        album: "Hotel California",
-        duration: "6:30",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 8,
-        title: "Stairway to Heaven",
-        artist: "Led Zeppelin",
-        album: "Led Zeppelin IV",
-        duration: "8:02",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      }
-    ],
-    "Música para Viajes": {
-      cover: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1080&h=1080",
-      description: "Música perfecta para viajes",
-      totalSongs: 8,
-      totalDuration: "1h 45m",
-      created: "2024",
-      songs: [
-      {
-        id: 1,
-        title: "Road Trip",
-        artist: "Various Artists",
-        album: "Travel Music",
-        duration: "4:20",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 2,
-        title: "Highway to Hell",
-        artist: "AC/DC",
-        album: "Highway to Hell",
-        duration: "3:29",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 3,
-        title: "On the Road Again",
-        artist: "Willie Nelson",
-        album: "Highway",
-        duration: "3:45",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 4,
-        title: "Life on the Road",
-        artist: "Bob Seger",
-        album: "Stranger in Town",
-        duration: "4:15",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 5,
-        title: "Drive",
-        artist: "Incubus",
-        album: "Make Yourself",
-        duration: "4:32",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 6,
-        title: "Take Me Home, Country Roads",
-        artist: "John Denver",
-        album: "Country Roads",
-        duration: "3:55",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 7,
-        title: "Wanderlust",
-        artist: "The Lumineers",
-        album: "Cleopatra",
-        duration: "4:25",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      },
-      {
-        id: 8,
-        title: "On the Road Again",
-        artist: "Creedence Clearwater Revival",
-        album: "Bayou Country",
-        duration: "3:30",
-        cover: "https://i.scdn.co/image/ab67616d00001e0226f7f19c7f0381e56156c94a"
-      }
-    ]
-  },
-  }
-];
-
-function PlaylistDetail() {
-  const { id, name } = useParams();
+export default function PlaylistDetail() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const playlist = PLAYLISTS.find(p => p.id === id);
-  const { currentSong, setCurrentSong, isPlaying, setIsPlaying, progress, setProgress, volume, setVolume, duration, setDuration } = usePlayer();
+  const { setCurrentSong, setIsPlaying } = usePlayer();
+  const { connectSpotifyUrl } = useAuth();
+  const token = localStorage.getItem('sp_token');
+  const [playlist, setPlaylist] = useState(null);
+  const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [newName, setNewName] = useState('');
 
-  if (!playlist) {
+  useEffect(() => {
+    async function fetchPlaylist() {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setPlaylist(data);
+        // flatten track items
+        setTracks(data.tracks.items.map(item => item.track));
+        setNewName(data.name);
+      } catch (err) {
+        console.error('Fetch playlist error:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPlaylist();
+  }, [id, token]);
+
+  const isConnected = Boolean(token);
+
+  const handlePlayAll = () => {
+    if (tracks.length) {
+      setCurrentSong(tracks[0]);
+      setIsPlaying(true);
+    }
+  };
+
+  const handleShare = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    alert('Enlace copiado al portapapeles');
+  };
+
+  const handleRename = async () => {
+    if (!newName.trim()) return;
+    try {
+      const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: newName })
+      });
+      if (res.ok) {
+        setPlaylist(prev => ({ ...prev, name: newName }));
+        setEditing(false);
+      } else {
+        console.error('Rename failed');
+      }
+    } catch (err) {
+      console.error('Rename error:', err);
+    }
+  };
+
+  const handleRemoveTrack = async (uri) => {
+    try {
+      const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/tracks`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tracks: [{ uri }] })
+      });
+      if (res.ok) {
+        setTracks(prev => prev.filter(t => t.uri !== uri));
+      }
+    } catch (err) {
+      console.error('Remove track error:', err);
+    }
+  };
+
+  if (!playlist && !loading) {
     return (
       <div className="min-h-screen bg-harmony-primary">
         <HeaderBar />
         <div className="container mx-auto px-6 pt-8">
           <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <button 
-                    onClick={() => navigate(`/friends/${id}`)} 
-                    className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition-colors duration-200"
-                  >
-                    <FaArrowLeft className="text-lg" />
-                  </button>
-                </div>
-
-                <h2 className="text-2xl font-bold text-harmony-accent">{name}</h2>
-              </div>
-              <div className="text-center text-harmony-text-secondary py-8">
-                <p className="text-xl font-semibold mb-4">Playlist no encontrada</p>
-                <p className="text-sm">No se encontró ninguna playlist con ese nombre.</p>
-              </div>
+            <div className="p-6 text-center text-harmony-text-secondary">
+              <p className="text-xl font-semibold mb-2">Playlist no encontrada</p>
             </div>
           </div>
         </div>
@@ -199,84 +128,101 @@ function PlaylistDetail() {
         <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <button 
-                  onClick={() => navigate(-1)} 
-                  className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition-colors duration-200"
-                >
-                  <FaArrowLeft className="text-lg" />
-                </button>
-              </div>
-
-              <h2 className="text-2xl font-bold text-harmony-accent">{name}</h2>
+              <button
+                onClick={() => navigate(-1)}
+                className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
+              >
+                <FaArrowLeft className="text-lg" />
+              </button>
+              {editing ? (
+                <div className="flex gap-2">
+                  <input
+                    className="bg-harmony-secondary/50 text-harmony-text-primary px-2 py-1 rounded"
+                    value={newName}
+                    onChange={e => setNewName(e.target.value)}
+                  />
+                  <button onClick={handleRename} className="px-3 py-1 bg-harmony-accent text-white rounded">
+                    Guardar
+                  </button>
+                  <button onClick={() => setEditing(false)} className="px-3 py-1 bg-gray-500 text-white rounded">
+                    Cancelar
+                  </button>
+                </div>
+              ) : (
+                <h1 className="text-3xl font-bold text-harmony-accent flex items-center gap-2">
+                  {playlist?.name}
+                  {isConnected && <FaPen className="cursor-pointer" onClick={() => setEditing(true)} />}
+                </h1>
+              )}
             </div>
 
-            <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-44px)] px-6 pb-6">
-              <div className="space-y-6">
-                <div className="flex gap-6">
-                  <div className="relative w-48 h-48 rounded-xl overflow-hidden group">
-                    <img
-                      src={playlist.cover}
-                      alt={name}
-                      className="w-full h-full object-cover transition-all duration-300 group-hover:filter group-hover:blur-sm group-hover:opacity-80"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <button className="text-white bg-harmony-accent/90 p-3 rounded-full hover:bg-harmony-accent/80 transition-colors">
-                        <FaPen className="text-xl" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="space-y-4">
-                      <h1 className="text-3xl font-bold text-harmony-accent mb-2">{name}</h1>
-                      <div className="flex items-center gap-4 text-harmony-text-secondary">
-                        <span>{playlist.totalSongs} canciones</span>
-                        <span>•</span>
-                        <span>{playlist.totalDuration}</span>
-                      </div>
-                      <p className="text-harmony-text-secondary line-clamp-2">{playlist.description}</p>
-                      <div className="flex items-center gap-4">
-                        <button 
-                          className="text-harmony-accent hover:text-harmony-accent/80"
-                          onClick={() => {
-                            setCurrentSong(playlist.songs[0]);
-                            setIsPlaying(true);
-                          }}
-                        >
-                          <FaPlay className="text-xl" />
-                        </button>
-                        <button className="text-harmony-accent hover:text-harmony-accent/80">
-                          <FaShareAlt className="text-xl" />
-                        </button>
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 rounded-full bg-harmony-accent/20"></div>
-                          <div className="w-2 h-2 rounded-full bg-harmony-accent/20"></div>
-                          <div className="w-2 h-2 rounded-full bg-harmony-accent/20"></div>
-                        </div>
-                      </div>
-                    </div>
+            <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-44px)] px-6 pb-6 space-y-6">
+              {/* Header Info */}
+              <div className="flex gap-6">
+                <div className="relative w-48 h-48 rounded-xl overflow-hidden group">
+                  <img
+                    src={playlist?.images[0]?.url}
+                    alt={playlist?.name}
+                    className="w-full h-full object-cover transition-all duration-300 group-hover:blur-sm group-hover:opacity-80"
+                  />
+                  <div className="absolute bottom-2 left-2 flex gap-2">
+                    <button onClick={handlePlayAll} className="text-harmony-accent hover:text-harmony-accent/80">
+                      <FaPlay className="text-xl" />
+                    </button>
+                    <button onClick={handleShare} className="text-harmony-accent hover:text-harmony-accent/80">
+                      <FaShareAlt className="text-xl" />
+                    </button>
                   </div>
                 </div>
+                <div className="flex-1 flex flex-col justify-center">
+                  <div className="flex items-center gap-4 text-harmony-text-secondary">
+                    <span>{playlist?.tracks.total} canciones</span>
+                    <span>•</span>
+                    <span>
+                      {/* calcular duración total */}
+                      {tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 1000 / 60 | 0} min
+                    </span>
+                  </div>
+                  {playlist?.description && (
+                    <p className="text-harmony-text-secondary mt-2 line-clamp-2">
+                      {playlist.description}
+                    </p>
+                  )}
+                </div>
+              </div>
 
-                <div className="space-y-4">
-                  {playlist.songs.map((song) => (
-                    <div key={song.id} className="playlist-song-card group flex items-center gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
-                        <img
-                          src={song.cover}
-                          alt={song.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
+              {/* Track list */}
+              <div className="space-y-4">
+                {tracks.map((song, idx) => (
+                  <div
+                    key={song.id + idx}
+                    className="group flex items-center gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+                  >
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
+                      <img
+                        src={song.album.images[0]?.url}
+                        alt={song.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-harmony-text-primary truncate">{song.name}</h3>
+                      <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
+                        <span className="truncate">{song.artists.map(a => a.name).join(', ')}</span>
+                        <span>•</span>
+                        <span>{Math.floor((song.duration_ms || 0) / 60000)}:{String(Math.floor(((song.duration_ms || 0) % 60000) / 1000)).padStart(2,'0')}</span>
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-harmony-text-primary truncate">{song.title}</h3>
-                        <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
-                          <span className="truncate">{song.artist}</span>
-                          <span>•</span>
-                          <span>{song.duration}</span>
-                        </div>
-                      </div>
-                      <button 
+                    </div>
+                    <div className="flex gap-2">
+                      {isConnected && (
+                        <button
+                          className="text-red-500 hover:text-red-600"
+                          onClick={() => handleRemoveTrack(song.uri)}
+                        >
+                          <FaTrashAlt />
+                        </button>
+                      )}
+                      <button
                         className="text-harmony-accent hover:text-harmony-accent/80"
                         onClick={() => {
                           setCurrentSong(song);
@@ -286,16 +232,14 @@ function PlaylistDetail() {
                         <FaPlay className="text-lg" />
                       </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
-      <FooterPlayer />
+      {(!token) && <FooterPlayer />}
     </div>
   );
-}
-
-export default PlaylistDetail;
+} 
