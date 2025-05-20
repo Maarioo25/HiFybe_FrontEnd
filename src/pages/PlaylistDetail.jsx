@@ -296,7 +296,7 @@ export default function PlaylistDetail() {
             </div>
 
             {/* Lista de canciones */}
-            <div className="flex-none h-96 overflow-y-auto scrollbar-thin scrollbar-track-harmony-secondary/30 scrollbar-thumb-harmony-accent hover:scrollbar-thumb-harmony-accent/80 transition px-6 pb-6 space-y-4">
+            <div className="flex-none h-[calc(100vh-244px)] overflow-y-auto scrollbar-thin scrollbar-track-harmony-secondary/30 scrollbar-thumb-harmony-accent hover:scrollbar-thumb-harmony-accent/80 transition px-6 pb-6 space-y-4">
               {tracks.map((song, idx) => (
                 <div
                   key={song.id + idx}
