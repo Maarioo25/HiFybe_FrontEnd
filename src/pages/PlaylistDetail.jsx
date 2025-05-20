@@ -93,51 +93,68 @@ export default function PlaylistDetail() {
     tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000
   );
 
-  // Subir nueva imagen
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-  
-    // Validación básica de tipo
-    if (!file.type.startsWith('image/')) {
-      toast.error('El archivo debe ser una imagen');
-      return;
-    }
-  
-    try {
-      console.log('PUT playlist image:', id, '– type:', file.type);
-  
-      const arrayBuffer = await file.arrayBuffer();
-      const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/images`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': file.type,
-          Accept: 'application/json'
-        },
-        body: arrayBuffer
-      });
-  
-      console.log('Spotify image update status:', res.status);
-      const text = await res.text();
-      console.log('Spotify image update body:', text);
-  
-      if (!res.ok) {
-        // Intentamos extraer mensaje de error JSON si existe
-        let msg = text;
-        try {
-          const errJson = JSON.parse(text);
-          msg = errJson.error?.message || text;
-        } catch {}
-        throw new Error(`(${res.status}) ${msg}`);
+  const toBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const b64 = reader.result.split(',')[1];
+        resolve(b64);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    const handleImageChange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+    
+      // Solo JPEG permitido por la API
+      if (file.type !== 'image/jpeg') {
+        toast.error('La imagen debe estar en formato JPEG');
+        return;
       }
-  
-      toast.success('Portada de la playlist actualizada correctamente');
-    } catch (err) {
-      console.error('Error al actualizar la portada:', err);
-      toast.error('No se pudo actualizar la portada: ' + err.message);
-    }
-  };
+    
+      try {
+        // Convertimos a Base64 y comprobamos tamaño
+        const b64 = await toBase64(file);
+        // 256 KB max → en Base64 ~256 000 * (4/3) ≈ 341 000 chars
+        if (b64.length > 350000) {
+          toast.error('La imagen debe pesar menos de 256 KB');
+          return;
+        }
+    
+        console.log('PUT playlist image:', id, '– Base64 length:', b64.length);
+    
+        const res = await fetch(
+          `https://api.spotify.com/v1/playlists/${id}/images`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'image/jpeg'
+            },
+            body: b64
+          }
+        );
+    
+        console.log('Spotify image update status:', res.status);
+    
+        if (res.status === 202) {
+          // Success: 202 Accepted (no body)
+          toast.success('Portada de la playlist actualizada correctamente');
+        } else if (res.status === 401) {
+          toast.error('Token expirado o inválido. Vuelve a iniciar sesión.');
+        } else {
+          // Leemos JSON si hay mensaje de error
+          const errJson = await res.json();
+          const msg = errJson.error?.message || res.statusText;
+          throw new Error(`(${res.status}) ${msg}`);
+        }
+      } catch (err) {
+        console.error('Error al actualizar la portada:', err);
+        toast.error('No se pudo actualizar la portada: ' + err.message);
+      }
+    };
   
 
   // Borrar pista
