@@ -206,8 +206,8 @@ export default function PlaylistDetail() {
   return (
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
       <HeaderBar />
-      <div className="flex-1 container mx-auto px-6 pt-8 pb-6 flex flex-col h-full">
-        <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col flex-1 overflow-hidden">
+      <div className="flex-1 container mx-auto px-6 pt-8 pb-6 flex flex-col">
+        <div className="h-[calc(100vh-244px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col">
             {/* Imagen y detalles */}
             <div className="flex items-center gap-6 mb-6">
