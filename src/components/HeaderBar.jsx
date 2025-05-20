@@ -33,101 +33,97 @@ export default function HeaderBar({ children, onSongSelect }) {
     }
   };
 
+  useEffect(() => {
+    if (showSearch) searchInputRef.current?.focus();
+  }, [showSearch]);
+
   return (
-    <nav className={`header-bar flex flex-col md:flex-row items-center md:justify-between py-4 px-4 md:px-8 bg-harmony-primary/90 rounded-b-3xl shadow-lg mb-8 transition-all duration-500 ${showSearch ? 'z-[60] drop-shadow-2xl' : ''}`} style={{ position: 'relative' }}>
-      {/* Título y búsqueda */}
-      <div className="w-full md:w-auto flex items-center justify-between md:justify-start gap-3">
+    <nav className="relative flex flex-col md:flex-row items-center justify-between
+                    bg-harmony-primary/90 px-6 py-4 rounded-b-3xl shadow-lg mb-8">
+      {/* Logo + Botón de búsqueda (wrapper relativo) */}
+      <div className="relative flex items-center gap-4">
         <span
-          className="font-bold text-xl md:text-2xl text-harmony-accent tracking-tight cursor-pointer"
+          className="font-bold text-2xl text-harmony-accent cursor-pointer"
           onClick={() => navigate("/")}
         >
           HiFybe
         </span>
+
+        {/* search toggle */}
         <button
-          className="p-2 rounded-full hover:bg-harmony-accent/10 transition text-harmony-accent focus:outline-none"
+          className="p-2 rounded-full hover:bg-harmony-accent/10 transition"
+          onClick={() => setShowSearch((v) => !v)}
           aria-label="Buscar"
-          onClick={() => setShowSearch(v => !v)}
         >
-          <FaSearch className="w-5 h-5" />
+          <FaSearch className="w-5 h-5 text-harmony-accent" />
         </button>
-      </div>
 
-      {/* Barra de búsqueda animada */}
-      <div
-        className={`absolute top-[56px] md:top-1/2 md:left-36 transform md:-translate-y-1/2 transition-all duration-300 ${showSearch ? 'w-full md:w-64 opacity-100 px-4 py-2' : 'w-0 opacity-0 p-0'} bg-harmony-primary/90 rounded-full shadow flex items-center overflow-hidden border border-harmony-accent/30`}
-        style={{ minHeight: 40, left: showSearch ? '1rem' : undefined }}
-      >
-        <input
-          ref={searchInputRef}
-          type="text"
-          className="bg-transparent outline-none text-harmony-text-primary placeholder-harmony-text-secondary w-full text-sm"
-          placeholder="Buscar canciones, artistas..."
-          autoFocus={showSearch}
-          value={searchValue}
-          onChange={handleSearch}
-          onBlur={() => setShowSearch(false)}
-        />
-      </div>
-
-      {/* Resultados de búsqueda */}
-      {showSearch && (
         <div
-          className="absolute top-[96px] md:top-[calc(50%+32px)] md:left-36 w-full md:w-64 bg-harmony-secondary/90 rounded-xl shadow-2xl border border-harmony-accent/30 animate-fade-in-down z-[70] overflow-hidden"
-        >
-          {searchResults.length > 0 ? (
-            searchResults.map((song, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-harmony-accent/10 cursor-pointer transition rounded-none md:rounded-xl"
-                onClick={() => onSongSelect?.(song)}
-              >
-                <img
-                  src={song.img}
-                  alt="cover"
-                  className="w-10 h-10 rounded-lg object-cover border border-harmony-accent/30"
-                />
-                <div className="flex flex-col">
-                  <span className="font-semibold text-harmony-text-primary text-sm md:text-base">{song.title}</span>
-                  <span className="text-xs text-harmony-text-secondary">{song.artist}</span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="flex items-center justify-center py-4 text-harmony-text-secondary text-sm">
-              {searchValue.trim() ? "No se encontraron resultados" : "Escribe algo para buscar"}
-            </div>
-          )}
-        </div>
-      )}
+          className={`
+            absolute z-50
+            top-full left-1/2 transform -translate-x-1/2 mt-2
+            md:top-1/2 md:left-36 md:transform md:-translate-y-1/2 md:translate-x-0 md:mt-0
 
-      {/* Navegación */}
-      <div className={`w-full md:flex-1 flex flex-nowrap items-center justify-center gap-2 mt-4 md:mt-0 transition-all duration-300 ${showSearch ? 'translate-y-20 md:translate-x-64' : ''}`}>
+            bg-harmony-primary/90 border border-harmony-accent/30
+            rounded-full flex items-center overflow-hidden
+            transition-all duration-300
+
+            ${showSearch
+              ? "w-64 px-4 py-2 opacity-100"
+              : "w-0 px-0 py-0 opacity-0 pointer-events-none"}
+          `}
+          style={{ minHeight: 40 }}
+        >
+          <input
+            ref={searchInputRef}
+            type="text"
+            className="bg-transparent outline-none flex-1 text-harmony-text-primary placeholder-harmony-text-secondary"
+            placeholder="Buscar canciones, artistas..."
+            value={searchValue}
+            onChange={handleSearch}
+            onBlur={() => setShowSearch(false)}
+          />
+        </div>
+      </div>
+
+      {/* Navegación principal (ya no se mueve) */}
+      <div className="flex-1 flex items-center justify-center gap-2 mt-4 md:mt-0">
         {[ 
           { icon: <FaHome />, label: 'Inicio', to: '/' },
           { icon: <FaUserFriends />, label: 'Amigos', to: '/friends' },
           { icon: <FaMusic />, label: 'Playlists', to: '/playlists' },
           { icon: <FaComments />, label: 'Chats', to: '/chats' },
         ].map(({ icon, label, to }) => {
-          const active = to === '/' ? location.pathname === to : location.pathname.startsWith(to);
+          const active = to === '/' 
+            ? location.pathname === to 
+            : location.pathname.startsWith(to);
           return (
             <button
               key={to}
               onClick={() => navigate(to)}
-              className={`px-3 py-1 rounded-full text-harmony-text-primary hover:bg-harmony-accent/10 hover:text-harmony-accent font-semibold flex items-center justify-center gap-2 ${active ? 'bg-harmony-accent/20 text-harmony-accent' : ''}`}
+              className={`
+                px-3 py-1 rounded-full flex items-center gap-2
+                font-semibold transition
+                ${active 
+                  ? 'bg-harmony-accent/20 text-harmony-accent'
+                  : 'text-harmony-text-primary hover:bg-harmony-accent/10 hover:text-harmony-accent'}
+              `}
             >
               {icon}
               <span className="hidden md:inline">{label}</span>
             </button>
           );
         })}
-        {/* Perfil */}
         <ProfileMenu user={user} logout={logout} />
       </div>
 
       {children}
+
+      {/* Aquí iría el dropdown de ProfileMenu, igual que antes */}
     </nav>
   );
 }
+
 
 // --- Menú de perfil desplegable ---
 function ProfileMenu({ user, logout }) {
