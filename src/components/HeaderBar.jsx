@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FaUserFriends, FaMusic, FaSearch, FaHome, FaComments, FaUserCircle, FaSignOutAlt, FaCog } from "react-icons/fa";
+import { FaUserFriends, FaMusic, FaSearch, FaHome, FaComments, FaUserCircle, FaSignOutAlt, FaCog, FaBell } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -40,7 +40,6 @@ export default function HeaderBar({ children, onSongSelect }) {
   return (
     <nav className="relative flex flex-col md:flex-row items-center justify-between
                     bg-harmony-primary/90 px-6 py-4 rounded-b-3xl shadow-lg mb-8">
-      {/* Logo + Botón de búsqueda (wrapper relativo) */}
       <div className="relative flex items-center gap-4">
         <span
           className="font-bold text-2xl text-harmony-accent cursor-pointer"
@@ -48,8 +47,6 @@ export default function HeaderBar({ children, onSongSelect }) {
         >
           HiFybe
         </span>
-
-        {/* search toggle */}
         <button
           className="p-2 rounded-full hover:bg-harmony-accent/10 transition"
           onClick={() => setShowSearch((v) => !v)}
@@ -57,20 +54,15 @@ export default function HeaderBar({ children, onSongSelect }) {
         >
           <FaSearch className="w-5 h-5 text-harmony-accent" />
         </button>
-
         <div
           className={`
             absolute z-50
             top-full left-1/2 transform -translate-x-1/2 mt-2
             md:top-1/2 md:left-36 md:transform md:-translate-y-1/2 md:translate-x-0 md:mt-0
-
             bg-harmony-primary/90 border border-harmony-accent/30
             rounded-full flex items-center overflow-hidden
             transition-all duration-300
-
-            ${showSearch
-              ? "w-64 px-4 py-2 opacity-100"
-              : "w-0 px-0 py-0 opacity-0 pointer-events-none"}
+            ${showSearch ? "w-64 px-4 py-2 opacity-100" : "w-0 px-0 py-0 opacity-0 pointer-events-none"}
           `}
           style={{ minHeight: 40 }}
         >
@@ -86,7 +78,6 @@ export default function HeaderBar({ children, onSongSelect }) {
         </div>
       </div>
 
-      {/* Navegación principal (ya no se mueve) */}
       <div className="flex-1 flex items-center justify-center gap-2 mt-4 md:mt-0">
         {[ 
           { icon: <FaHome />, label: 'Inicio', to: '/' },
@@ -114,18 +105,68 @@ export default function HeaderBar({ children, onSongSelect }) {
             </button>
           );
         })}
+      </div>
+
+      {/* Notificaciones + Perfil */}
+      <div className="flex items-center gap-2 mt-4 md:mt-0">
+        <NotificationBell />
         <ProfileMenu user={user} logout={logout} />
       </div>
 
       {children}
-
-      {/* Aquí iría el dropdown de ProfileMenu, igual que antes */}
     </nav>
   );
 }
 
+function NotificationBell() {
+  const [open, setOpen] = useState(false);
+  const bellRef = useRef(null);
+  const [notifications, setNotifications] = useState([]);
 
-// --- Menú de perfil desplegable ---
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (bellRef.current && !bellRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={bellRef}>
+      <button
+        className="p-2 text-harmony-accent hover:text-harmony-accent/80 focus:outline-none text-2xl"
+        onClick={() => setOpen(v => !v)}
+        aria-label="Notificaciones"
+      >
+        <FaBell />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-64 bg-harmony-primary/95 rounded-xl shadow-xl border border-harmony-accent/20 z-50 animate-fade-in-down text-sm">
+          <div className="px-4 py-3 border-b border-harmony-accent/10 font-semibold text-harmony-accent">
+            Notificaciones
+          </div>
+          {notifications.length === 0 ? (
+            <div className="px-4 py-4 text-center text-harmony-text-secondary">
+              No tienes ninguna notificación pendiente
+            </div>
+          ) : (
+            <ul>
+              {notifications.map((n, i) => (
+                <li key={i} className="px-4 py-2 hover:bg-harmony-accent/10 cursor-pointer text-harmony-text-primary">
+                  {n.mensaje}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function ProfileMenu({ user, logout }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
@@ -157,7 +198,7 @@ function ProfileMenu({ user, logout }) {
           </div>
           <button
             className="w-full flex items-center gap-2 px-4 py-3 hover:bg-harmony-accent/10 text-harmony-text-primary text-sm transition"
-            onClick={() => { /* navegar a perfil */ setOpen(false); }}
+            onClick={() => { setOpen(false); }}
           >
             <FaCog className="text-lg" /> Ajustes de perfil
           </button>
