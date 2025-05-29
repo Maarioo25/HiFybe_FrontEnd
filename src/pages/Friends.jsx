@@ -15,9 +15,9 @@ export default function Friends() {
   useEffect(() => {
     const loadFriends = async () => {
       try {
-        const currentUser = await userService.getCurrentUser(); // obtener usuario actual
-        const userId = currentUser._id || currentUser.id; // usar _id si existe
-        console.log(userId);
+        const currentUser = await userService.getCurrentUser();
+        const userId = currentUser.user?._id || currentUser.user?.id;
+        console.log('Usuario actual:', userId);
         const data = await friendService.getFriends(userId);
         setFriendsList(data);
       } catch (err) {
@@ -26,7 +26,6 @@ export default function Friends() {
         setLoading(false);
       }
     };
-
     loadFriends();
   }, []);
 
