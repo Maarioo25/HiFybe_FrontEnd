@@ -1,3 +1,4 @@
+// components/Friends.jsx
 import React, { useState, useEffect } from 'react';
 import { FaMusic, FaPlay, FaPlus } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
@@ -14,7 +15,8 @@ export default function Friends() {
   useEffect(() => {
     const loadFriends = async () => {
       try {
-        const { id: userId } = await userService.getCurrentUser();
+        const currentUser = await userService.getCurrentUser(); // obtener usuario actual
+        const userId = currentUser._id || currentUser.id; // usar _id si existe
         const data = await friendService.getFriends(userId);
         setFriendsList(data);
       } catch (err) {
@@ -23,6 +25,7 @@ export default function Friends() {
         setLoading(false);
       }
     };
+
     loadFriends();
   }, []);
 
@@ -37,7 +40,7 @@ export default function Friends() {
           <div className="p-6">
             <h2 className="text-xl font-bold text-harmony-accent mb-6">Mis Amigos</h2>
             <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-24px)] px-4 pb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[...friendsList, { id: 'add' }].map((amigo) => (
+              {[...friendsList, { id: 'add' }].map(amigo => (
                 amigo.id === 'add' ? (
                   <div key="add" className="friend-card relative group w-full h-50">
                     <div className="flex items-center justify-center w-full h-full bg-harmony-secondary/20 rounded-xl hover:bg-harmony-secondary/30 transition-colors duration-200">
@@ -68,7 +71,7 @@ export default function Friends() {
                               <FaMusic className="text-lg" />
                               <span>{amigo.playlistsPublicas} playlists públicas</span>
                             </div>
-                            {amigo.estado.includes('Escuchando') && (
+                            {amigo.estado?.includes('Escuchando') && (
                               <div className="flex items-center gap-2 text-white/80 mt-1">
                                 <FaPlay className="text-lg" />
                                 <span>{amigo.estado}</span>
