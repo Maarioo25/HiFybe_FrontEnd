@@ -1,3 +1,5 @@
+import api from './api';
+
 export const chatService = {
   getConversations: async () => {
     const res = await api.get('/conversaciones');
