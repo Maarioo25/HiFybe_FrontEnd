@@ -6,7 +6,10 @@ export const friendService = {
     return res.data;
   },
   sendRequest: async (emisorId, receptorId) => {
-    const res = await api.post('/amistades/solicitudes', { emisorId, receptorId });
+    const res = await api.post('/amistades/solicitudes', {
+      de_usuario_id: emisorId,
+      para_usuario_id: receptorId
+    });
     return res.data;
   },
   respondRequest: async (solicitudId, estado) => {
