@@ -17,6 +17,7 @@ export default function Friends() {
       try {
         const currentUser = await userService.getCurrentUser(); // obtener usuario actual
         const userId = currentUser._id || currentUser.id; // usar _id si existe
+        console.log(userId);
         const data = await friendService.getFriends(userId);
         setFriendsList(data);
       } catch (err) {
