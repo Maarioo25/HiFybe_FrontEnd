@@ -1,6 +1,6 @@
 // components/Friends.jsx
 import React, { useState, useEffect } from 'react';
-import { FaMusic, FaPlay, FaPlus } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { Link } from 'react-router-dom';
@@ -17,7 +17,6 @@ export default function Friends() {
       try {
         const currentUser = await userService.getCurrentUser();
         const userId = currentUser.user?._id || currentUser.user?.id;
-        console.log('Usuario actual:', userId);
         const data = await friendService.getFriends(userId);
         setFriendsList(data);
       } catch (err) {
@@ -40,7 +39,7 @@ export default function Friends() {
           <div className="p-6">
             <h2 className="text-xl font-bold text-harmony-accent mb-6">Mis Amigos</h2>
             <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-24px)] px-4 pb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[...friendsList, { id: 'add' }].map(amigo => (
+              {(friendsList.length === 0 ? [{ id: 'add' }] : [...friendsList, { id: 'add' }]).map(amigo => (
                 amigo.id === 'add' ? (
                   <div key="add" className="friend-card relative group w-full h-50">
                     <div className="flex items-center justify-center w-full h-full bg-harmony-secondary/20 rounded-xl hover:bg-harmony-secondary/30 transition-colors duration-200">
@@ -49,7 +48,7 @@ export default function Friends() {
                   </div>
                 ) : (
                   <Link to={`/friends/${amigo.id}`} key={amigo.id} className="friend-card relative group w-full h-50">
-                    <div className="relative w-full h-full rounded-xl overflow-hidden">
+                    <div className="relative w-full h-full rounded-xl overflow-hidden group">
                       <div className="absolute inset-0">
                         <img
                           src={amigo.foto_perfil}
