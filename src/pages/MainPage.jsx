@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { FRIENDS } from "../data/friends";
 import { SONGS } from "../data/songs";
 import { useAuth } from "../context/AuthContext";
+import { friendService } from "../services/friendService";
+import { userService } from "../services/userService";
 import { usePlayer } from "../context/PlayerContext";
 import { useNavigate } from "react-router-dom";
 import HeaderBar from "../components/HeaderBar";
@@ -9,8 +11,13 @@ import FooterPlayer from '../components/FooterPlayer';
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./style.css";
+import AddFriendModal from '../components/AddFriendModal';
+
 
 export default function MainPage() {
+  const [showAddFriendModal, setShowAddFriendModal] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
   const { loading } = useAuth();
   const navigate = useNavigate();
   const { playTrack } = usePlayer();
@@ -23,6 +30,20 @@ export default function MainPage() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState('friends');
   const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
+
+  const [realFriends, setRealFriends] = useState([]);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      const currentUser = await userService.getCurrentUser();
+      const userId = currentUser.user._id || currentUser.user.id;
+      setCurrentUserId(userId);
+      const friends = await friendService.getFriends(userId);
+      setRealFriends(friends);
+    };
+    fetchFriends();
+  }, []);
+  
 
   // Función para obtener usuarios cercanos en unas coordenadas dadas
   const fetchUsersAtPosition = async (latitude, longitude) => {
@@ -232,46 +253,21 @@ export default function MainPage() {
               <div ref={mapRef} id="map" className="rounded-2xl shadow-lg h-full" />
 
               {selectedUser && (
-                <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 flex items-center
-                                bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border
-                                border-harmony-text-secondary/20 gap-3 max-w-xs backdrop-blur-md
-                                transition-all animate-fade-in-down">
+                <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 max-w-xs backdrop-blur-md transition-all animate-fade-in-down">
                   <div className="flex flex-col items-center mr-2">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-harmony-accent
-                                    shadow-lg bg-harmony-primary flex items-center justify-center overflow-hidden mb-1">
-                      <img
-                        src={selectedUser.foto_perfil ||
-                          'https://ui-avatars.com/api/?name=' + encodeURIComponent(selectedUser.nombre)}
-                        alt={selectedUser.nombre}
-                        className="w-full h-full object-cover rounded-full"
-                      />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-harmony-accent shadow-lg bg-harmony-primary flex items-center justify-center overflow-hidden mb-1">
+                      <img src={selectedUser.foto_perfil || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(selectedUser.nombre)} alt={selectedUser.nombre} className="w-full h-full object-cover rounded-full" />
                     </div>
-                    <span className="text-xs sm:text-sm text-harmony-text-primary font-semibold truncate
-                                     max-w-[60px] sm:max-w-[72px] text-center">
-                      {selectedUser.nombre}
-                    </span>
+                    <span className="text-xs sm:text-sm text-harmony-text-primary font-semibold truncate max-w-[60px] sm:max-w-[72px] text-center">{selectedUser.nombre}</span>
                   </div>
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span className="text-harmony-accent text-xs sm:text-sm font-bold uppercase tracking-wide mb-1">
-                      Escuchando
-                    </span>
-                    <span className="text-harmony-text-primary text-sm sm:text-base font-bold truncate">
-                      {selectedUser.song.title}
-                    </span>
-                    <span className="text-harmony-text-secondary text-xs sm:text-sm truncate">
-                      {selectedUser.song.artist}
-                    </span>
+                    <span className="text-harmony-accent text-xs sm:text-sm font-bold uppercase tracking-wide mb-1">Escuchando</span>
+                    <span className="text-harmony-text-primary text-sm sm:text-base font-bold truncate">{selectedUser.song.title}</span>
+                    <span className="text-harmony-text-secondary text-xs sm:text-sm truncate">{selectedUser.song.artist}</span>
                   </div>
                   <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">
-                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80
-                                        rounded-full text-xs sm:text-sm font-semibold text-white shadow">
-                      Seguir
-                    </button>
-                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80
-                                        rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow
-                                        border border-harmony-accent">
-                      Escuchar
-                    </button>
+                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow">Seguir</button>
+                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent">Escuchar</button>
                   </div>
                 </div>
               )}
@@ -307,31 +303,22 @@ export default function MainPage() {
               <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent pr-1">
                 {activeTab === 'friends' ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {FRIENDS.map((amigo, idx) => (
+                    {realFriends.map((amigo, idx) => (
                       <div
-                        key={idx}
+                        key={amigo.id}
                         className="friend-card relative flex flex-col justify-end h-48 sm:h-64 rounded-xl overflow-hidden group shadow-lg border border-harmony-secondary/30"
                       >
                         <img
-                          src={amigo.photo}
-                          alt={amigo.name}
+                          src={amigo.foto_perfil}
+                          alt={amigo.nombre}
                           className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-300 filter blur-sm"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-harmony-primary/80 via-harmony-primary/40 to-transparent" />
                         <div className="relative flex flex-col justify-end h-full px-4 sm:px-5 pb-3 sm:pb-4 pt-8 w-full">
                           <div className="font-bold text-harmony-accent text-lg sm:text-xl drop-shadow mb-1 sm:mb-2 truncate">
-                            {amigo.name}
+                            {amigo.nombre}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <img
-                              src={amigo.song.img}
-                              alt={amigo.song.title}
-                              className="w-6 sm:w-8 h-6 sm:h-8 rounded-lg object-cover border-2 border-harmony-accent shadow"
-                            />
-                            <div className="text-harmony-text-primary text-xs sm:text-sm truncate max-w-[100px] sm:max-w-[120px]">
-                              {amigo.song.title} - {amigo.song.artist}
-                            </div>
-                          </div>
+                          <div className="text-harmony-text-secondary text-sm">Canción destacada no disponible</div>
                         </div>
                         <span
                           className={`absolute top-2 right-2 w-3 h-3 rounded-full border-2 border-white shadow ${
@@ -339,18 +326,19 @@ export default function MainPage() {
                           }`}
                         />
                         <button
-                          onClick={() => navigate(`/friends/${idx + 1}`)}
+                          onClick={() => navigate(`/friends/${amigo.id}`)}
                           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         />
                       </div>
                     ))}
                     <button
                       className="flex flex-col items-center justify-center h-48 sm:h-64 rounded-xl border-2 border-dashed border-harmony-accent text-harmony-accent hover:bg-harmony-accent/10 transition shadow-lg"
-                      onClick={() => {/* lógica agregar */}}
+                      onClick={() => setShowAddFriendModal(true)}
                     >
                       <span className="text-4xl mb-2">+</span>
                       <span className="font-semibold">Agregar amigo</span>
                     </button>
+
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
@@ -367,7 +355,7 @@ export default function MainPage() {
                         }}
                       >
                         <img
-                          src={song.img}
+                          src={song.img || 'https://via.placeholder.com/48'}
                           alt={song.title}
                           className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
                         />
@@ -389,6 +377,13 @@ export default function MainPage() {
         </div>
       </div>
       <FooterPlayer />
+      {showAddFriendModal && currentUserId && (
+        <AddFriendModal
+          currentUserId={currentUserId}
+          existingFriends={realFriends}
+          onClose={() => setShowAddFriendModal(false)}
+        />
+      )}
     </div>
   );
 }

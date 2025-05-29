@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaUserFriends, FaMusic, FaSearch, FaHome, FaComments, FaUserCircle, FaSignOutAlt, FaCog, FaBell } from "react-icons/fa";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function HeaderBar({ children, onSongSelect }) {
@@ -79,33 +79,34 @@ export default function HeaderBar({ children, onSongSelect }) {
       </div>
 
       <div className="flex-1 flex items-center justify-center gap-2 mt-4 md:mt-0">
-        {[ 
-          { icon: <FaHome />, label: 'Inicio', to: '/' },
-          { icon: <FaUserFriends />, label: 'Amigos', to: '/friends' },
-          { icon: <FaMusic />, label: 'Playlists', to: '/playlists' },
-          { icon: <FaComments />, label: 'Chats', to: '/chats' },
-        ].map(({ icon, label, to }) => {
-          const active = to === '/' 
-            ? location.pathname === to 
-            : location.pathname.startsWith(to);
-          return (
-            <button
-              key={to}
-              onClick={() => navigate(to)}
-              className={`
-                px-3 py-1 rounded-full flex items-center gap-2
-                font-semibold transition
-                ${active 
-                  ? 'bg-harmony-accent/20 text-harmony-accent'
-                  : 'text-harmony-text-primary hover:bg-harmony-accent/10 hover:text-harmony-accent'}
-              `}
-            >
-              {icon}
-              <span className="hidden md:inline">{label}</span>
-            </button>
-          );
-        })}
-      </div>
+  {[ 
+    { icon: <FaHome />, label: 'Inicio', to: '/' },
+    { icon: <FaUserFriends />, label: 'Amigos', to: '/friends' },
+    { icon: <FaMusic />, label: 'Playlists', to: '/playlists' },
+    { icon: <FaComments />, label: 'Chats', to: '/chats' },
+  ].map(({ icon, label, to }) => {
+    const active = to === '/' 
+      ? location.pathname === to 
+      : location.pathname.startsWith(to);
+    return (
+      <Link
+        key={to}
+        to={to}
+        className={`
+          px-3 py-1 rounded-full flex items-center gap-2
+          font-semibold transition
+          ${active 
+            ? 'bg-harmony-accent/20 text-harmony-accent'
+            : 'text-harmony-text-primary hover:bg-harmony-accent/10 hover:text-harmony-accent'}
+        `}
+      >
+        {icon}
+        <span className="hidden md:inline">{label}</span>
+      </Link>
+    );
+  })}
+</div>
+
 
       {/* Notificaciones + Perfil */}
       <div className="flex items-center gap-2 mt-4 md:mt-0">

@@ -73,7 +73,6 @@ export default function Friends() {
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
   if (error) return <div className="min-h-screen flex items-center justify-center">{error}</div>;
 
   return (
@@ -107,8 +106,10 @@ export default function Friends() {
               </button>
             </div>
 
-            <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-24px)] px-4 pb-8">
-              {activeTab === 'amigos' ? (
+            <div className="h-[46vh] max-h-[65vh] overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent px-4 mb-8">
+              {loading ? (
+                <div className="flex items-center justify-center h-full text-white">Cargando datos...</div>
+              ) : activeTab === 'amigos' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {(friendsList.length === 0 ? [{ id: 'add' }] : [...friendsList, { id: 'add' }]).map(amigo => (
                     amigo.id === 'add' ? (
