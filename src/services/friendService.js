@@ -5,6 +5,10 @@ export const friendService = {
     const res = await api.get(`/amistades/usuarios/${userId}`);
     return res.data;
   },
+  getFriendById: async (id) => {
+    const res = await api.get(`/usuarios/${id}`);
+    return res.data;
+  },
   sendRequest: async (emisorId, receptorId) => {
     const res = await api.post('/amistades/solicitudes', {
       de_usuario_id: emisorId,
