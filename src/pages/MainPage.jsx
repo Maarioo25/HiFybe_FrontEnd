@@ -12,11 +12,13 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./style.css";
 import AddFriendModal from '../components/AddFriendModal';
+import { musicService } from '../services/musicService';
 
 
 export default function MainPage() {
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [spotifyRecommendations, setSpotifyRecommendations] = useState([]);
 
   const { loading } = useAuth();
   const navigate = useNavigate();
@@ -192,6 +194,18 @@ export default function MainPage() {
     });
   }, [selectedUser]);
 
+  useEffect(() => {
+    const fetchRecomendaciones = async () => {
+      try {
+        const songs = await musicService.getSpotifyRecommendations();
+        setSpotifyRecommendations(songs);
+      } catch (err) {
+        console.error("Error al obtener recomendaciones:", err);
+      }
+    };
+    fetchRecomendaciones();
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-harmony-primary">
@@ -342,33 +356,33 @@ export default function MainPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    {SONGS.map(song => (
-                      <div
-                        key={song.spotifyUri}
-                        className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
-                        onClick={async () => {
-                          try { await playTrack(song.spotifyUri); }
-                          catch (err) {
-                            console.error('playTrack error:', err);
-                            alert('No se pudo reproducir: ' + err.message);
-                          }
-                        }}
-                      >
-                        <img
-                          src={song.img || 'https://via.placeholder.com/48'}
-                          alt={song.title}
-                          className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-harmony-text-primary truncate">
-                            {song.title}
-                          </div>
-                          <div className="text-xs text-harmony-text-secondary truncate">
-                            {song.artist}
-                          </div>
+                    {spotifyRecommendations.map(song => (
+                    <div
+                      key={song.spotifyUri}
+                      className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
+                      onClick={async () => {
+                        try { await playTrack(song.spotifyUri); }
+                        catch (err) {
+                          console.error('playTrack error:', err);
+                          alert('No se pudo reproducir: ' + err.message);
+                        }
+                      }}
+                    >
+                      <img
+                        src={song.img || 'https://via.placeholder.com/48'}
+                        alt={song.title}
+                        className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-harmony-text-primary truncate">
+                          {song.title}
+                        </div>
+                        <div className="text-xs text-harmony-text-secondary truncate">
+                          {song.artist}
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
                   </div>
                 )}
               </div>
