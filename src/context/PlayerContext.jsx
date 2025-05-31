@@ -10,7 +10,7 @@ export const PlayerProvider = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(50);
+  const [volume, setVolume] = useState(10);
   const [isPremium, setIsPremium] = useState(null); // <- nuevo
 
   // 1) Obtener token de URL o localStorage
