@@ -31,6 +31,7 @@ export default function PublicPlaylistDetail() {
   }, [userId, playlistId]);
 
   if (error) {
+    console.log(error);
     return (
       <div className="min-h-screen bg-harmony-primary">
         <HeaderBar onSongSelect={playTrack} />
