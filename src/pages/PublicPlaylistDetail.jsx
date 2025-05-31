@@ -24,7 +24,7 @@ export default function PublicPlaylistDetail() {
         const playlistTracks = await playlistService.getSpotifyPlaylistTracks(id);
 
         setPlaylist(playlistInfo);
-        setTracks(playlistTracks);
+        setTracks(playlistTracks);  
       } catch (err) {
         setError('No se encontró la playlist o hubo un error cargando datos.');
       }

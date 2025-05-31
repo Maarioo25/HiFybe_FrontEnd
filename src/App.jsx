@@ -57,7 +57,6 @@ function App() {
               <Route path="/" element={<MainPage />} />
               <Route path="/friends" element={<Friends />} />
               <Route path="/friends/:id" element={<FriendDetail />} />
-              <Route path="/friends/:id/playlists/:name" element={<PlaylistDetail />} />
               <Route path="/chats" element={<Chats />} />
               <Route path="/playlists" element={<Playlists />} />
               <Route path="/playlists/:id" element={<PlaylistDetail />} />
