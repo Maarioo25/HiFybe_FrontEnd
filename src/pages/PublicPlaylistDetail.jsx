@@ -12,6 +12,7 @@ export default function PublicPlaylistDetail() {
 
   const decodedName = decodeURIComponent(name || '');
   const playlist = realFriends?.find(p => p.nombre === decodedName);
+  const { playTrack } = usePlayer();
 
   // Si no existe
   if (!playlist) {

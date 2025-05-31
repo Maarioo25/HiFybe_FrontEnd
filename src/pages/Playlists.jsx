@@ -15,6 +15,7 @@ export default function Playlists() {
   const { setCurrentSong, setIsPlaying } = usePlayer();
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { playTrack } = usePlayer();
 
   // Fetch playlists de Spotify cuando cambie el token
   useEffect(() => {

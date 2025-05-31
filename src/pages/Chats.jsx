@@ -46,7 +46,7 @@ export default function Chats() {
       }
     }
   ];
-
+  const { playTrack } = usePlayer();
   const { currentSong, setCurrentSong, isPlaying, setIsPlaying, progress, setProgress, volume, setVolume, duration, setDuration } = usePlayer();
 
   return (

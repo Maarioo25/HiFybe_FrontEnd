@@ -18,6 +18,7 @@ export default function Friends() {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('amigos');
+  const { playTrack } = usePlayer();
 
   useEffect(() => {
     const loadData = async () => {

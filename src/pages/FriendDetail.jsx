@@ -13,6 +13,7 @@ export default function FriendDetail() {
   const [friend, setFriend] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [error, setError] = useState(null);
+  const { playTrack } = usePlayer();
 
   const { setCurrentSong, setIsPlaying } = usePlayer();
 
