@@ -17,9 +17,8 @@ export const musicService = {
     const res = await axios.post(`/playlists/${pid}/canciones`, { songId: sid });
     return res.data;
   },
-  getSpotifyRecommendations: async () => {
-    const token = localStorage.getItem('sp_token');
-    if (!token) throw new Error("No hay token");
+  getSpotifyRecommendations: async (token) => {
+    if (!token) throw new Error("Token de Spotify no disponible");
 
     const res = await axios.get('https://api.spotify.com/v1/recommendations', {
       headers: {

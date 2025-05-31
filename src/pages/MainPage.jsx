@@ -195,16 +195,21 @@ export default function MainPage() {
   }, [selectedUser]);
 
   useEffect(() => {
-    const fetchRecomendaciones = async () => {
+    const fetchRecommendations = async () => {
+      const token = localStorage.getItem('sp_token');
+      if (!token) return;
+  
       try {
-        const songs = await musicService.getSpotifyRecommendations();
+        const songs = await musicService.getSpotifyRecommendations(token);
         setSpotifyRecommendations(songs);
       } catch (err) {
         console.error("Error al obtener recomendaciones:", err);
       }
     };
-    fetchRecomendaciones();
+  
+    fetchRecommendations();
   }, []);
+  
 
   if (loading) {
     return (
