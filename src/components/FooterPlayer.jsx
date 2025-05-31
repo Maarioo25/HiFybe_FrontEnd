@@ -346,18 +346,18 @@ const FooterPlayer = () => {
               Añadir a playlist
             </h2>
 
-            {isLoading && (
-              <div className="text-center text-harmony-text-secondary">
+            {loadingPlaylists && (
+              <div className="px-4 py-2 text-center text-harmony-text-secondary">
                 Cargando playlists...
               </div>
             )}
 
-            {errorMsg && (
-              <div className="text-center text-red-500 mb-2">{errorMsg}</div>
+            {!loadingPlaylists && errorMsg && (
+              <div className="px-4 py-2 text-sm text-red-500">{errorMsg}</div>
             )}
 
-            {!loadingPlaylists && playlists.length === 0 && (
-              <div className="text-center text-harmony-text-secondary mb-4">
+            {!loadingPlaylists && playlists.length === 0 && !errorMsg && (
+              <div className="px-4 py-2 text-center text-harmony-text-secondary">
                 No se encontraron playlists.
               </div>
             )}
