@@ -9,7 +9,7 @@ import { friendService } from '../services/friendService';
 import { playlistService } from '../services/playlistService';
 
 export default function FriendDetail() {
-  const { id } = useParams();
+  const { userId } = useParams();
   const navigate = useNavigate();
   const [friend, setFriend] = useState(null);
   const [playlists, setPlaylists] = useState([]);
@@ -19,7 +19,7 @@ export default function FriendDetail() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userData = await friendService.getFriendById(id);
+        const userData = await friendService.getFriendById(userId);
         setFriend(userData);
 
         // Si el amigo tiene cuenta de Spotify vinculada, obtenemos sus playlists
@@ -34,7 +34,7 @@ export default function FriendDetail() {
       }
     };
     fetchData();
-  }, [id]);
+  }, [userId]);
 
   if (error) {
     return (

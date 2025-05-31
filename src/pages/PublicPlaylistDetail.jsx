@@ -19,8 +19,9 @@ export default function PublicPlaylistDetail() {
   useEffect(() => {
     const fetchPlaylistDetail = async () => {
       try {
-        // Llamar al endpoint local: /users/:userId/playlists/:playlistId
+        console.log(userId, playlistId);
         const res = await api.get(`/users/${userId}/playlists/${playlistId}`);
+        console.log(res);
         const data = res.data;
         setPlaylist(data);
         // Suponemos que la propiedad canciones ya viene poblada

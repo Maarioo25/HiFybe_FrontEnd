@@ -9,9 +9,5 @@ export const playlistService = {
   getSpotifyPlaylistById: async (playlistId) => {
     const res = await api.get(`/spotify/playlists/detail/${playlistId}`);
     return res.data;
-  },
-  getSpotifyPlaylistTracks: async (playlistId) => {
-    const res = await api.get(`/spotify/playlists/tracks/${playlistId}`);
-    return res.data;
-  },
+  }
 };
