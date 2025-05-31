@@ -1,24 +1,41 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+// src/pages/PublicPlaylistDetail.jsx
+import React, { useEffect, useState } from 'react';
 import { FaPlay, FaShareAlt, FaArrowLeft } from 'react-icons/fa';
+import { useParams, useNavigate } from 'react-router-dom';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
+import { playlistService } from '../services/playlistService';
 
 export default function PublicPlaylistDetail() {
-  const { name } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { setCurrentSong, setIsPlaying } = usePlayer();
+  const { setCurrentSong, setIsPlaying, playTrack } = usePlayer();
+  const [playlist, setPlaylist] = useState(null);
+  const [tracks, setTracks] = useState([]);
+  const [error, setError] = useState(null);
 
-  const decodedName = decodeURIComponent(name || '');
-  const playlist = realFriends?.find(p => p.nombre === decodedName);
-  const { playTrack } = usePlayer();
+  useEffect(() => {
+    const fetchPlaylistDetail = async () => {
+      try {
+        // Obtener información general de la playlist
+        const playlistInfo = await playlistService.getSpotifyPlaylistById(id);
+        // Obtener las canciones/tracks de la playlist
+        const playlistTracks = await playlistService.getSpotifyPlaylistTracks(id);
 
-  // Si no existe
-  if (!playlist) {
+        setPlaylist(playlistInfo);
+        setTracks(playlistTracks);
+      } catch (err) {
+        setError('No se encontró la playlist o hubo un error cargando datos.');
+      }
+    };
+    fetchPlaylistDetail();
+  }, [id]);
+
+  if (error) {
     return (
       <div className="min-h-screen bg-harmony-primary">
-        <HeaderBar onSongSelect={playTrack}/>
+        <HeaderBar onSongSelect={playTrack} />
         <div className="container mx-auto px-6 pt-8">
           <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
             <div className="p-6 text-center text-harmony-text-secondary">
@@ -29,7 +46,7 @@ export default function PublicPlaylistDetail() {
                 <FaArrowLeft />
               </button>
               <p className="mt-4 text-xl font-semibold">Playlist no encontrada</p>
-              <p className="text-sm">No se encontró la playlist de este amigo.</p>
+              <p className="text-sm">No se pudo cargar la playlist pública.</p>
             </div>
           </div>
         </div>
@@ -38,20 +55,28 @@ export default function PublicPlaylistDetail() {
     );
   }
 
-  const tracks = playlist.songs || [];
+  if (!playlist) {
+    return (
+      <div className="min-h-screen bg-harmony-primary flex items-center justify-center">
+        <div className="text-white text-lg">Cargando playlist...</div>
+      </div>
+    );
+  }
 
-  // Compartir URL
   const handleShare = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(url);
     alert('Enlace copiado al portapapeles');
   };
 
-  // Reproducir toda la playlist
   const handlePlayAll = () => {
     if (tracks.length > 0) {
+      // Reproducir la primera canción de la lista completa
       setCurrentSong(tracks[0]);
       setIsPlaying(true);
+      // Si quisieras encolar todas, podrías llamar a playTrack con un array, 
+      // dependiendo de cómo tengas implementado tu contexto/servicio de reproducción.
+      // playTrack(tracks) // ejemplo si playTrack acepta lista entera
     }
   };
 
@@ -68,7 +93,11 @@ export default function PublicPlaylistDetail() {
               >
                 <FaArrowLeft className="text-lg" />
               </button>
-              <h1 className="text-3xl font-bold text-harmony-accent">{decodedName}</h1>
+              <div className="flex-1 text-center">
+                <h1 className="text-3xl font-bold text-harmony-accent truncate">
+                  {playlist.nombre}
+                </h1>
+              </div>
               <div className="flex items-center gap-4">
                 <button
                   onClick={handlePlayAll}
@@ -87,8 +116,26 @@ export default function PublicPlaylistDetail() {
               </div>
             </div>
 
-            <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-44px)] px-6 pb-6 space-y-6">
-              {tracks.map(track => (
+            <div className="flex flex-col md:flex-row gap-6 mb-8">
+              <div className="md:w-1/3 flex-shrink-0">
+                <img
+                  src={playlist.imagen}
+                  alt={playlist.nombre}
+                  className="w-full h-auto rounded-lg shadow-lg object-cover"
+                />
+              </div>
+              <div className="md:w-2/3 space-y-4">
+                <p className="text-harmony-text-secondary">
+                  {tracks.length} canciones • {playlist.propietario?.nombre || 'Desconocido'}
+                </p>
+                <p className="text-harmony-text-secondary">
+                  {playlist.descripcion || 'Sin descripción.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-120px)] px-6 pb-6 space-y-6">
+              {tracks.map((track) => (
                 <div
                   key={track.id}
                   className="group flex items-center gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
@@ -101,7 +148,9 @@ export default function PublicPlaylistDetail() {
                     />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-harmony-text-primary truncate">{track.title}</h3>
+                    <h3 className="font-semibold text-harmony-text-primary truncate">
+                      {track.title}
+                    </h3>
                     <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
                       <span className="truncate">{track.artist}</span>
                       <span>•</span>
@@ -113,6 +162,8 @@ export default function PublicPlaylistDetail() {
                     onClick={() => {
                       setCurrentSong(track);
                       setIsPlaying(true);
+                      // Alternativamente, si quieres usar playTrack:
+                      // playTrack(track);
                     }}
                     title="Reproducir canción"
                   >
