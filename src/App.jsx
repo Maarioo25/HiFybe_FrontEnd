@@ -60,7 +60,7 @@ function App() {
               <Route path="/chats" element={<Chats />} />
               <Route path="/playlists" element={<Playlists />} />
               <Route path="/playlists/:id" element={<PlaylistDetail />} />
-              <Route path="/friends/:id/playlists/:name" element={<PublicPlaylistDetail />} />
+              <Route path="/friends/:id/playlists/:playlistId" element={<PublicPlaylistDetail />} />
 
             </Route>
 
