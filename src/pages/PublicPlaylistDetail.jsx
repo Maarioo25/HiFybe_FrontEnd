@@ -5,10 +5,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
-import api from '../services/api'; // reemplaza playlistService por instancia axios
+import { playlistService } from '../services/playlistService';
 
 export default function PublicPlaylistDetail() {
-  // Ahora obtenemos userId y playlistId en lugar de solo id
+  // Extraer ambos parámetros de la URL
   const { userId, playlistId } = useParams();
   const navigate = useNavigate();
   const { setCurrentSong, setIsPlaying, playTrack } = usePlayer();
@@ -22,7 +22,8 @@ export default function PublicPlaylistDetail() {
         // Llamar al servicio con userId y playlistId
         const playlistInfo = await playlistService.getSpotifyPlaylistById(userId, playlistId);
         setPlaylist(playlistInfo);
-        setTracks(playlistInfo.canciones); // asumimos que "canciones" viene en el objeto
+        // Asumir que el objeto incluye 'canciones'
+        setTracks(playlistInfo.canciones);
       } catch (err) {
         setError('No se encontró la playlist o hubo un error cargando datos.');
       }
@@ -31,7 +32,6 @@ export default function PublicPlaylistDetail() {
   }, [userId, playlistId]);
 
   if (error) {
-    console.log(error);
     return (
       <div className="min-h-screen bg-harmony-primary">
         <HeaderBar onSongSelect={playTrack} />
