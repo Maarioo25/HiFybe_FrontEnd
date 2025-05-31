@@ -196,11 +196,8 @@ export default function MainPage() {
 
   useEffect(() => {
     const fetchRecommendations = async () => {
-      const token = localStorage.getItem('sp_token');
-      if (!token) return;
-  
       try {
-        const songs = await musicService.getSpotifyRecommendations(token);
+        const songs = await musicService.getSpotifyRecommendations();
         setSpotifyRecommendations(songs);
       } catch (err) {
         console.error("Error al obtener recomendaciones:", err);
@@ -208,7 +205,8 @@ export default function MainPage() {
     };
   
     fetchRecommendations();
-  }, []);  
+  }, []);
+  
   
 
   if (loading) {

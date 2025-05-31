@@ -17,29 +17,16 @@ export const musicService = {
     const res = await axios.post(`/playlists/${pid}/canciones`, { songId: sid });
     return res.data;
   },
-  getSpotifyRecommendations: async (token) => {
+  getSpotifyRecommendations: async () => {
+    const token = localStorage.getItem('sp_token');
     if (!token) throw new Error("No hay token de Spotify");
 
-    try {
-      const res = await axios.get('https://api.spotify.com/v1/recommendations', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: {
-          seed_genres: 'pop',
-          limit: 10
-        }
-      });
+    const res = await api.get('/spotify/recomendaciones', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
 
-      return res.data.tracks.map(track => ({
-        spotifyUri: track.uri,
-        title: track.name,
-        artist: track.artists.map(a => a.name).join(', '),
-        img: track.album.images?.[0]?.url || ''
-      }));
-    } catch (error) {
-      console.error("Error al obtener recomendaciones de Spotify:", error.response?.data || error);
-      throw error;
-    }
+    return res.data;
   }
 };
