@@ -145,10 +145,9 @@ export default function FriendDetail() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {playlists.map((playlist) => (
-                // Enlace a la página de la playlist pública (route: /playlists-publicas/:id)
                 <Link
                   key={playlist.id}
-                  to={`/playlists-publicas/${encodeURIComponent(playlist.id)}`}
+                  to={`/friends/${encodeURIComponent(friend.id)}/playlists/${encodeURIComponent(playlist.id)}`}
                   className="playlist-card relative group w-full h-48 flex items-center gap-4 p-4 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
                 >
                   <div className="relative w-24 h-24 rounded-lg overflow-hidden shadow-md">
@@ -162,7 +161,6 @@ export default function FriendDetail() {
                         className="text-harmony-accent hover:text-harmony-accent/80"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Reproducir la primera canción de la playlist (si existe)
                           if (playlist.songs && playlist.songs.length > 0) {
                             setCurrentSong(playlist.songs[0]);
                             setIsPlaying(true);
