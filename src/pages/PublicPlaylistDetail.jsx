@@ -5,10 +5,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
-import { playlistService } from '../services/playlistService';
+import api from '../services/api'; // reemplaza playlistService por instancia axios
 
 export default function PublicPlaylistDetail() {
-  const { id } = useParams();
+  // Ahora obtenemos userId y playlistId en lugar de solo id
+  const { userId, playlistId } = useParams();
   const navigate = useNavigate();
   const { setCurrentSong, setIsPlaying, playTrack } = usePlayer();
   const [playlist, setPlaylist] = useState(null);
@@ -18,19 +19,18 @@ export default function PublicPlaylistDetail() {
   useEffect(() => {
     const fetchPlaylistDetail = async () => {
       try {
-        // Obtener información general de la playlist
-        const playlistInfo = await playlistService.getSpotifyPlaylistById(id);
-        // Obtener las canciones/tracks de la playlist
-        const playlistTracks = await playlistService.getSpotifyPlaylistTracks(id);
-
-        setPlaylist(playlistInfo);
-        setTracks(playlistTracks);  
+        // Llamar al endpoint local: /users/:userId/playlists/:playlistId
+        const res = await api.get(`/users/${userId}/playlists/${playlistId}`);
+        const data = res.data;
+        setPlaylist(data);
+        // Suponemos que la propiedad canciones ya viene poblada
+        setTracks(data.canciones);
       } catch (err) {
         setError('No se encontró la playlist o hubo un error cargando datos.');
       }
     };
     fetchPlaylistDetail();
-  }, [id]);
+  }, [userId, playlistId]);
 
   if (error) {
     return (
@@ -71,18 +71,14 @@ export default function PublicPlaylistDetail() {
 
   const handlePlayAll = () => {
     if (tracks.length > 0) {
-      // Reproducir la primera canción de la lista completa
       setCurrentSong(tracks[0]);
       setIsPlaying(true);
-      // Si quisieras encolar todas, podrías llamar a playTrack con un array, 
-      // dependiendo de cómo tengas implementado tu contexto/servicio de reproducción.
-      // playTrack(tracks) // ejemplo si playTrack acepta lista entera
     }
   };
 
   return (
     <div className="min-h-screen bg-harmony-primary">
-      <HeaderBar />
+      <HeaderBar onSongSelect={playTrack} />
       <div className="container mx-auto px-6 pt-8">
         <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
           <div className="p-6">
@@ -126,7 +122,7 @@ export default function PublicPlaylistDetail() {
               </div>
               <div className="md:w-2/3 space-y-4">
                 <p className="text-harmony-text-secondary">
-                  {tracks.length} canciones • {playlist.propietario?.nombre || 'Desconocido'}
+                  {tracks.length} canciones • {playlist.owner?.nombre || 'Desconocido'}
                 </p>
                 <p className="text-harmony-text-secondary">
                   {playlist.descripcion || 'Sin descripción.'}
@@ -137,7 +133,7 @@ export default function PublicPlaylistDetail() {
             <div className="overflow-y-auto scrollbar-thin h-[calc(60vh-120px)] px-6 pb-6 space-y-6">
               {tracks.map((track) => (
                 <div
-                  key={track.id}
+                  key={track._id}
                   className="group flex items-center gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
                 >
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
@@ -162,8 +158,6 @@ export default function PublicPlaylistDetail() {
                     onClick={() => {
                       setCurrentSong(track);
                       setIsPlaying(true);
-                      // Alternativamente, si quieres usar playTrack:
-                      // playTrack(track);
                     }}
                     title="Reproducir canción"
                   >

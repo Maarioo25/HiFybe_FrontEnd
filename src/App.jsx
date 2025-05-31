@@ -61,7 +61,6 @@ function App() {
               <Route path="/playlists" element={<Playlists />} />
               <Route path="/playlists/:id" element={<PlaylistDetail />} />  
               <Route path="/friends/:id/playlists/:playlistId" element={<PublicPlaylistDetail />} />
-
             </Route>
 
             
