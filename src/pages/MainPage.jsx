@@ -5,12 +5,12 @@ import { userService } from "../services/userService";
 import { usePlayer } from "../context/PlayerContext";
 import { useNavigate } from "react-router-dom";
 import HeaderBar from "../components/HeaderBar";
-import FooterPlayer from '../components/FooterPlayer';
+import FooterPlayer from "../components/FooterPlayer";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./style.css";
-import AddFriendModal from '../components/AddFriendModal';
-import axios from 'axios';
+import AddFriendModal from "../components/AddFriendModal";
+import axios from "axios";
 
 export default function MainPage() {
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
@@ -19,7 +19,7 @@ export default function MainPage() {
   const [usuariosCercanos, setUsuariosCercanos] = useState([]);
   const [realFriends, setRealFriends] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('friends');
+  const [activeTab, setActiveTab] = useState("friends");
   const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
 
   const { loading } = useAuth();
@@ -29,6 +29,12 @@ export default function MainPage() {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markerRefs = useRef([]);
+
+  // Detectar token de Spotify
+  const spotifyToken = localStorage.getItem("sp_token");
+  const handleConnectSpotify = () => {
+    window.location.href = "https://api.mariobueno.info/usuarios/spotify/connect";
+  };
 
   // Obtener lista de amigos
   useEffect(() => {
@@ -48,26 +54,26 @@ export default function MainPage() {
       let res = await fetch(
         `${import.meta.env.VITE_API_URL}/usuarios/ubicacion`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ latitude, longitude })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ latitude, longitude }),
         }
       );
-      if (!res.ok) console.error('POST /ubicacion fallo:', await res.text());
+      if (!res.ok) console.error("POST /ubicacion fallo:", await res.text());
 
       res = await fetch(
         `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
-        { credentials: 'include' }
+        { credentials: "include" }
       );
       if (!res.ok) {
-        console.error('GET /cerca fallo:', await res.text());
+        console.error("GET /cerca fallo:", await res.text());
         return;
       }
 
       const data = await res.json();
       if (Array.isArray(data)) setUsuariosCercanos(data);
-      else console.error('GET /cerca devolvió data no-array:', data);
+      else console.error("GET /cerca devolvió data no-array:", data);
     } catch (err) {
       console.error("Error al obtener usuarios cercanos:", err);
     }
@@ -95,19 +101,21 @@ export default function MainPage() {
 
     mapInstance.current = L.map(mapRef.current, {
       preferCanvas: false,
-      zoomControl: false
+      zoomControl: false,
     }).setView(currentPosition, 13);
 
-    ['tilePane','shadowPane','overlayPane','markerPane','popupPane'].forEach(name => {
-      const pane = mapInstance.current.getPane(name);
-      if (pane) pane.style.position = 'relative';
-    });
+    ["tilePane", "shadowPane", "overlayPane", "markerPane", "popupPane"].forEach(
+      (name) => {
+        const pane = mapInstance.current.getPane(name);
+        if (pane) pane.style.position = "relative";
+      }
+    );
 
     L.tileLayer(
       "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png",
       { maxZoom: 19, attribution: "OpenStreetMap" }
     ).addTo(mapInstance.current);
-    L.control.zoom({ position: 'topright' }).addTo(mapInstance.current);
+    L.control.zoom({ position: "topright" }).addTo(mapInstance.current);
 
     return () => {
       mapInstance.current.remove();
@@ -119,42 +127,45 @@ export default function MainPage() {
   useEffect(() => {
     if (!mapInstance.current) return;
 
-    markerRefs.current.forEach(m => mapInstance.current.removeLayer(m));
+    markerRefs.current.forEach((m) => mapInstance.current.removeLayer(m));
     markerRefs.current = [];
 
-    markerRefs.current = usuariosCercanos.map((user) => {
-      const coords = user.ubicacion?.coordinates;
-      if (!coords) return null;
+    markerRefs.current = usuariosCercanos
+      .map((user) => {
+        const coords = user.ubicacion?.coordinates;
+        if (!coords) return null;
 
-      const isSmall = window.innerWidth < 640;
-      const sizeClass = isSmall ? 'w-8 h-8' : 'w-10 h-10';
-      const posClass = isSmall ? 'top-1 right-1' : 'top-2 right-2';
+        const isSmall = window.innerWidth < 640;
+        const sizeClass = isSmall ? "w-8 h-8" : "w-10 h-10";
+        const posClass = isSmall ? "top-1 right-1" : "top-2 right-2";
 
-      const icon = L.divIcon({
-        className: 'custom-icon',
-        html: `
-          <div class='${sizeClass} rounded-full flex items-center justify-center shadow-lg
-                       bg-gradient-to-br from-indigo-400 to-purple-500 custom-marker'>
-            <img src='${user.foto_perfil || 'https://ui-avatars.com/api/?name=' +
-              encodeURIComponent(user.nombre)}'
-                 alt='${user.nombre}'
-                 class='w-full h-full object-cover rounded-full border-2 border-white shadow' />
-            <span class='absolute ${posClass} w-3 h-3 rounded-full bg-green-500
-                               border-2 border-white shadow'></span>
-          </div>`
-      });
-
-      return L.marker([coords[1], coords[0]], { icon })
-        .addTo(mapInstance.current)
-        .on('click', () => {
-          setSelectedUser({
-            nombre: user.nombre,
-            foto_perfil: user.foto_perfil,
-            song: { title: "No disponible", artist: "", img: "" }
-          });
-          mapInstance.current.setView([coords[1], coords[0]], 15);
+        const icon = L.divIcon({
+          className: "custom-icon",
+          html: `
+            <div class='${sizeClass} rounded-full flex items-center justify-center shadow-lg
+                         bg-gradient-to-br from-indigo-400 to-purple-500 custom-marker'>
+              <img src='${user.foto_perfil ||
+                "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(user.nombre)}'
+                   alt='${user.nombre}'
+                   class='w-full h-full object-cover rounded-full border-2 border-white shadow' />
+              <span class='absolute ${posClass} w-3 h-3 rounded-full bg-green-500
+                                 border-2 border-white shadow'></span>
+            </div>`,
         });
-    }).filter(Boolean);
+
+        return L.marker([coords[1], coords[0]], { icon })
+          .addTo(mapInstance.current)
+          .on("click", () => {
+            setSelectedUser({
+              nombre: user.nombre,
+              foto_perfil: user.foto_perfil,
+              song: { title: "No disponible", artist: "", img: "" },
+            });
+            mapInstance.current.setView([coords[1], coords[0]], 15);
+          });
+      })
+      .filter(Boolean);
   }, [usuariosCercanos]);
 
   // Animar icono del usuario seleccionado
@@ -164,24 +175,25 @@ export default function MainPage() {
     markerRefs.current.forEach((marker, idx) => {
       const user = usuariosCercanos[idx];
       const isSel = user.nombre === selectedUser.nombre;
-      const bounceClass = isSel ? ' bounce' : '';
+      const bounceClass = isSel ? " bounce" : "";
 
       const isSmall = window.innerWidth < 640;
-      const sizeClass = isSmall ? 'w-8 h-8' : 'w-10 h-10';
-      const posClass = isSmall ? 'top-1 right-1' : 'top-2 right-2';
+      const sizeClass = isSmall ? "w-8 h-8" : "w-10 h-10";
+      const posClass = isSmall ? "top-1 right-1" : "top-2 right-2";
 
       const icon = L.divIcon({
         className: `custom-icon${bounceClass}`,
         html: `
           <div class='relative ${sizeClass} rounded-full flex items-center justify-center shadow-lg
                        bg-gradient-to-br from-indigo-400 to-purple-500 custom-marker'>
-            <img src='${user.foto_perfil || 'https://ui-avatars.com/api/?name=' +
-              encodeURIComponent(user.nombre)}'
+            <img src='${user.foto_perfil ||
+              "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(user.nombre)}'
                  alt='${user.nombre}'
                  class='w-full h-full object-cover rounded-full' />
             <span class='absolute ${posClass} w-3 h-3 rounded-full bg-green-500
                                border-2 border-white shadow'></span>
-          </div>`
+          </div>`,
       });
       marker.setIcon(icon);
     });
@@ -189,20 +201,25 @@ export default function MainPage() {
 
   // Obtener recomendaciones desde el JSON y pedir detalles al backend
   useEffect(() => {
+    // Solo obtener si hay token de Spotify
+    if (!spotifyToken) return;
+
     const fetchRecommendations = async () => {
       try {
-        const res = await fetch('/data/recommendations.json');
+        const res = await fetch("/data/recommendations.json");
         const recomendaciones = await res.json();
 
         const detalles = await Promise.all(
           recomendaciones.map(async (rec) => {
-            const respuesta = await axios.get(`${import.meta.env.VITE_API_URL}/canciones/spotify/${rec.id}`)
+            const respuesta = await axios.get(
+              `${import.meta.env.VITE_API_URL}/canciones/spotify/${rec.id}`
+            );
             return {
               id: rec.id,
               title: respuesta.data.nombre,
               artist: respuesta.data.artista,
               img: respuesta.data.imagen,
-              spotifyUri: respuesta.data.uri
+              spotifyUri: respuesta.data.uri,
             };
           })
         );
@@ -214,7 +231,7 @@ export default function MainPage() {
     };
 
     fetchRecommendations();
-  }, []);
+  }, [spotifyToken]);
 
   if (loading) {
     return (
@@ -246,11 +263,12 @@ export default function MainPage() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
           {/* Mapa + Selected User */}
           <div className="lg:col-span-2">
-            <div className="bg-harmony-secondary/30 rounded-2xl p-4 sm:p-6 border border-harmony-text-secondary/10
-                            flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh] relative">
+            <div
+              className="bg-harmony-secondary/30 rounded-2xl p-4 sm:p-6 border border-harmony-text-secondary/10
+                            flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh] relative"
+            >
               <h2 className="text-lg sm:text-xl font-bold mb-4 text-harmony-accent">
                 Usuarios escuchando cerca
               </h2>
@@ -272,24 +290,48 @@ export default function MainPage() {
                 </button>
               </div>
 
-              <div ref={mapRef} id="map" className="rounded-2xl shadow-lg h-full" />
+              <div
+                ref={mapRef}
+                id="map"
+                className="rounded-2xl shadow-lg h-full"
+              />
 
               {selectedUser && (
                 <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 max-w-xs backdrop-blur-md transition-all animate-fade-in-down">
                   <div className="flex flex-col items-center mr-2">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-harmony-accent shadow-lg bg-harmony-primary flex items-center justify-center overflow-hidden mb-1">
-                      <img src={selectedUser.foto_perfil || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(selectedUser.nombre)} alt={selectedUser.nombre} className="w-full h-full object-cover rounded-full" />
+                      <img
+                        src={
+                          selectedUser.foto_perfil ||
+                          "https://ui-avatars.com/api/?name=" +
+                            encodeURIComponent(selectedUser.nombre)
+                        }
+                        alt={selectedUser.nombre}
+                        className="w-full h-full object-cover rounded-full"
+                      />
                     </div>
-                    <span className="text-xs sm:text-sm text-harmony-text-primary font-semibold truncate max-w-[60px] sm:max-w-[72px] text-center">{selectedUser.nombre}</span>
+                    <span className="text-xs sm:text-sm text-harmony-text-primary font-semibold truncate max-w-[60px] sm:max-w-[72px] text-center">
+                      {selectedUser.nombre}
+                    </span>
                   </div>
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span className="text-harmony-accent text-xs sm:text-sm font-bold uppercase tracking-wide mb-1">Escuchando</span>
-                    <span className="text-harmony-text-primary text-sm sm:text-base font-bold truncate">{selectedUser.song.title}</span>
-                    <span className="text-harmony-text-secondary text-xs sm:text-sm truncate">{selectedUser.song.artist}</span>
+                    <span className="text-harmony-accent text-xs sm:text-sm font-bold uppercase tracking-wide mb-1">
+                      Escuchando
+                    </span>
+                    <span className="text-harmony-text-primary text-sm sm:text-base font-bold truncate">
+                      {selectedUser.song.title}
+                    </span>
+                    <span className="text-harmony-text-secondary text-xs sm:text-sm truncate">
+                      {selectedUser.song.artist}
+                    </span>
                   </div>
                   <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">
-                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow">Seguir</button>
-                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent">Escuchar</button>
+                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow">
+                      Seguir
+                    </button>
+                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent">
+                      Escuchar
+                    </button>
                   </div>
                 </div>
               )}
@@ -298,34 +340,41 @@ export default function MainPage() {
 
           {/* Panel derecho: Amigos / Recomendaciones */}
           <div>
-            <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6
-                            border border-harmony-text-secondary/10 flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh]">
+            <div
+              className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6
+                            border border-harmony-text-secondary/10 flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh]"
+            >
+              {/* Botones de pestañas */}
               <div className="flex items-center mb-4 gap-2">
                 <button
-                  onClick={() => setActiveTab('friends')}
+                  onClick={() => setActiveTab("friends")}
                   className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-semibold text-sm transition border shadow-sm focus:outline-none ${
-                    activeTab === 'friends'
-                      ? 'bg-harmony-accent text-white border-harmony-accent'
-                      : 'bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10'
+                    activeTab === "friends"
+                      ? "bg-harmony-accent text-white border-harmony-accent"
+                      : "bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10"
                   }`}
                 >
                   Amigos
                 </button>
                 <button
-                  onClick={() => setActiveTab('recomendaciones')}
+                  onClick={() => setActiveTab("recomendaciones")}
                   className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-semibold text-sm transition border shadow-sm focus:outline-none ${
-                    activeTab === 'recomendaciones'
-                      ? 'bg-harmony-accent text-white border-harmony-accent'
-                      : 'bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10'
+                    activeTab === "recomendaciones"
+                      ? "bg-harmony-accent text-white border-harmony-accent"
+                      : "bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10"
                   }`}
                 >
                   Recomendaciones
                 </button>
               </div>
+
               <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent pr-1">
-                {activeTab === 'friends' ? (
+                {/* =====================================
+                     PESTAÑA “AMIGOS”
+                     ===================================== */}
+                {activeTab === "friends" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {realFriends.map((amigo, idx) => (
+                    {realFriends.map((amigo) => (
                       <div
                         key={amigo.id}
                         className="friend-card relative flex flex-col justify-end h-48 sm:h-64 rounded-xl overflow-hidden group shadow-lg border border-harmony-secondary/30"
@@ -340,11 +389,13 @@ export default function MainPage() {
                           <div className="font-bold text-harmony-accent text-lg sm:text-xl drop-shadow mb-1 sm:mb-2 truncate">
                             {amigo.nombre}
                           </div>
-                          <div className="text-harmony-text-secondary text-sm">Canción destacada no disponible</div>
+                          <div className="text-harmony-text-secondary text-sm">
+                            Canción destacada no disponible
+                          </div>
                         </div>
                         <span
                           className={`absolute top-2 right-2 w-3 h-3 rounded-full border-2 border-white shadow ${
-                            amigo.online ? 'bg-green-500' : 'bg-gray-500'
+                            amigo.online ? "bg-green-500" : "bg-gray-500"
                           }`}
                         />
                         <button
@@ -361,35 +412,66 @@ export default function MainPage() {
                       <span className="font-semibold">Agregar amigo</span>
                     </button>
                   </div>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    {spotifyRecommendations.map(song => (
-                      <div
-                        key={song.spotifyUri}
-                        className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
-                        onClick={async () => {
-                          try { await playTrack(song.spotifyUri); }
-                          catch (err) {
-                            console.error('playTrack error:', err);
-                            alert('No se pudo reproducir: ' + err.message);
-                          }
-                        }}
-                      >
-                        <img
-                          src={song.img || 'https://via.placeholder.com/48'}
-                          alt={song.title}
-                          className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-harmony-text-primary truncate">
-                            {song.title}
-                          </div>
-                          <div className="text-xs text-harmony-text-secondary truncate">
-                            {song.artist}
-                          </div>
-                        </div>
+                )}
+
+                {/* =====================================
+                     PESTAÑA “RECOMENDACIONES”
+                     ===================================== */}
+                {activeTab === "recomendaciones" && (
+                  <div className="flex flex-col gap-3 transition-opacity duration-300 opacity-100">
+                    {/* Si no hay token de Spotify, mostrar botón para conectar */}
+                    {!spotifyToken ? (
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <span className="text-harmony-text-primary mb-4">
+                          Debes conectar tu cuenta de Spotify para ver las
+                          recomendaciones
+                        </span>
+                        <button
+                          onClick={handleConnectSpotify}
+                          className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
+                        >
+                          Conectar con Spotify
+                        </button>
                       </div>
-                    ))}
+                    ) : (
+                      /* Si existe token, renderizar recomendaciones */
+                      <>
+                        {spotifyRecommendations.length === 0 ? (
+                          <div className="text-center text-harmony-text-secondary mt-4">
+                            Cargando recomendaciones...
+                          </div>
+                        ) : (
+                          spotifyRecommendations.map((song) => (
+                            <div
+                              key={song.spotifyUri}
+                              className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
+                              onClick={async () => {
+                                try {
+                                  await playTrack(song.spotifyUri);
+                                } catch (err) {
+                                  console.error("playTrack error:", err);
+                                  alert("No se pudo reproducir: " + err.message);
+                                }
+                              }}
+                            >
+                              <img
+                                src={song.img || "https://via.placeholder.com/48"}
+                                alt={song.title}
+                                className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="font-semibold text-harmony-text-primary truncate">
+                                  {song.title}
+                                </div>
+                                <div className="text-xs text-harmony-text-secondary truncate">
+                                  {song.artist}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -397,7 +479,9 @@ export default function MainPage() {
           </div>
         </div>
       </div>
+
       <FooterPlayer />
+
       {showAddFriendModal && currentUserId && (
         <AddFriendModal
           currentUserId={currentUserId}
