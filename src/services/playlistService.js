@@ -6,8 +6,8 @@ export const playlistService = {
     const res = await api.get(`/spotify/playlists/${userId}`);
     return res.data;
   },
-  getSpotifyPlaylistById: async (playlistId) => {
-    const res = await api.get(`/spotify/playlists/detail/${playlistId}`);
+  getSpotifyPlaylistById: async (userId, playlistId) => {
+    const res = await api.get(`/playlists/friends/${userId}/playlists/${playlistId}`);
     return res.data;
   }
 };

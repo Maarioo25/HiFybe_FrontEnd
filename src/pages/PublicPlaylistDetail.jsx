@@ -20,7 +20,7 @@ export default function PublicPlaylistDetail() {
     const fetchPlaylistDetail = async () => {
       try {
         console.log(userId, playlistId);
-        const res = await api.get(`/users/${userId}/playlists/${playlistId}`);
+        const res = await api.get(`/friends/${userId}/playlists/${playlistId}`);
         console.log(res);
         const data = res.data;
         setPlaylist(data);
