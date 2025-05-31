@@ -26,8 +26,9 @@ export default function HeaderBar({ children, onSongSelect }) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
+  // Refs para manejar clicks fuera y foco
   const searchInputRef = useRef(null);
-  const dropdownRef = useRef(null);
+  const searchContainerRef = useRef(null);
 
   // Token de Spotify almacenado en localStorage
   const spotifyToken = localStorage.getItem("sp_token");
@@ -39,12 +40,12 @@ export default function HeaderBar({ children, onSongSelect }) {
     }
   }, [showSearch]);
 
-  // Cerrar el dropdown al hacer clic fuera
+  // Cerrar el dropdown al hacer clic fuera del contenedor completo (input + resultados)
   useEffect(() => {
     function handleClickOutside(event) {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target) &&
         showSearch
       ) {
         setShowSearch(false);
@@ -143,7 +144,7 @@ export default function HeaderBar({ children, onSongSelect }) {
       className="relative flex flex-col md:flex-row items-center justify-between
                  bg-harmony-primary/90 px-6 py-4 rounded-b-3xl shadow-lg mb-8"
     >
-      {/* Logo */}
+      {/* Logo y búsqueda */}
       <div className="flex items-center gap-4">
         <span
           className="font-bold text-2xl text-harmony-accent cursor-pointer"
@@ -152,8 +153,9 @@ export default function HeaderBar({ children, onSongSelect }) {
           HiFybe
         </span>
 
-        {/* Botón para mostrar/ocultar el input de búsqueda */}
-        <div className="relative">
+        {/* Contenedor completo de búsqueda (botón, input y resultados) */}
+        <div className="relative" ref={searchContainerRef}>
+          {/* Botón para mostrar/ocultar el input de búsqueda */}
           <button
             className="p-2 rounded-full hover:bg-harmony-accent/10 transition"
             onClick={() => {
@@ -191,12 +193,9 @@ export default function HeaderBar({ children, onSongSelect }) {
             />
           </div>
 
-          {/* Dropdown de resultados posicionado debajo del input */}
+          {/* Dropdown de resultados, posicionado debajo del input */}
           {showSearch && (
-            <div
-              ref={dropdownRef}
-              className="absolute top-full left-full mt-2 ml-2 w-64 bg-harmony-secondary/20 rounded-xl border border-harmony-accent/30 shadow-lg z-50"
-            >
+            <div className="absolute top-full left-full mt-2 ml-2 w-64 bg-harmony-secondary/90 rounded-xl border border-harmony-accent/30 shadow-lg z-50">
               {isLoading && (
                 <div className="px-4 py-2 text-center text-harmony-text-secondary">
                   Buscando...
@@ -217,7 +216,7 @@ export default function HeaderBar({ children, onSongSelect }) {
                 searchResults.map((track) => (
                   <div
                     key={track.id}
-                    className="flex items-center gap-2 px-3 py-2 hover:bg-harmony-accent/10 cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-2 hover:bg-harmony-accent/20 cursor-pointer"
                     onClick={() => handleSelectTrack(track)}
                   >
                     <img
@@ -255,9 +254,7 @@ export default function HeaderBar({ children, onSongSelect }) {
           { icon: <FaComments />, label: "Chats", to: "/chats" },
         ].map(({ icon, label, to }) => {
           const active =
-            to === "/"
-              ? location.pathname === to
-              : location.pathname.startsWith(to);
+            to === "/" ? location.pathname === to : location.pathname.startsWith(to);
           return (
             <Link
               key={to}

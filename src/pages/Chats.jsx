@@ -51,7 +51,7 @@ export default function Chats() {
 
   return (
     <div className="min-h-screen bg-harmony-primary">
-      <HeaderBar />
+      <HeaderBar onSongSelect={playTrack}/>
       <div className="container mx-auto px-6 py-8">
         <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">
           <div className="p-6">

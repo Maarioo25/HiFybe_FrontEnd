@@ -259,7 +259,7 @@ export default function MainPage() {
 
   return (
     <div className="text-harmony-text-primary min-h-screen bg-harmony-primary">
-      <HeaderBar />
+      <HeaderBar onSongSelect={playTrack} />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -186,7 +186,7 @@ export default function PlaylistDetail() {
   if (!playlist && !loading) {
     return (
       <div className="min-h-screen bg-harmony-primary">
-        <HeaderBar />
+        <HeaderBar onSongSelect={playTrack}/>
         <div className="container mx-auto px-6 pt-8">
           <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 p-6 text-center text-harmony-text-secondary">
             <button
@@ -205,7 +205,7 @@ export default function PlaylistDetail() {
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
-      <HeaderBar />
+      <HeaderBar onSongSelect={playTrack}/>
       <div className="flex-1 container mx-auto px-6 pb-6 flex flex-col">
         <div className="h-[calc(100vh-222px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col min-h-0">
