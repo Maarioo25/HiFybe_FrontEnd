@@ -4,20 +4,17 @@ import { FaPlay, FaShareAlt, FaArrowLeft } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
-import { FRIENDS } from '../data/friends';
 
 export default function PublicPlaylistDetail() {
-  const { id, name } = useParams();
+  const { name } = useParams();
   const navigate = useNavigate();
   const { setCurrentSong, setIsPlaying } = usePlayer();
 
-  const friendId = parseInt(id, 10);
   const decodedName = decodeURIComponent(name || '');
-  const friend = FRIENDS.find(f => f.id === friendId);
-  const playlist = friend?.playlists?.find(p => p.nombre === decodedName);
+  const playlist = realFriends?.find(p => p.nombre === decodedName);
 
   // Si no existe
-  if (!friend || !playlist) {
+  if (!playlist) {
     return (
       <div className="min-h-screen bg-harmony-primary">
         <HeaderBar />

@@ -19,17 +19,27 @@ export const musicService = {
     return res.data;
   },
   getSpotifyRecommendations: async () => {
-    const token = localStorage.getItem('sp_token');
-    if (!token) throw new Error("No hay token de Spotify");
-
     try {
-      const res = await api.get('/spotify/recomendaciones', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      return res.data;
+      const res = await fetch('/data/recommendations.json');
+      const recomendaciones = await res.json();
+
+      const detalles = await Promise.all(
+        recomendaciones.map(async (rec) => {
+          const respuesta = await api.get(`/canciones/spotify/${rec.id}`);
+          return {
+            id: rec.id,
+            title: respuesta.data.nombre,
+            artist: respuesta.data.artista,
+            img: respuesta.data.imagen,
+            spotifyUri: respuesta.data.uri
+          };
+        })
+      );
+
+      return detalles;
     } catch (err) {
-      console.error('Error al obtener recomendaciones:', err.response?.data || err.message);
-      throw err;
+      console.error("Error en musicService.getSpotifyRecommendations:", err);
+      return [];
     }
   }
 };

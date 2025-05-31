@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FRIENDS } from "../data/friends";
-import { SONGS } from "../data/songs";
 import { useAuth } from "../context/AuthContext";
 import { friendService } from "../services/friendService";
 import { userService } from "../services/userService";
@@ -12,13 +10,17 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./style.css";
 import AddFriendModal from '../components/AddFriendModal';
-import { musicService } from '../services/musicService';
-
+import axios from 'axios';
 
 export default function MainPage() {
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [spotifyRecommendations, setSpotifyRecommendations] = useState([]);
+  const [usuariosCercanos, setUsuariosCercanos] = useState([]);
+  const [realFriends, setRealFriends] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('friends');
+  const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
 
   const { loading } = useAuth();
   const navigate = useNavigate();
@@ -28,13 +30,7 @@ export default function MainPage() {
   const mapInstance = useRef(null);
   const markerRefs = useRef([]);
 
-  const [usuariosCercanos, setUsuariosCercanos] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('friends');
-  const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
-
-  const [realFriends, setRealFriends] = useState([]);
-
+  // Obtener lista de amigos
   useEffect(() => {
     const fetchFriends = async () => {
       const currentUser = await userService.getCurrentUser();
@@ -45,12 +41,10 @@ export default function MainPage() {
     };
     fetchFriends();
   }, []);
-  
 
-  // Función para obtener usuarios cercanos en unas coordenadas dadas
+  // Función para obtener usuarios cercanos
   const fetchUsersAtPosition = async (latitude, longitude) => {
     try {
-      // POST ubicación
       let res = await fetch(
         `${import.meta.env.VITE_API_URL}/usuarios/ubicacion`,
         {
@@ -62,7 +56,6 @@ export default function MainPage() {
       );
       if (!res.ok) console.error('POST /ubicacion fallo:', await res.text());
 
-      // GET usuarios cerca
       res = await fetch(
         `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
         { credentials: 'include' }
@@ -80,7 +73,7 @@ export default function MainPage() {
     }
   };
 
-  // 1) Geolocalización y carga inicial (incluye centrar mapa)
+  // Geolocalización inicial
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
@@ -96,7 +89,7 @@ export default function MainPage() {
     );
   }, []);
 
-  // 2) Inicializar Leaflet
+  // Inicializar Leaflet
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -122,7 +115,7 @@ export default function MainPage() {
     };
   }, []);
 
-  // 3) Marcadores responsivos
+  // Marcadores de usuarios cercanos
   useEffect(() => {
     if (!mapInstance.current) return;
 
@@ -164,7 +157,7 @@ export default function MainPage() {
     }).filter(Boolean);
   }, [usuariosCercanos]);
 
-  // 4) Bounce icon al seleccionar
+  // Animar icono del usuario seleccionado
   useEffect(() => {
     if (!markerRefs.current.length || !selectedUser) return;
 
@@ -194,20 +187,36 @@ export default function MainPage() {
     });
   }, [selectedUser]);
 
+  // Obtener recomendaciones desde el JSON y pedir detalles al backend
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const songs = await musicService.getSpotifyRecommendations();
-        setSpotifyRecommendations(songs);
+        const res = await fetch('/data/recommendations.json');
+        const recomendaciones = await res.json();
+
+        const detalles = await Promise.all(
+          recomendaciones.map(async (rec) => {
+            const respuesta = await axios.get(
+              `${import.meta.env.VITE_API_URL}/cancion/${rec.id}`
+            );
+            return {
+              id: rec.id,
+              title: respuesta.data.nombre,
+              artist: respuesta.data.artista,
+              img: respuesta.data.imagen,
+              spotifyUri: respuesta.data.uri
+            };
+          })
+        );
+
+        setSpotifyRecommendations(detalles);
       } catch (err) {
         console.error("Error al obtener recomendaciones:", err);
       }
     };
-  
+
     fetchRecommendations();
   }, []);
-  
-  
 
   if (loading) {
     return (
@@ -217,7 +226,6 @@ export default function MainPage() {
     );
   }
 
-  // Handlers para botones
   const reloadMap = () => {
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
@@ -249,7 +257,6 @@ export default function MainPage() {
                 Usuarios escuchando cerca
               </h2>
 
-              {/* Botones recargar y centrar */}
               <div className="absolute top-4 right-4 flex space-x-2 z-20">
                 <button
                   onClick={reloadMap}
@@ -355,37 +362,36 @@ export default function MainPage() {
                       <span className="text-4xl mb-2">+</span>
                       <span className="font-semibold">Agregar amigo</span>
                     </button>
-
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
                     {spotifyRecommendations.map(song => (
-                    <div
-                      key={song.spotifyUri}
-                      className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
-                      onClick={async () => {
-                        try { await playTrack(song.spotifyUri); }
-                        catch (err) {
-                          console.error('playTrack error:', err);
-                          alert('No se pudo reproducir: ' + err.message);
-                        }
-                      }}
-                    >
-                      <img
-                        src={song.img || 'https://via.placeholder.com/48'}
-                        alt={song.title}
-                        className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-harmony-text-primary truncate">
-                          {song.title}
-                        </div>
-                        <div className="text-xs text-harmony-text-secondary truncate">
-                          {song.artist}
+                      <div
+                        key={song.spotifyUri}
+                        className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
+                        onClick={async () => {
+                          try { await playTrack(song.spotifyUri); }
+                          catch (err) {
+                            console.error('playTrack error:', err);
+                            alert('No se pudo reproducir: ' + err.message);
+                          }
+                        }}
+                      >
+                        <img
+                          src={song.img || 'https://via.placeholder.com/48'}
+                          alt={song.title}
+                          className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-harmony-text-primary truncate">
+                            {song.title}
+                          </div>
+                          <div className="text-xs text-harmony-text-secondary truncate">
+                            {song.artist}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                   </div>
                 )}
               </div>
