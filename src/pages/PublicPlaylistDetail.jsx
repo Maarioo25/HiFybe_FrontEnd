@@ -19,13 +19,10 @@ export default function PublicPlaylistDetail() {
   useEffect(() => {
     const fetchPlaylistDetail = async () => {
       try {
-        console.log(userId, playlistId);
-        const res = await api.get(`/playlists/friends/${userId}/playlists/${playlistId}`);
-        console.log(res);
-        const data = res.data;
-        setPlaylist(data);
-        // Suponemos que la propiedad canciones ya viene poblada
-        setTracks(data.canciones);
+        // Llamar al servicio con userId y playlistId
+        const playlistInfo = await playlistService.getSpotifyPlaylistById(userId, playlistId);
+        setPlaylist(playlistInfo);
+        setTracks(playlistInfo.canciones); // asumimos que "canciones" viene en el objeto
       } catch (err) {
         setError('No se encontró la playlist o hubo un error cargando datos.');
       }
