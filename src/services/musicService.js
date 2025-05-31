@@ -22,12 +22,14 @@ export const musicService = {
     const token = localStorage.getItem('sp_token');
     if (!token) throw new Error("No hay token de Spotify");
 
-    const res = await api.get('/spotify/recomendaciones', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    return res.data;
+    try {
+      const res = await api.get('/spotify/recomendaciones', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (err) {
+      console.error('Error al obtener recomendaciones:', err.response?.data || err.message);
+      throw err;
+    }
   }
 };
