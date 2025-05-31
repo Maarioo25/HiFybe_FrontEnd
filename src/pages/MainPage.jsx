@@ -208,7 +208,7 @@ export default function MainPage() {
     };
   
     fetchRecommendations();
-  }, []);
+  }, []);  
   
 
   if (loading) {
