@@ -19,13 +19,10 @@ export default function HeaderBar({ children, onSongSelect }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Estado para mostrar/ocultar el input de búsqueda
+  // Estados para mostrar/ocultar el input de búsqueda
   const [showSearch, setShowSearch] = useState(false);
-  // Texto que el usuario escribe
   const [searchValue, setSearchValue] = useState("");
-  // Resultados devueltos por Spotify API
   const [searchResults, setSearchResults] = useState([]);
-  // Control de carga / error
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
@@ -35,14 +32,14 @@ export default function HeaderBar({ children, onSongSelect }) {
   // Token de Spotify almacenado en localStorage
   const spotifyToken = localStorage.getItem("sp_token");
 
-  // Si se abre el campo de búsqueda, hacemos focus al input
+  // Poner foco en el input cuando se muestre
   useEffect(() => {
     if (showSearch) {
       searchInputRef.current?.focus();
     }
   }, [showSearch]);
 
-  // Cerrar dropdown de búsqueda si se hace clic fuera
+  // Cerrar el dropdown al hacer clic fuera
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -61,8 +58,7 @@ export default function HeaderBar({ children, onSongSelect }) {
   }, [showSearch]);
 
   /**
-   * fetchSpotifySearch
-   * Llama al endpoint de búsqueda de Spotify y actualiza searchResults.
+   * Llama al endpoint de búsqueda de Spotify y actualiza searchResults
    */
   const fetchSpotifySearch = async (query) => {
     if (!query) {
@@ -98,8 +94,7 @@ export default function HeaderBar({ children, onSongSelect }) {
         return;
       }
       const data = await res.json();
-      const tracks = data.tracks?.items || [];
-      setSearchResults(tracks);
+      setSearchResults(data.tracks?.items || []);
     } catch (err) {
       console.error("Error buscando en Spotify:", err);
       setErrorMsg("Ocurrió un error al buscar en Spotify.");
@@ -109,7 +104,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     }
   };
 
-  // Debounce para no llamar en cada tecla, sino 300ms después de que deje de teclear
+  // Debounce para no llamar al API en cada pulsación, sino 300ms después
   const debouncedSearch = useCallback(
     debounce((term) => {
       fetchSpotifySearch(term);
@@ -117,7 +112,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     [spotifyToken]
   );
 
-  // Cada vez que cambia el texto del input, disparamos la búsqueda debounced
+  // Maneja cambio en el input de búsqueda
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
@@ -125,11 +120,10 @@ export default function HeaderBar({ children, onSongSelect }) {
     debouncedSearch(value);
   };
 
-  // Al seleccionar un resultado: llamamos a onSongSelect(uri), cerramos dropdown
+  // Al seleccionar una pista, llamamos a onSongSelect(uri)
   const handleSelectTrack = (track) => {
-    const uri = track.uri;
     if (onSongSelect) {
-      onSongSelect(uri);
+      onSongSelect(track.uri);
     }
     setShowSearch(false);
     setSearchValue("");
@@ -137,7 +131,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     setErrorMsg(null);
   };
 
-  // Control de pulsar Enter en el input: si hay resultados, selecciona el primero
+  // Manejar Enter para seleccionar el primer resultado
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && searchResults.length > 0) {
       handleSelectTrack(searchResults[0]);
@@ -149,67 +143,76 @@ export default function HeaderBar({ children, onSongSelect }) {
       className="relative flex flex-col md:flex-row items-center justify-between
                  bg-harmony-primary/90 px-6 py-4 rounded-b-3xl shadow-lg mb-8"
     >
-      {/* Logo + Botón de búsqueda */}
-      <div className="relative flex items-center gap-4">
+      {/* Logo */}
+      <div className="flex items-center gap-4">
         <span
           className="font-bold text-2xl text-harmony-accent cursor-pointer"
           onClick={() => navigate("/")}
         >
           HiFybe
         </span>
-        <button
-          className="p-2 rounded-full hover:bg-harmony-accent/10 transition"
-          onClick={() => {
-            setShowSearch((v) => !v);
-            setSearchValue("");
-            setSearchResults([]);
-            setErrorMsg(null);
-          }}
-          aria-label="Buscar"
-        >
-          <FaSearch className="w-5 h-5 text-harmony-accent" />
-        </button>
 
-        {/* Contenedor del input y dropdown de resultados */}
-        <div
-          className={`
-            absolute z-50
-            top-full left-1/2 transform -translate-x-1/2 mt-2
-            md:top-1/2 md:left-36 md:transform md:-translate-y-1/2 md:translate-x-0 md:mt-0
-            bg-harmony-primary/90 border border-harmony-accent/30
-            rounded-full flex flex-col overflow-hidden
-            transition-all duration-300
-            ${showSearch ? "w-64 opacity-100" : "w-0 opacity-0 pointer-events-none"}
-          `}
-          style={{ minHeight: 40 }}
-          ref={dropdownRef}
-        >
-          <input
-            ref={searchInputRef}
-            type="text"
-            className="bg-transparent outline-none w-full px-4 py-2 text-harmony-text-primary placeholder-harmony-text-secondary"
-            placeholder="Buscar en Spotify..."
-            value={searchValue}
-            onChange={handleSearchChange}
-            onKeyDown={handleKeyDown}
-          />
+        {/* Botón para mostrar/ocultar el input de búsqueda */}
+        <div className="relative">
+          <button
+            className="p-2 rounded-full hover:bg-harmony-accent/10 transition"
+            onClick={() => {
+              setShowSearch((v) => !v);
+              if (showSearch) {
+                // Si se cierra, resetear estados
+                setSearchValue("");
+                setSearchResults([]);
+                setErrorMsg(null);
+              }
+            }}
+            aria-label="Buscar"
+          >
+            <FaSearch className="w-5 h-5 text-harmony-accent" />
+          </button>
 
-          {/* Dropdown con resultados */}
+          {/* Input de búsqueda (círculo expandible) */}
+          <div
+            className={`
+              absolute top-0 left-full ml-2 flex items-center
+              bg-harmony-primary/90 border border-harmony-accent/30
+              rounded-full transition-all duration-300
+              ${showSearch ? "w-64 px-4 py-2 opacity-100" : "w-0 px-0 py-0 opacity-0 pointer-events-none"}
+            `}
+            style={{ minHeight: 40 }}
+          >
+            <input
+              ref={searchInputRef}
+              type="text"
+              className="bg-transparent outline-none w-full text-harmony-text-primary placeholder-harmony-text-secondary"
+              placeholder="Buscar en Spotify..."
+              value={searchValue}
+              onChange={handleSearchChange}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+
+          {/* Dropdown de resultados posicionado debajo del input */}
           {showSearch && (
-            <div className="mt-1 bg-harmony-secondary/20 rounded-b-xl overflow-hidden">
+            <div
+              ref={dropdownRef}
+              className="absolute top-full left-full mt-2 ml-2 w-64 bg-harmony-secondary/20 rounded-xl border border-harmony-accent/30 shadow-lg z-50"
+            >
               {isLoading && (
                 <div className="px-4 py-2 text-center text-harmony-text-secondary">
                   Buscando...
                 </div>
               )}
-              {errorMsg && !isLoading && (
+              {!isLoading && errorMsg && (
                 <div className="px-4 py-2 text-sm text-red-500">{errorMsg}</div>
               )}
-              {!isLoading && !errorMsg && searchResults.length === 0 && searchValue.trim() !== "" && (
-                <div className="px-4 py-2 text-center text-harmony-text-secondary">
-                  No se encontraron resultados.
-                </div>
-              )}
+              {!isLoading &&
+                !errorMsg &&
+                searchResults.length === 0 &&
+                searchValue.trim() !== "" && (
+                  <div className="px-4 py-2 text-center text-harmony-text-secondary">
+                    No se encontraron resultados.
+                  </div>
+                )}
               {!isLoading &&
                 searchResults.map((track) => (
                   <div
