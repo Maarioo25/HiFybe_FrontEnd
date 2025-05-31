@@ -30,13 +30,14 @@ const FooterPlayer = () => {
     isPremium,
   } = usePlayer();
 
-  // Estados para gestionar el modal y playlists
+  // Estados para gestionar el modal, playlists y toast
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [loadingPlaylists, setLoadingPlaylists] = useState(false);
   const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
   const [addingTrack, setAddingTrack] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
 
   // Formatea tiempo en mm:ss
   const formatTime = (ms) => {
@@ -80,6 +81,15 @@ const FooterPlayer = () => {
     fetchPlaylists();
   }, [showPlaylistModal, spotifyToken]);
 
+  // Mostrar toast por 3 segundos cuando toastMessage cambie
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timer = setTimeout(() => {
+      setToastMessage('');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [toastMessage]);
+
   // Maneja la adición de la canción actual a la playlist seleccionada
   const handleAddToPlaylist = async () => {
     if (!selectedPlaylistId || !currentTrack) return;
@@ -102,6 +112,8 @@ const FooterPlayer = () => {
       if (!res.ok) {
         throw new Error(`Error al añadir a playlist: ${res.statusText}`);
       }
+      // Toast de éxito
+      setToastMessage('Canción añadida a la playlist.');
       // Cerrar modal tras éxito
       setShowPlaylistModal(false);
       setSelectedPlaylistId(null);
@@ -161,6 +173,13 @@ const FooterPlayer = () => {
 
   return (
     <>
+      {/* Toast en la esquina superior derecha */}
+      {toastMessage && (
+        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in">
+          {toastMessage}
+        </div>
+      )}
+
       {/* Barra de reproducción */}
       <div className="now-playing-bar fixed left-0 bottom-0 w-full shadow-2xl">
         <div className="absolute inset-0 bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 z-0" />
@@ -366,18 +385,22 @@ const FooterPlayer = () => {
               <div className="max-h-60 overflow-y-auto mb-4">
                 <ul>
                   {playlists.map((pl) => (
-                    <li key={pl.id}>
-                      <label className="flex items-center gap-2 py-1 hover:bg-harmony-accent/10 rounded px-2 cursor-pointer">
+                    <li key={pl.id} className="flex items-center gap-2 py-1 hover:bg-harmony-accent/10 rounded px-2 cursor-pointer">
+                      <img
+                        src={pl.images[0]?.url || '/avatars/default.jpg'}
+                        alt={pl.name}
+                        className="w-6 h-6 rounded object-cover"
+                      />
+                      <label className="flex-1 text-harmony-text-primary truncate">
                         <input
                           type="radio"
                           name="playlist"
                           value={pl.id}
                           checked={selectedPlaylistId === pl.id}
                           onChange={() => setSelectedPlaylistId(pl.id)}
+                          className="mr-2"
                         />
-                        <span className="text-harmony-text-primary truncate">
-                          {pl.name}
-                        </span>
+                        {pl.name}
                       </label>
                     </li>
                   ))}
