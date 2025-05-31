@@ -26,7 +26,7 @@ export const musicService = {
           Authorization: `Bearer ${token}`
         },
         params: {
-          seed_genres: 'pop', // o rock, edm, etc.
+          seed_genres: 'pop',
           limit: 10
         }
       });
