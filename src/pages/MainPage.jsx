@@ -196,9 +196,7 @@ export default function MainPage() {
 
         const detalles = await Promise.all(
           recomendaciones.map(async (rec) => {
-            const respuesta = await axios.get(
-              `${import.meta.env.VITE_API_URL}/cancion/${rec.id}`
-            );
+            const respuesta = await axios.get(`${import.meta.env.VITE_API_URL}/canciones/spotify/${rec.id}`)
             return {
               id: rec.id,
               title: respuesta.data.nombre,
