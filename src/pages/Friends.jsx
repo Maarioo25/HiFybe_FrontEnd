@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { userService } from '../services/userService';
 import { friendService } from '../services/friendService';
 import { notificationService } from '../services/notificationService';
+import { usePlayer } from '../context/PlayerContext';
 
 export default function Friends() {
   const [friendsList, setFriendsList] = useState([]);
