@@ -295,185 +295,184 @@ export default function PlaylistDetail() {
   return (
     <div className="flex-1 container mx-auto px-6 pb-6 flex flex-col">
       <HeaderBar onSongSelect={playTrack} />
-      <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
-      <div className="flex-1 max-w-6xl mx-auto pb-6 flex flex-col">
-          <div className="h-[calc(100vh-222px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
-            <div className="p-6 flex-1 flex flex-col min-h-0">
-              {/* Imagen y detalles comunes */}
-              <div className="flex items-center gap-6 mb-6">
-                <div
-                  className={`relative w-48 h-48 rounded-lg overflow-hidden shadow-md 
-                    ${isOwnPlaylist ? 'cursor-pointer group' : ''}`}
-                  onClick={() => {
-                    if (isOwnPlaylist) fileInputRef.current.click();
-                  }}
-                >
-                  <img
-                    src={playlist.images[0]?.url}
-                    alt={playlist.name}
-                    className={`w-full h-full object-cover transition-transform duration-300 
-                      ${isOwnPlaylist ? 'group-hover:scale-110' : ''}`}
+      <div className="flex-1 container mx-auto px-6 pb-6 flex flex-col">
+        <div className="h-[calc(100vh-222px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
+          <div className="p-6 flex-1 flex flex-col min-h-0">
+            {/* Imagen y detalles comunes */}
+            <div className="flex items-center gap-6 mb-6">
+              <div
+                className={`relative w-48 h-48 rounded-lg overflow-hidden shadow-md 
+                  ${isOwnPlaylist ? 'cursor-pointer group' : ''}`}
+                onClick={() => {
+                  if (isOwnPlaylist) fileInputRef.current.click();
+                }}
+              >
+                <img
+                  src={playlist.images[0]?.url}
+                  alt={playlist.name}
+                  className={`w-full h-full object-cover transition-transform duration-300 
+                    ${isOwnPlaylist ? 'group-hover:scale-110' : ''}`}
+                />
+                {isOwnPlaylist && (
+                  <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <FaEdit className="text-white text-2xl" />
+                  </div>
+                )}
+                {isOwnPlaylist && (
+                  <input
+                    type="file"
+                    accept="image/jpeg"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                    className="hidden"
                   />
-                  {isOwnPlaylist && (
-                    <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                      <FaEdit className="text-white text-2xl" />
-                    </div>
-                  )}
-                  {isOwnPlaylist && (
-                    <input
-                      type="file"
-                      accept="image/jpeg"
-                      ref={fileInputRef}
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                  )}
-                </div>
-                <div>
-                  {/* Título editable vs. solo lectura */}
-                  <div className="flex items-center gap-2">
-                    {isOwnPlaylist && editMode ? (
-                      <>
-                        <input
-                          type="text"
-                          value={newName}
-                          onChange={e => setNewName(e.target.value)}
-                          className="border-b border-harmony-text-secondary bg-transparent focus:outline-none text-4xl font-bold text-harmony-accent"
-                        />
-                        <button onClick={handleSaveName} title="Guardar">
-                          <FaCheck />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditMode(false);
-                            setNewName(playlist.name);
-                          }}
-                          title="Cancelar"
-                        >
-                          <FaTimes />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <h1 className="text-4xl font-bold text-harmony-accent truncate">
-                          {playlist.name}
-                        </h1>
-                        {isOwnPlaylist && (
-                          <button
-                            onClick={() => setEditMode(true)}
-                            className="text-harmony-accent hover:text-harmony-accent/80"
-                            title="Editar nombre"
-                          >
-                            <FaEdit />
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                  <p className="mt-2 text-harmony-text-secondary truncate">
-                    {playlist.description || 'Sin descripción'}
-                  </p>
-                  <div className="mt-1 text-sm text-harmony-text-secondary">
-                    Creada{' '}
-                    {isOwnPlaylist
-                      ? `por ${playlist.owner.display_name}`
-                      : `por ${playlist.owner.display_name || 'Desconocido'}`}
-                  </div>
-                  <div className="mt-4 flex items-center gap-4">
-                    <button
-                      onClick={() => playAndStoreTrack(tracks[0]?.uri)}
-                      className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
-                      title="Reproducir todo"
-                    >
-                      <FaPlay className="text-xl" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(window.location.href);
-                        alert('Enlace copiado');
-                      }}
-                      className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
-                      title="Compartir playlist"
-                    >
-                      <FaShareAlt className="text-xl" />
-                    </button>
-                  </div>
-                </div>
+                )}
               </div>
-
-              {/* Stats: número de canciones y duración total */}
-              <div className="flex-none px-6 mb-4">
-                <div className="flex items-center gap-4 text-harmony-text-secondary">
-                  <span>{tracks.length} canciones</span>
-                  <span>•</span>
-                  <span>{totalDurationMin} min</span>
-                </div>
-              </div>
-
-              {/* Lista de canciones */}
-              <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-harmony-secondary/30 scrollbar-thumb-harmony-accent hover:scrollbar-thumb-harmony-accent/80 transition px-6 pb-6 space-y-4">
-                {tracks.map((song, idx) => (
-                  <div
-                    key={song.id + idx}
-                    onClick={() => playAndStoreTrack(song.uri)}
-                    className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
-                        <img
-                          src={song.album.images[0]?.url}
-                          alt={song.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-harmony-text-primary truncate">
-                          {song.name}
-                        </h3>
-                        <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
-                          <span className="truncate">
-                            {song.artists.map(a => a.name).join(', ')}
-                          </span>
-                          <span>•</span>
-                          <span>
-                            {Math.floor((song.duration_ms || 0) / 60000)}:
-                            {String(
-                              Math.floor(((song.duration_ms || 0) % 60000) / 1000)
-                            ).padStart(2, '0')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Botones de eliminar/reproducir individuales (solo si es tuya) */}
-                    <div className="flex items-center gap-4">
+              <div>
+                {/* Título editable vs. solo lectura */}
+                <div className="flex items-center gap-2">
+                  {isOwnPlaylist && editMode ? (
+                    <>
+                      <input
+                        type="text"
+                        value={newName}
+                        onChange={e => setNewName(e.target.value)}
+                        className="border-b border-harmony-text-secondary bg-transparent focus:outline-none text-4xl font-bold text-harmony-accent"
+                      />
+                      <button onClick={handleSaveName} title="Guardar">
+                        <FaCheck />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditMode(false);
+                          setNewName(playlist.name);
+                        }}
+                        title="Cancelar"
+                      >
+                        <FaTimes />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="text-4xl font-bold text-harmony-accent truncate">
+                        {playlist.name}
+                      </h1>
                       {isOwnPlaylist && (
                         <button
-                          onClick={e => handleRemoveTrack(e, song.uri)}
-                          className="text-red-500 hover:text-red-600 p-2 rounded-full transition"
-                          title="Eliminar canción"
+                          onClick={() => setEditMode(true)}
+                          className="text-harmony-accent hover:text-harmony-accent/80"
+                          title="Editar nombre"
                         >
-                          <FaTrashAlt />
+                          <FaEdit />
                         </button>
                       )}
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          playAndStoreTrack(song.uri);
-                        }}                      
-                        className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full transition"
-                        title="Reproducir canción"
-                      >
-                        <FaPlay />
-                      </button>
+                    </>
+                  )}
+                </div>
+                <p className="mt-2 text-harmony-text-secondary truncate">
+                  {playlist.description || 'Sin descripción'}
+                </p>
+                <div className="mt-1 text-sm text-harmony-text-secondary">
+                  Creada{' '}
+                  {isOwnPlaylist
+                    ? `por ${playlist.owner.display_name}`
+                    : `por ${playlist.owner.display_name || 'Desconocido'}`}
+                </div>
+                <div className="mt-4 flex items-center gap-4">
+                  <button
+                    onClick={() => playAndStoreTrack(tracks[0]?.uri)}
+                    className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
+                    title="Reproducir todo"
+                  >
+                    <FaPlay className="text-xl" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      alert('Enlace copiado');
+                    }}
+                    className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
+                    title="Compartir playlist"
+                  >
+                    <FaShareAlt className="text-xl" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats: número de canciones y duración total */}
+            <div className="flex-none px-6 mb-4">
+              <div className="flex items-center gap-4 text-harmony-text-secondary">
+                <span>{tracks.length} canciones</span>
+                <span>•</span>
+                <span>{totalDurationMin} min</span>
+              </div>
+            </div>
+
+            {/* Lista de canciones */}
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-harmony-secondary/30 scrollbar-thumb-harmony-accent hover:scrollbar-thumb-harmony-accent/80 transition px-6 pb-6 space-y-4">
+              {tracks.map((song, idx) => (
+                <div
+                  key={song.id + idx}
+                  onClick={() => playAndStoreTrack(song.uri)}
+                  className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
+                      <img
+                        src={song.album.images[0]?.url}
+                        alt={song.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-harmony-text-primary truncate">
+                        {song.name}
+                      </h3>
+                      <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
+                        <span className="truncate">
+                          {song.artists.map(a => a.name).join(', ')}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          {Math.floor((song.duration_ms || 0) / 60000)}:
+                          {String(
+                            Math.floor(((song.duration_ms || 0) % 60000) / 1000)
+                          ).padStart(2, '0')}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
+
+                  {/* Botones de eliminar/reproducir individuales (solo si es tuya) */}
+                  <div className="flex items-center gap-4">
+                    {isOwnPlaylist && (
+                      <button
+                        onClick={e => handleRemoveTrack(e, song.uri)}
+                        className="text-red-500 hover:text-red-600 p-2 rounded-full transition"
+                        title="Eliminar canción"
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    )}
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        playAndStoreTrack(song.uri);
+                      }}                      
+                      className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full transition"
+                      title="Reproducir canción"
+                    >
+                      <FaPlay />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
+
       <FooterPlayer />
     </div>
   );
