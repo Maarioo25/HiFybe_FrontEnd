@@ -17,12 +17,16 @@ export default function ChatDetalle() {
 
   useEffect(() => {
     const cargarMensajes = async () => {
-      const user = await userService.getCurrentUser();
+      const res = await userService.getCurrentUser();
+      const user = res?.user;
       if (user?._id) {
         setUsuarioActualId(user._id);
         const data = await conversationService.getMensajesDeConversacion(conversacionId);
         setMensajes(data);
       }
+      console.log("Conversación ID desde URL:", conversacionId);
+      console.log("Usuario actual:", user);
+
     };
 
     cargarMensajes();
@@ -45,6 +49,12 @@ export default function ChatDetalle() {
       <HeaderBar onSongSelect={playTrack} />
 
       <div className="flex-1 overflow-y-auto container mx-auto px-4 py-6 space-y-4">
+        {mensajes.length === 0 && (
+        <div className="text-center text-harmony-text-secondary">
+            No hay mensajes en esta conversación todavía.
+        </div>
+        )}
+
         {mensajes.map((msg) => (
           <div
             key={msg._id}
