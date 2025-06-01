@@ -213,7 +213,7 @@ const FooterPlayer = () => {
                 top: 0,
                 width: '100%',
                 height: '100%',
-                backgroundImage: `url(${currentTrack.album.images[0].url})`,
+                backgroundImage: `url(${currentTrack?.album?.images?.[0]?.url || "https://via.placeholder.com/48"})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'left',
                 filter: 'blur(12px) brightness(0.7)',
@@ -226,22 +226,22 @@ const FooterPlayer = () => {
           {/* Portada y meta */}
           <div className="flex items-center z-10 gap-2 md:gap-4 min-w-[150px] md:min-w-[200px] max-w-[full] md:max-w-[320px] w-full md:w-[320px] overflow-hidden">
             <img
-              src={currentTrack.album.images[0].url}
+              src={currentTrack?.album?.images?.[0]?.url || "https://via.placeholder.com/48"}
               alt="Album cover"
               className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg"
             />
             <div className="truncate text-harmony-text-primary">
               <div
                 className="font-semibold truncate max-w-[150px] md:max-w-[210px] text-sm md:text-base"
-                title={currentTrack.name}
+                title={currentTrack?.name}
               >
-                {currentTrack.name}
+                {currentTrack?.name}
               </div>
               <div
                 className="text-xs text-harmony-text-secondary truncate max-w-[150px] md:max-w-[210px]"
-                title={currentTrack.artists.map((a) => a.name).join(', ')}
+                title={currentTrack?.artists?.map((a) => a.name).join(', ')}
               >
-                {currentTrack.artists.map((a) => a.name).join(', ')}
+                {currentTrack?.artists?.map((a) => a.name).join(', ')}
               </div>
               {!isPremium && (
                 <div className="text-xs text-yellow-500 mt-1">
