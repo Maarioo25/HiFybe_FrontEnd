@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import HeaderBar from "../components/HeaderBar";
 import FooterPlayer from "../components/FooterPlayer";
 import "leaflet/dist/leaflet.css";
+import toast from "react-hot-toast";
 import L from "leaflet";
 import "./style.css";
 import AddFriendModal from "../components/AddFriendModal";
