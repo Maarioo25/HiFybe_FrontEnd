@@ -39,7 +39,7 @@ export default function FriendDetail() {
   if (error) {
     return (
       <div className="min-h-screen bg-harmony-primary">
-        <HeaderBar />
+        <HeaderBar onSongSelect={setCurrentSong}/>
         <div className="container mx-auto px-6 py-8">
           <h2 className="text-xl font-bold text-red-500">{error}</h2>
         </div>
@@ -147,7 +147,7 @@ export default function FriendDetail() {
               {playlists.map((playlist) => (
                 <Link
                   key={playlist.id}
-                  to={`/friends/${encodeURIComponent(friend._id)}/playlists/${encodeURIComponent(playlist.id)}`}
+                  to={`/playlists/friends/${encodeURIComponent(friend._id)}/playlists/${encodeURIComponent(playlist.id)}`}
                   className="playlist-card relative group w-full h-48 flex items-center gap-4 p-4 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
                 >
                   <div className="relative w-24 h-24 rounded-lg overflow-hidden shadow-md">
