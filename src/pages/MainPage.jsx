@@ -455,7 +455,10 @@ export default function MainPage() {
                         <img
                           src={amigo.foto_perfil}
                           alt={amigo.nombre}
-                          className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-300 filter blur-sm"
+                          className="absolute inset-0 w-full h-full object-cover scale-105 
+                                     transition-all duration-300 
+                                     group-hover:scale-110 
+                                     group-hover:blur-sm group-active:blur-sm"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-harmony-primary/80 via-harmony-primary/40 to-transparent" />
                         <div className="relative flex flex-col justify-end h-full px-4 sm:px-5 pb-3 sm:pb-4 pt-8 w-full">
