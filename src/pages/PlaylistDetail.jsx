@@ -417,19 +417,19 @@ export default function PlaylistDetail() {
                   onClick={() => playAndStoreTrack(song.uri)}
                   className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer max-w-full overflow-hidden"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md flex-shrink-0">
                       <img
                         src={song.album.images[0]?.url}
                         alt={song.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-harmony-text-primary truncate">
                         {song.name}
                       </h3>
-                      <div className="flex items-center gap-2 text-xs text-harmony-text-secondary">
+                      <div className="flex items-center gap-2 text-xs text-harmony-text-secondary truncate">
                         <span className="truncate">
                           {song.artists.map(a => a.name).join(', ')}
                         </span>
