@@ -375,16 +375,20 @@ export default function MainPage() {
                       onClick={async () => {
                         try {
                           await friendService.sendRequest(currentUserId, selectedUser._id);
-                          await notificationService.createNotification(
-                            selectedUser._id,
-                            `${selectedUser.nombre} te ha enviado una solicitud de amistad`
-                          );
+                          try {
+                            await notificationService.createNotification(
+                              selectedUser._id,
+                              `${selectedUser.nombre} te ha enviado una solicitud de amistad`
+                            );
+                          } catch (notifErr) {
+                            console.warn('Error al crear notificación:', notifErr);
+                          }
                           toast.success('Solicitud enviada correctamente');
                         } catch (error) {
-                          console.error(error);
+                          console.error('Error al enviar solicitud:', error);
                           toast.error(error?.response?.data?.mensaje || 'Error al enviar la solicitud');
                         }
-                      }}                      
+                      }}                                          
                       className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
                     >
                       Seguir
