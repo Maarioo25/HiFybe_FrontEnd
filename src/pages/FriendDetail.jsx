@@ -43,15 +43,15 @@ export default function FriendDetail() {
       const userId = currentUser.user._id;
       const conversaciones = await conversationService.getConversacionesDeUsuario(userId);
 
-      const yaExiste = conversaciones.find(conv =>
-        (conv.usuario1_id._id === userId && conv.usuario2_id._id === friend._id) ||
-        (conv.usuario2_id._id === userId && conv.usuario1_id._id === friend._id)
+      const yaExiste = conversaciones.find(conversacion =>
+        (conversacion.usuario1_id._id === userId && conversacion.usuario2_id._id === friend._id) ||
+        (conversacion.usuario2_id._id === userId && conversacion.usuario1_id._id === friend._id)
       );
 
       if (yaExiste) {
         navigate(`/chat/${yaExiste._id}`);
       } else {
-        const nueva = await conversationService.crearConversacion([userId, friend._id]);
+        const nueva = await conversationService.crearConversacion(userId, friend._id);
         navigate(`/chat/${nueva._id}`);
       }
     } catch (error) {
