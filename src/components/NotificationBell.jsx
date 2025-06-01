@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaBell } from 'react-icons/fa';
-import { notificacionesService } from '../services/notificacionesService';
+import { notificationService } from '../services/notificationService';
 import { useAuth } from '../context/AuthContext';
 
 export default function NotificationBell() {
@@ -21,12 +21,12 @@ export default function NotificationBell() {
 
   useEffect(() => {
     if (open && user?._id) {
-      notificacionesService.get(user._id).then(setNotifications).catch(() => {});
+      notificationService.get(user._id).then(setNotifications).catch(() => {});
     }
   }, [open, user]);
 
   const handleMarkAsRead = async (id) => {
-    await notificacionesService.marcarLeida(id);
+    await notificationService.marcarLeida(id);
     setNotifications((prev) => prev.map(n => n._id === id ? { ...n, leido: true } : n));
   };
 

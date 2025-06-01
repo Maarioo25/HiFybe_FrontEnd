@@ -5,7 +5,7 @@ import FooterPlayer from '../components/FooterPlayer';
 import { Link } from 'react-router-dom';
 import { userService } from '../services/userService';
 import { friendService } from '../services/friendService';
-import { notificationService } from '../services/notificationesService';
+import { notificationService } from '../services/notificationService';
 import { usePlayer } from '../context/PlayerContext';
 import { toast } from 'react-hot-toast';
 
