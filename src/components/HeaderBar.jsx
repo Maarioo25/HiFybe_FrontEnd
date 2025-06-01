@@ -7,13 +7,13 @@ import {
   FaComments,
   FaUserCircle,
   FaSignOutAlt,
-  FaCog,
-  FaBell,
+  FaCog
 } from "react-icons/fa";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../services/userService";
 import debounce from "lodash.debounce";
+import NotificationBell from "./NotificationBell";
 
 export default function HeaderBar({ children, onSongSelect }) {
   const { user, logout } = useAuth();
@@ -294,57 +294,6 @@ export default function HeaderBar({ children, onSongSelect }) {
 
       {children}
     </nav>
-  );
-}
-
-function NotificationBell() {
-  const [open, setOpen] = useState(false);
-  const bellRef = useRef(null);
-  const [notifications] = useState([]); // Puedes cargar desde API si lo deseas
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (bellRef.current && !bellRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative" ref={bellRef}>
-      <button
-        className="p-2 text-harmony-accent hover:text-harmony-accent/80 focus:outline-none text-2xl"
-        onClick={() => setOpen((v) => !v)}
-        aria-label="Notificaciones"
-      >
-        <FaBell />
-      </button>
-      {open && (
-        <div className="absolute right-0 mt-2 w-64 bg-harmony-primary/95 rounded-xl shadow-xl border border-harmony-accent/20 z-50 animate-fade-in-down text-sm">
-          <div className="px-4 py-3 border-b border-harmony-accent/10 font-semibold text-harmony-accent">
-            Notificaciones
-          </div>
-          {notifications.length === 0 ? (
-            <div className="px-4 py-4 text-center text-harmony-text-secondary">
-              No tienes ninguna notificación pendiente
-            </div>
-          ) : (
-            <ul>
-              {notifications.map((n, i) => (
-                <li
-                  key={i}
-                  className="px-4 py-2 hover:bg-harmony-accent/10 cursor-pointer text-harmony-text-primary"
-                >
-                  {n.mensaje}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-    </div>
   );
 }
 
