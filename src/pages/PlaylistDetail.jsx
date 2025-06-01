@@ -410,12 +410,12 @@ export default function PlaylistDetail() {
             </div>
 
             {/* Lista de canciones */}
-            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-harmony-secondary/30 scrollbar-thumb-harmony-accent hover:scrollbar-thumb-harmony-accent/80 transition px-6 pb-6 space-y-4">
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-harmony-secondary/30 scrollbar-thumb-harmony-accent hover:scrollbar-thumb-harmony-accent/80 transition px-4 pb-6 space-y-4">
               {tracks.map((song, idx) => (
                 <div
                   key={song.id + idx}
                   onClick={() => playAndStoreTrack(song.uri)}
-                  className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer"
+                  className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer max-w-full overflow-hidden"
                 >
                   <div className="flex items-center gap-3 flex-1">
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden shadow-md">
