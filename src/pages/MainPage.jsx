@@ -328,7 +328,7 @@ export default function MainPage() {
                 className="rounded-2xl shadow-lg h-full"
               />
               {selectedUser && (
-                <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 max-w-100 backdrop-blur-md transition-all animate-fade-in-down">
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 sm:bottom-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 w-[90%] sm:w-[60%] max-w-lg backdrop-blur-md transition-all animate-fade-in-down">
                   <div className="flex flex-col items-center mr-2">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-harmony-accent shadow-lg bg-harmony-primary flex items-center justify-center overflow-hidden mb-1">
                       <img
