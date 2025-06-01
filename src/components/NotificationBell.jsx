@@ -1,5 +1,7 @@
+// src/components/NotificationBell.jsx
+
 import React, { useState, useEffect, useRef } from 'react';
-import { FaBell } from 'react-icons/fa';
+import { FaBell, FaTimes } from 'react-icons/fa';
 import { notificationService } from '../services/notificationService';
 import { useAuth } from '../context/AuthContext';
 
@@ -30,6 +32,11 @@ export default function NotificationBell() {
     setNotifications((prev) => prev.map(n => n._id === id ? { ...n, leido: true } : n));
   };
 
+  const handleDelete = async (id) => {
+    await notificationService.eliminar(id);
+    setNotifications((prev) => prev.filter(n => n._id !== id));
+  };
+
   const unreadCount = notifications.filter(n => !n.leido).length;
 
   return (
@@ -58,12 +65,20 @@ export default function NotificationBell() {
               {notifications.map((n) => (
                 <li
                   key={n._id}
-                  className={`px-4 py-2 cursor-pointer hover:bg-harmony-accent/10 ${
+                  className={`group px-4 py-2 flex justify-between items-center hover:bg-harmony-accent/10 ${
                     n.leido ? 'text-harmony-text-secondary' : 'text-harmony-text-primary font-semibold'
                   }`}
-                  onClick={() => handleMarkAsRead(n._id)}
                 >
-                  {n.contenido}
+                  <span onClick={() => handleMarkAsRead(n._id)} className="flex-1 cursor-pointer truncate">
+                    {n.contenido}
+                  </span>
+                  <button
+                    className="ml-2 text-xs text-red-400 hover:text-red-600"
+                    onClick={() => handleDelete(n._id)}
+                    aria-label="Eliminar notificación"
+                  >
+                    <FaTimes />
+                  </button>
                 </li>
               ))}
             </ul>

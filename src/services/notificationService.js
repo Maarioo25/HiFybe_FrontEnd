@@ -18,4 +18,9 @@ export const notificationService = {
     });
     return res.data;
   },
+
+  eliminar: async (id) => {
+    const res = await api.delete(`/notificaciones/${id}`);
+    return res.data;
+  },
 };
