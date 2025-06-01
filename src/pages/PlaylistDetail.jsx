@@ -1,37 +1,53 @@
+// src/pages/PlaylistDetail.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaPlay, FaTrashAlt, FaShareAlt, FaArrowLeft, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
+import {
+  FaPlay,
+  FaTrashAlt,
+  FaShareAlt,
+  FaArrowLeft,
+  FaEdit,
+  FaCheck,
+  FaTimes
+} from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
 import { toast } from 'react-hot-toast';
-
+import { playlistService } from '../services/playlistService';
 
 export default function PlaylistDetail() {
-  const { id } = useParams();
+  const { id, userId, playlistId } = useParams();
   const navigate = useNavigate();
   const { playTrack } = usePlayer();
   const token = localStorage.getItem('sp_token');
+
+  // Estado común a ambos casos
   const [playlist, setPlaylist] = useState(null);
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Estados sólo si es “tuya” (editable)
   const [snapshotId, setSnapshotId] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [newName, setNewName] = useState('');
   const fileInputRef = useRef(null);
 
+  // ¿Es playlist propia o pública?
+  const isOwnPlaylist = Boolean(id && !userId && !playlistId);
+
   useEffect(() => {
-    async function fetchPlaylist() {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
+    async function fetchOwnPlaylist() {
       try {
+        setLoading(true);
         const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text);
+        }
         const data = await res.json();
         setPlaylist(data);
         setNewName(data.name);
@@ -39,21 +55,76 @@ export default function PlaylistDetail() {
         setSnapshotId(data.snapshot_id);
       } catch (err) {
         console.error('Fetch playlist error:', err);
+        setError('No se pudo cargar tu playlist. Quizá no tengas permiso o el token expiró.');
       } finally {
         setLoading(false);
       }
     }
-    fetchPlaylist();
-  }, [id, token]);
+
+    async function fetchPublicPlaylist() {
+      try {
+        setLoading(true);
+        // playlistService.getSpotifyPlaylistById devuelve un objeto con campos: nombre, descripcion, imagen, owner, canciones (array)
+        const playlistInfo = await playlistService.getSpotifyPlaylistById(userId, playlistId);
+        setPlaylist({
+          name: playlistInfo.nombre,
+          description: playlistInfo.descripcion,
+          images: [{ url: playlistInfo.imagen }],
+          owner: { display_name: playlistInfo.owner?.nombre || 'Desconocido' }
+        });
+        // Adaptamos “canciones” públicas al formato básico que usa la UI (title, artist, duration y cover)
+        setTracks(
+          playlistInfo.canciones.map(track => ({
+            id: track._id,
+            name: track.title,
+            artists: [{ name: track.artist }],
+            duration_ms: parseDurationToMs(track.duration),
+            album: { images: [{ url: track.cover }] },
+            uri: track.uri || null
+          }))
+        );
+      } catch (err) {
+        console.error('Carga playlist pública error:', err);
+        setError('No se encontró la playlist pública o hubo un error al cargarla.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Función auxiliar para convertir "3:45" a milisegundos
+    function parseDurationToMs(durationStr) {
+      const parts = durationStr.split(':').map(p => parseInt(p, 10));
+      if (parts.length === 2) {
+        return (parts[0] * 60 + parts[1]) * 1000;
+      }
+      return 0;
+    }
+
+    if (isOwnPlaylist) {
+      if (!token) {
+        setError('Necesitas iniciar sesión para ver tu playlist.');
+        setLoading(false);
+        return;
+      }
+      fetchOwnPlaylist();
+    } else {
+      if (!userId || !playlistId) {
+        setError('Parámetros inválidos para playlist pública.');
+        setLoading(false);
+        return;
+      }
+      fetchPublicPlaylist();
+    }
+  }, [id, userId, playlistId, token, isOwnPlaylist]);
+
+  // ------------- FUNCIONES DE EDICIÓN (solo si isOwnPlaylist) -------------
 
   const handleSaveName = async () => {
     if (!newName.trim()) {
       toast.error('El nombre no puede estar vacío');
       return;
     }
-  
     try {
-      console.log('Updating playlist via PUT:', id, '→', newName);
       const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
         method: 'PUT',
         headers: {
@@ -63,9 +134,6 @@ export default function PlaylistDetail() {
         },
         body: JSON.stringify({ name: newName })
       });
-  
-      console.log('Spotify status:', res.status);
-  
       if (!res.ok) {
         const text = await res.text();
         let msg = text;
@@ -75,8 +143,6 @@ export default function PlaylistDetail() {
         } catch {}
         throw new Error(`(${res.status}) ${msg}`);
       }
-  
-      // Spotify responde 200 OK sin cuerpo
       setPlaylist(prev => ({ ...prev, name: newName }));
       setEditMode(false);
       toast.success('Nombre de la playlist actualizado');
@@ -86,11 +152,7 @@ export default function PlaylistDetail() {
     }
   };
 
-  const totalDurationMin = Math.floor(
-    tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000
-  );
-
-  const toBase64 = (file) =>
+  const toBase64 = file =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = reject;
@@ -101,59 +163,48 @@ export default function PlaylistDetail() {
       reader.readAsDataURL(file);
     });
 
-    const handleImageChange = async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-    
-      // Solo JPEG permitido por la API
-      if (file.type !== 'image/jpeg') {
-        toast.error('La imagen debe estar en formato JPEG');
+  const handleImageChange = async e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'image/jpeg') {
+      toast.error('La imagen debe estar en formato JPEG');
+      return;
+    }
+
+    try {
+      const b64 = await toBase64(file);
+      if (b64.length > 350000) {
+        toast.error('La imagen debe pesar menos de 256 KB');
         return;
       }
-    
-      try {
-        const b64 = await toBase64(file);
-        // 256 KB max → en Base64 ~256 000 * (4/3) ≈ 341 000 chars
-        if (b64.length > 350000) {
-          toast.error('La imagen debe pesar menos de 256 KB');
-          return;
-        }
-    
-        console.log('PUT playlist image:', id, '– Base64 length:', b64.length);
-    
-        const res = await fetch(
-          `https://api.spotify.com/v1/playlists/${id}/images`,
-          {
-            method: 'PUT',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'image/jpeg'
-            },
-            body: b64
-          }
-        );
-    
-        console.log('Spotify image update status:', res.status);
-    
-        if (res.status === 202) {
-          // Success: 202 Accepted (no body)
-          toast.success('Portada de la playlist actualizada correctamente');
-        } else if (res.status === 401) {
-          toast.error('Token expirado o inválido. Vuelve a iniciar sesión.');
-        } else {
-          // Leemos JSON si hay mensaje de error
-          const errJson = await res.json();
-          const msg = errJson.error?.message || res.statusText;
-          throw new Error(`(${res.status}) ${msg}`);
-        }
-      } catch (err) {
-        console.error('Error al actualizar la portada:', err);
-        toast.error('No se pudo actualizar la portada: ' + err.message);
+      const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/images`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'image/jpeg'
+        },
+        body: b64
+      });
+      if (res.status === 202) {
+        toast.success('Portada de la playlist actualizada correctamente');
+        setPlaylist(prev => {
+          const nuevaUrl = prev.images[0].url + `?v=${Date.now()}`;
+          return { ...prev, images: [{ url: nuevaUrl }] };
+        });
+      } else if (res.status === 401) {
+        toast.error('Token expirado o inválido. Vuelve a iniciar sesión.');
+      } else {
+        const errJson = await res.json();
+        const msg = errJson.error?.message || res.statusText;
+        throw new Error(`(${res.status}) ${msg}`);
       }
-    };
-  
+    } catch (err) {
+      console.error('Error al actualizar la portada:', err);
+      toast.error('No se pudo actualizar la portada: ' + err.message);
+    }
+  };
 
-  // Borrar pista
   const handleRemoveTrack = async (e, trackUri) => {
     e.stopPropagation();
     if (!window.confirm('¿Eliminar esta canción de la playlist?')) return;
@@ -177,16 +228,34 @@ export default function PlaylistDetail() {
       const result = await res.json();
       setSnapshotId(result.snapshot_id);
       setTracks(prev => prev.filter(t => t.uri !== trackUri));
+      toast.success('Canción eliminada');
     } catch (err) {
       console.error('Remove track error:', err);
-      alert('No se pudo eliminar la canción: ' + err.message);
+      toast.error('No se pudo eliminar la canción: ' + err.message);
     }
   };
 
-  if (!playlist && !loading) {
+  // -------------------------------------------------------------------------
+
+  // Calculamos duración total en minutos
+  const totalDurationMin = Math.floor(
+    tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000
+  );
+
+  // ------------------ RENDERIZADO ------------------
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-harmony-primary flex items-center justify-center">
+        <div className="text-white text-lg">Cargando playlist...</div>
+      </div>
+    );
+  }
+
+  if (error || !playlist) {
     return (
       <div className="min-h-screen bg-harmony-primary">
-        <HeaderBar onSongSelect={playTrack}/>
+        <HeaderBar onSongSelect={playTrack} />
         <div className="container mx-auto px-6 pt-8">
           <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 p-6 text-center text-harmony-text-secondary">
             <button
@@ -195,7 +264,12 @@ export default function PlaylistDetail() {
             >
               <FaArrowLeft className="text-lg" />
             </button>
-            <p className="mt-4 text-xl font-semibold">Playlist no encontrada</p>
+            <p className="mt-4 text-xl font-semibold">
+              {isOwnPlaylist ? 'Playlist no encontrada' : 'Playlist pública no encontrada'}
+            </p>
+            <p className="mt-2 text-sm">
+              {error || 'No se pudieron obtener los datos.'}
+            </p>
           </div>
         </div>
         <FooterPlayer />
@@ -205,35 +279,44 @@ export default function PlaylistDetail() {
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
-      <HeaderBar onSongSelect={playTrack}/>
+      <HeaderBar onSongSelect={playTrack} />
       <div className="flex-1 container mx-auto px-6 pb-6 flex flex-col">
         <div className="h-[calc(100vh-222px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col min-h-0">
-            {/* Imagen y detalles */}
+            {/* Imagen y detalles comunes */}
             <div className="flex items-center gap-6 mb-6">
               <div
-                className="relative w-48 h-48 rounded-lg overflow-hidden shadow-md cursor-pointer group"
-                onClick={() => fileInputRef.current.click()}
+                className={`relative w-48 h-48 rounded-lg overflow-hidden shadow-md 
+                  ${isOwnPlaylist ? 'cursor-pointer group' : ''}`}
+                onClick={() => {
+                  if (isOwnPlaylist) fileInputRef.current.click();
+                }}
               >
                 <img
-                  src={playlist?.images[0]?.url}
-                  alt={playlist?.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  src={playlist.images[0]?.url}
+                  alt={playlist.name}
+                  className={`w-full h-full object-cover transition-transform duration-300 
+                    ${isOwnPlaylist ? 'group-hover:scale-110' : ''}`}
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                  <FaEdit className="text-white text-2xl" />
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
+                {isOwnPlaylist && (
+                  <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <FaEdit className="text-white text-2xl" />
+                  </div>
+                )}
+                {isOwnPlaylist && (
+                  <input
+                    type="file"
+                    accept="image/jpeg"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                )}
               </div>
               <div>
+                {/* Título editable vs. solo lectura */}
                 <div className="flex items-center gap-2">
-                  {editMode ? (
+                  {isOwnPlaylist && editMode ? (
                     <>
                       <input
                         type="text"
@@ -244,28 +327,41 @@ export default function PlaylistDetail() {
                       <button onClick={handleSaveName} title="Guardar">
                         <FaCheck />
                       </button>
-                      <button onClick={() => { setEditMode(false); setNewName(playlist.name); }} title="Cancelar">
+                      <button
+                        onClick={() => {
+                          setEditMode(false);
+                          setNewName(playlist.name);
+                        }}
+                        title="Cancelar"
+                      >
                         <FaTimes />
                       </button>
                     </>
                   ) : (
                     <>
-                      <h1 className="text-4xl font-bold text-harmony-accent">{playlist?.name}</h1>
-                      <button
-                        onClick={() => setEditMode(true)}
-                        className="text-harmony-accent hover:text-harmony-accent/80"
-                        title="Editar nombre"
-                      >
-                        <FaEdit />
-                      </button>
+                      <h1 className="text-4xl font-bold text-harmony-accent truncate">
+                        {playlist.name}
+                      </h1>
+                      {isOwnPlaylist && (
+                        <button
+                          onClick={() => setEditMode(true)}
+                          className="text-harmony-accent hover:text-harmony-accent/80"
+                          title="Editar nombre"
+                        >
+                          <FaEdit />
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
                 <p className="mt-2 text-harmony-text-secondary truncate">
-                  {playlist?.description || 'Sin descripción'}
+                  {playlist.description || 'Sin descripción'}
                 </p>
                 <div className="mt-1 text-sm text-harmony-text-secondary">
-                  Creada por {playlist?.owner.display_name}
+                  Creada{' '}
+                  {isOwnPlaylist
+                    ? `por ${playlist.owner.display_name}`
+                    : `por ${playlist.owner.display_name || 'Desconocido'}`}
                 </div>
                 <div className="mt-4 flex items-center gap-4">
                   <button
@@ -276,7 +372,10 @@ export default function PlaylistDetail() {
                     <FaPlay className="text-xl" />
                   </button>
                   <button
-                    onClick={() => { navigator.clipboard.writeText(window.location.href); alert('Enlace copiado'); }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      alert('Enlace copiado');
+                    }}
                     className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
                     title="Compartir playlist"
                   >
@@ -286,7 +385,7 @@ export default function PlaylistDetail() {
               </div>
             </div>
 
-            {/* Stats */}
+            {/* Stats: número de canciones y duración total */}
             <div className="flex-none px-6 mb-4">
               <div className="flex items-center gap-4 text-harmony-text-secondary">
                 <span>{tracks.length} canciones</span>
@@ -329,16 +428,23 @@ export default function PlaylistDetail() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Botones de eliminar/reproducir individuales (solo si es tuya) */}
                   <div className="flex items-center gap-4">
+                    {isOwnPlaylist && (
+                      <button
+                        onClick={e => handleRemoveTrack(e, song.uri)}
+                        className="text-red-500 hover:text-red-600 p-2 rounded-full transition"
+                        title="Eliminar canción"
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    )}
                     <button
-                      onClick={e => handleRemoveTrack(e, song.uri)}
-                      className="text-red-500 hover:text-red-600 p-2 rounded-full transition"
-                      title="Eliminar canción"
-                    >
-                      <FaTrashAlt />
-                    </button>
-                    <button
-                      onClick={e => { e.stopPropagation(); playTrack(song.uri); }}
+                      onClick={e => {
+                        e.stopPropagation();
+                        playTrack(song.uri);
+                      }}
                       className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full transition"
                       title="Reproducir canción"
                     >
@@ -351,6 +457,7 @@ export default function PlaylistDetail() {
           </div>
         </div>
       </div>
+
       <FooterPlayer />
     </div>
   );

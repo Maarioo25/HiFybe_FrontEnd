@@ -59,8 +59,8 @@ function App() {
               <Route path="/friends/:id" element={<FriendDetail />} />
               <Route path="/chats" element={<Chats />} />
               <Route path="/playlists" element={<Playlists />} />
-              <Route path="/playlists/:id" element={<PlaylistDetail />} />  
-              <Route path="/friends/:id/playlists/:playlistId" element={<PublicPlaylistDetail />} />
+              <Route path="/playlists/:id" element={<PlaylistDetail />} />
+              <Route path="/public/:userId/:playlistId" element={<PlaylistDetail />} />
             </Route>
 
             
