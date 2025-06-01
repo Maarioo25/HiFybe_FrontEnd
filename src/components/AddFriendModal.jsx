@@ -24,7 +24,7 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
   const handleAddFriend = async (targetId, nombre) => {
     try {
       await friendService.sendRequest(currentUserId, targetId);
-      await notificationService.createNotification(
+      await notificationService.crear(
         targetId,
         `${nombre} te ha enviado una solicitud de amistad`
       );
