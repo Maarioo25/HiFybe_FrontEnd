@@ -183,14 +183,16 @@ export default function MainPage() {
                   ? {
                       title: songData.nombre,
                       artist: songData.artista,
-                      img: songData.imagen
+                      img: songData.imagen,
+                      uri: songData.uri
                     }
                   : {
                       title: "No disponible",
                       artist: "",
-                      img: ""
+                      img: "",
+                      uri: null
                     },
-              });
+              });              
           
               mapInstance.current.setView([coords[1], coords[0]], 15);
             } catch (error) {
