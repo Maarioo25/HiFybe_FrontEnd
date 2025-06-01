@@ -9,7 +9,6 @@ import FriendDetail from "./pages/FriendDetail";
 import Chats from "./pages/Chats";
 import Playlists from "./pages/Playlists";
 import PlaylistDetail from "./pages/PlaylistDetail";
-import PublicPlaylistDetail from './pages/PublicPlaylistDetail';
 import { PlayerProvider } from './context/PlayerContext';
 
 
