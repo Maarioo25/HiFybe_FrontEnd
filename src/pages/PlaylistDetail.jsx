@@ -293,9 +293,9 @@ export default function PlaylistDetail() {
   }
 
   return (
-    <div className="flex-1 container mx-auto px-6 pb-6 flex flex-col">
+    <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
       <HeaderBar onSongSelect={playTrack} />
-      <div className="flex-1 container mx-auto px-6 pb-6 flex flex-col">
+      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="h-[calc(100vh-222px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col min-h-0">
             {/* Imagen y detalles comunes */}
