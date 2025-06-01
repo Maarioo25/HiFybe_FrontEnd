@@ -25,7 +25,7 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
     try {
       await friendService.sendRequest(currentUserId, targetId);
       await notificationService.crear(
-        targetId,
+        currentUserId,
         `${nombre} te ha enviado una solicitud de amistad`
       );
       toast.success('Solicitud enviada correctamente');
