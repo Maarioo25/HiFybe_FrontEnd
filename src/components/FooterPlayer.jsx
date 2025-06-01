@@ -31,7 +31,6 @@ const FooterPlayer = () => {
     isPremium,
   } = usePlayer();
 
-  // Estados para gestionar el modal, playlists y toast
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [loadingPlaylists, setLoadingPlaylists] = useState(false);
@@ -40,7 +39,6 @@ const FooterPlayer = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [toastMessage, setToastMessage] = useState('');
 
-  // Formatea tiempo en mm:ss
   const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -53,10 +51,8 @@ const FooterPlayer = () => {
     window.location.href = 'https://api.mariobueno.info/usuarios/spotify/connect';
   };
 
-  // Cuando se abre el modal, cargamos las playlists del usuario
   useEffect(() => {
     if (!showPlaylistModal) return;
-
     const fetchPlaylists = async () => {
       setLoadingPlaylists(true);
       setErrorMsg('');
@@ -66,9 +62,7 @@ const FooterPlayer = () => {
             Authorization: `Bearer ${spotifyToken}`,
           },
         });
-        if (!res.ok) {
-          throw new Error(`Error al obtener playlists: ${res.statusText}`);
-        }
+        if (!res.ok) throw new Error(`Error al obtener playlists: ${res.statusText}`);
         const data = await res.json();
         setPlaylists(data.items || []);
       } catch (err) {
@@ -78,44 +72,33 @@ const FooterPlayer = () => {
         setLoadingPlaylists(false);
       }
     };
-
     fetchPlaylists();
   }, [showPlaylistModal, spotifyToken]);
 
-  // Mostrar toast por 3 segundos cuando toastMessage cambie
   useEffect(() => {
     if (!toastMessage) return;
-    const timer = setTimeout(() => {
-      setToastMessage('');
-    }, 3000);
+    const timer = setTimeout(() => setToastMessage(''), 3000);
     return () => clearTimeout(timer);
   }, [toastMessage]);
 
-  // Maneja la adición de la canción actual a la playlist seleccionada
   const handleAddToPlaylist = async () => {
     if (!selectedPlaylistId || !currentTrack) return;
     setAddingTrack(true);
     setErrorMsg('');
     try {
-      const playlistId = selectedPlaylistId;
-      const uri = currentTrack.uri; // Ej. "spotify:track:..."
       const res = await fetch(
-        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/tracks`,
         {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${spotifyToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ uris: [uri] }),
+          body: JSON.stringify({ uris: [currentTrack.uri] }),
         }
       );
-      if (!res.ok) {
-        throw new Error(`Error al añadir a playlist: ${res.statusText}`);
-      }
-      // Toast de éxito
+      if (!res.ok) throw new Error(`Error al añadir a playlist: ${res.statusText}`);
       setToastMessage('Canción añadida a la playlist.');
-      // Cerrar modal tras éxito
       setShowPlaylistModal(false);
       setSelectedPlaylistId(null);
     } catch (err) {
@@ -126,31 +109,6 @@ const FooterPlayer = () => {
     }
   };
 
-  if (!spotifyToken) {
-    return (
-      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex flex-col items-center justify-center p-4 text-center">
-        <span className="text-harmony-text-primary mb-2">
-          Debes conectar tu cuenta de Spotify para usar el reproductor
-        </span>
-        <button
-          onClick={handleConnectSpotify}
-          className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
-        >
-          Conectar con Spotify
-        </button>
-      </div>
-    );
-  }
-
-  if (!currentTrack) {
-    return (
-      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
-        <span className="text-harmony-text-primary">Selecciona una canción para reproducir</span>
-      </div>
-    );
-  }
-
-  // Handlers básicos
   const handlePlayPause = () => {
     if (isPlaying) {
       pause();
@@ -183,25 +141,43 @@ const FooterPlayer = () => {
         console.error("Error guardando canción en FooterPlayer:", err);
       }
     };
-  
     guardarCancion();
   }, [currentTrack]);
-  
+
+  if (!spotifyToken) {
+    return (
+      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex flex-col items-center justify-center p-4 text-center">
+        <span className="text-harmony-text-primary mb-2">
+          Debes conectar tu cuenta de Spotify para usar el reproductor
+        </span>
+        <button
+          onClick={handleConnectSpotify}
+          className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
+        >
+          Conectar con Spotify
+        </button>
+      </div>
+    );
+  }
+
+  if (!currentTrack?.album?.images?.[0]?.url) {
+    return (
+      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
+        <span className="text-harmony-text-primary">Selecciona una canción para reproducir</span>
+      </div>
+    );
+  }
 
   return (
     <>
-      {/* Toast en la esquina superior derecha */}
       {toastMessage && (
         <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in">
           {toastMessage}
         </div>
       )}
-
-      {/* Barra de reproducción */}
       <div className="now-playing-bar fixed left-0 bottom-0 w-full shadow-2xl">
         <div className="absolute inset-0 bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 z-0" />
         <div className="relative mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-2 md:gap-4 px-4 py-3">
-          {/* Fondo degradado borroso */}
           <div
             className="absolute left-0 top-0 pointer-events-none overflow-hidden z-0 hidden md:block"
             style={{ width: '40%', height: '100%' }}
@@ -213,7 +189,7 @@ const FooterPlayer = () => {
                 top: 0,
                 width: '100%',
                 height: '100%',
-                backgroundImage: `url(${currentTrack?.album?.images?.[0]?.url || "https://via.placeholder.com/48"})`,
+                backgroundImage: `url(${currentTrack?.album?.images?.[0]?.url})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'left',
                 filter: 'blur(12px) brightness(0.7)',
@@ -222,11 +198,9 @@ const FooterPlayer = () => {
               }}
             />
           </div>
-
-          {/* Portada y meta */}
           <div className="flex items-center z-10 gap-2 md:gap-4 min-w-[150px] md:min-w-[200px] max-w-[full] md:max-w-[320px] w-full md:w-[320px] overflow-hidden">
             <img
-              src={currentTrack?.album?.images?.[0]?.url || "https://via.placeholder.com/48"}
+              src={currentTrack?.album?.images?.[0]?.url}
               alt="Album cover"
               className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg"
             />
@@ -250,8 +224,6 @@ const FooterPlayer = () => {
               )}
             </div>
           </div>
-
-          {/* Barra y controles */}
           <div className="flex-1 flex flex-col items-center justify-center min-w-0 z-10 w-full">
             <div className="w-full flex items-center gap-2 md:gap-3 mb-2">
               <span className="text-xs text-harmony-text-secondary w-8 md:w-10 text-right select-none">
@@ -301,7 +273,6 @@ const FooterPlayer = () => {
               >
                 {isPlaying ? <FaPause className="text-xl" /> : <FaPlay className="text-xl" />}
               </button>
-
               <button
                 onClick={nextTrack}
                 disabled={!isPremium}
@@ -319,8 +290,6 @@ const FooterPlayer = () => {
               >
                 <FaShareAlt className="text-lg" />
               </button>
-
-              {/* Botón para añadir la canción a playlist */}
               <button
                 onClick={() => setShowPlaylistModal(true)}
                 disabled={!isPremium}
@@ -335,8 +304,6 @@ const FooterPlayer = () => {
               </button>
             </div>
           </div>
-
-          {/* Volumen */}
           <div className="flex items-center gap-1 md:gap-2 min-w-[100px] md:min-w-[120px] justify-end z-10 w-full md:w-auto mt-2 md:mt-0">
             {volume > 0 ? (
               <FaVolumeUp className="text-xs md:text-sm text-harmony-text-secondary" />
@@ -360,8 +327,6 @@ const FooterPlayer = () => {
           </div>
         </div>
       </div>
-
-      {/* Modal para seleccionar playlist */}
       {showPlaylistModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-harmony-primary rounded-xl w-11/12 max-w-md p-6 shadow-xl relative">
@@ -377,27 +342,22 @@ const FooterPlayer = () => {
             >
               <FaTimes />
             </button>
-
             <h2 className="text-lg font-semibold text-harmony-accent mb-4">
               Añadir a playlist
             </h2>
-
             {loadingPlaylists && (
               <div className="px-4 py-2 text-center text-harmony-text-secondary">
                 Cargando playlists...
               </div>
             )}
-
             {!loadingPlaylists && errorMsg && (
               <div className="px-4 py-2 text-sm text-red-500">{errorMsg}</div>
             )}
-
             {!loadingPlaylists && playlists.length === 0 && !errorMsg && (
               <div className="px-4 py-2 text-center text-harmony-text-secondary">
                 No se encontraron playlists.
               </div>
             )}
-
             {!loadingPlaylists && playlists.length > 0 && (
               <div className="max-h-60 overflow-y-auto mb-4">
                 <ul>
@@ -424,7 +384,6 @@ const FooterPlayer = () => {
                 </ul>
               </div>
             )}
-
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => {
