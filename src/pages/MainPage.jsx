@@ -172,6 +172,7 @@ export default function MainPage() {
           .on("click", async () => {
             try {
               const songData = await userService.getCancionUsuario(user._id);
+              console.log('Canción obtenida correctamente: ' + songData.nombre);
           
               setSelectedUser({
                 nombre: user.nombre,
