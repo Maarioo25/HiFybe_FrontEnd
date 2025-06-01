@@ -1,8 +1,6 @@
-// src/services/notificacionesService.js
-
 import api from './api';
 
-export const notificacionesService = {
+export const notificationService = {
   get: async (usuarioId) => {
     const res = await api.get(`/notificaciones/usuarios/${usuarioId}`);
     return res.data;
