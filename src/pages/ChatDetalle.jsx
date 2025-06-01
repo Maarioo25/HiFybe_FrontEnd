@@ -1,3 +1,4 @@
+// ✅ ChatDetalle.js
 import React, { useEffect, useState, useRef } from 'react';
 import { FaPaperclip, FaSmile, FaPaperPlane } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
@@ -88,13 +89,12 @@ export default function ChatDetalle() {
   };
 
   return (
-    <div className="h-screen bg-harmony-primary flex flex-col overflow-hidden">
-      <HeaderBar onSongSelect={playTrack} />
+    <div className="flex flex-col h-screen overflow-hidden bg-harmony-primary">
+      <div className="shrink-0">
+        <HeaderBar onSongSelect={playTrack} />
+      </div>
 
-      <div className="flex-1 max-h-[calc(80vh-125px)] overflow-y-auto px-4 py-2 space-y-4 mx-4 rounded-2xl bg-harmony-secondary/30 border border-harmony-text-secondary/10 backdrop-blur-sm scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
-
-
-
+      <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 mx-4 bg-harmony-secondary/30 border border-harmony-text-secondary/10 rounded-2xl backdrop-blur-sm scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         {mensajes.length === 0 && (
           <div className="text-center text-harmony-text-secondary">
             No hay mensajes en esta conversación todavía.
@@ -110,8 +110,8 @@ export default function ChatDetalle() {
               className={`max-w-[75%] p-3 rounded-2xl border backdrop-blur-sm transition
                 ${msg.emisor_id._id === usuarioActualId
                   ? 'bg-harmony-accent/80 text-white border-white/20'
-                  : 'bg-harmony-secondary/30 text-harmony-text-primary border-harmony-text-secondary/10'
-                }`}
+                  : 'bg-harmony-secondary/30 text-harmony-text-primary border-harmony-text-secondary/10'}
+              `}
             >
               <div className="text-sm font-semibold mb-1">{msg.emisor_id.nombre}</div>
               <div>{msg.contenido}</div>
@@ -130,7 +130,6 @@ export default function ChatDetalle() {
         <div ref={scrollRef} />
       </div>
 
-      {/* Barra de búsqueda de canciones */}
       {mostrarBusqueda && (
         <div
           ref={busquedaRef}
@@ -166,8 +165,7 @@ export default function ChatDetalle() {
         </div>
       )}
 
-      {/* Barra de entrada fija */}
-      <div className="relative px-4 mt-2.5 z-10">
+      <div className="shrink-0 px-4 mt-4 mb-4 z-10">
         <div className="flex items-center gap-3 bg-harmony-secondary/40 backdrop-blur-md rounded-full px-4 py-2 border border-harmony-text-secondary/20">
           <button className="p-2 hover:bg-harmony-secondary/50 rounded-full">
             <FaSmile className="text-lg" />
@@ -180,7 +178,7 @@ export default function ChatDetalle() {
             onChange={(e) => setNuevoMensaje(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleEnviar()}
           />
-                    <button
+          <button
             onClick={handleEnviar}
             className="p-2 hover:bg-harmony-secondary/50 rounded-full"
             title="Enviar mensaje"
@@ -194,12 +192,12 @@ export default function ChatDetalle() {
           >
             <FaPaperclip className="text-lg" />
           </button>
-
-
         </div>
       </div>
 
-      <FooterPlayer />
+      <div className="shrink-0">
+        <FooterPlayer />
+      </div>
     </div>
   );
 }

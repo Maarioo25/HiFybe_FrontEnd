@@ -295,262 +295,259 @@ export default function MainPage() {
   };
 
   return (
-    <div className="text-harmony-text-primary min-h-screen bg-harmony-primary">
+    <div className="flex flex-col h-screen bg-harmony-primary text-harmony-text-primary">
       <HeaderBar onSongSelect={playTrack} />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Mapa + Selected User */}
-          <div className="lg:col-span-2">
-            <div
-              className="bg-harmony-secondary/30 rounded-2xl p-4 sm:p-6 border border-harmony-text-secondary/10
-                            flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh] relative"
-            >
-              <h2 className="text-lg sm:text-xl font-bold mb-4 text-harmony-accent">
-                Usuarios escuchando cerca
-              </h2>
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Mapa + Selected User */}
+              <div className="lg:col-span-2">
+                <div className="bg-harmony-secondary/30 rounded-2xl p-4 sm:p-6 border border-harmony-text-secondary/10 flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh] relative mt-4 sm:mt-0">
+                  <h2 className="text-lg sm:text-xl font-bold mb-4 text-harmony-accent">
+                    Usuarios escuchando cerca
+                  </h2>
 
-              <div className="absolute top-4 right-4 flex space-x-2 z-20">
-                <button
-                  onClick={reloadMap}
-                  className="p-2 h-10 w-10 bg-harmony-secondary rounded-full shadow hover:bg-harmony-secondary/80"
-                  title="Recargar mapa"
-                >
-                  ⟳
-                </button>
-                <button
-                  onClick={centerMap}
-                  className="p-2 h-10 w-10 bg-harmony-secondary rounded-full shadow hover:bg-harmony-secondary/80"
-                  title="Centrar en mi posición"
-                >
-                  ⊕
-                </button>
+                  <div className="absolute top-4 right-4 flex space-x-2 z-20">
+                    <button
+                      onClick={reloadMap}
+                      className="p-2 h-10 w-10 bg-harmony-secondary rounded-full shadow hover:bg-harmony-secondary/80"
+                      title="Recargar mapa"
+                    >
+                      ⟳
+                    </button>
+                    <button
+                      onClick={centerMap}
+                      className="p-2 h-10 w-10 bg-harmony-secondary rounded-full shadow hover:bg-harmony-secondary/80"
+                      title="Centrar en mi posición"
+                    >
+                      ⊕
+                    </button>
+                  </div>
+
+                  <div
+                    ref={mapRef}
+                    id="map"
+                    className="rounded-2xl shadow-lg h-full"
+                  />
+                  {selectedUser && (
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 sm:bottom-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 w-[90%] sm:w-[60%] max-w-lg backdrop-blur-md transition-all animate-fade-in-down">
+                      <div className="flex flex-col items-center mr-2">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-harmony-accent shadow-lg bg-harmony-primary flex items-center justify-center overflow-hidden mb-1">
+                          <img
+                            src={
+                              selectedUser.foto_perfil ||
+                              "https://ui-avatars.com/api/?name=" +
+                                encodeURIComponent(selectedUser.nombre)
+                            }
+                            alt={selectedUser.nombre}
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        </div>
+                        <span className="text-xs sm:text-sm text-harmony-text-primary font-semibold truncate max-w-[60px] sm:max-w-[72px] text-center">
+                          {selectedUser.nombre}
+                        </span>
+                      </div>
+
+                      {/* Canción actual */}
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        {selectedUser.song?.img && (
+                          <img
+                            src={selectedUser.song.img}
+                            alt="Album"
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded shadow object-cover border border-harmony-accent"
+                          />
+                        )}
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-harmony-accent text-xs sm:text-sm font-bold uppercase tracking-wide mb-1">
+                            Escuchando
+                          </span>
+                          <span className="text-harmony-text-primary text-sm sm:text-base font-bold truncate">
+                            {selectedUser.song.title}
+                          </span>
+                          <span className="text-harmony-text-secondary text-xs sm:text-sm truncate">
+                            {selectedUser.song.artist}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">                
+                        <button
+                          onClick={async () => {
+                            try {
+                              await friendService.sendRequest(currentUserId, selectedUser._id);
+                              try {
+                                await notificationService.createNotification(
+                                  selectedUser._id,
+                                  `${selectedUser.nombre} te ha enviado una solicitud de amistad`
+                                );
+                              } catch (notifErr) {
+                                console.warn('Error al crear notificación:', notifErr);
+                              }
+                              toast.success('Solicitud enviada correctamente');
+                            } catch (error) {
+                              console.error('Error al enviar solicitud:', error);
+                              toast.error(error?.response?.data?.mensaje || 'Error al enviar la solicitud');
+                            }
+                          }}                                            
+                          className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
+                        >
+                          Seguir
+                        </button>
+
+                        {selectedUser.song?.uri && (
+                          <button
+                            onClick={() => playTrack(selectedUser.song.uri)}
+                            className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent"
+                          >
+                            Escuchar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div
-                ref={mapRef}
-                id="map"
-                className="rounded-2xl shadow-lg h-full"
-              />
-              {selectedUser && (
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 sm:bottom-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 w-[90%] sm:w-[60%] max-w-lg backdrop-blur-md transition-all animate-fade-in-down">
-                  <div className="flex flex-col items-center mr-2">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-harmony-accent shadow-lg bg-harmony-primary flex items-center justify-center overflow-hidden mb-1">
-                      <img
-                        src={
-                          selectedUser.foto_perfil ||
-                          "https://ui-avatars.com/api/?name=" +
-                            encodeURIComponent(selectedUser.nombre)
-                        }
-                        alt={selectedUser.nombre}
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    </div>
-                    <span className="text-xs sm:text-sm text-harmony-text-primary font-semibold truncate max-w-[60px] sm:max-w-[72px] text-center">
-                      {selectedUser.nombre}
-                    </span>
-                  </div>
-
-                  {/* Canción actual */}
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    {selectedUser.song?.img && (
-                      <img
-                        src={selectedUser.song.img}
-                        alt="Album"
-                        className="w-10 h-10 sm:w-12 sm:h-12 rounded shadow object-cover border border-harmony-accent"
-                      />
-                    )}
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-harmony-accent text-xs sm:text-sm font-bold uppercase tracking-wide mb-1">
-                        Escuchando
-                      </span>
-                      <span className="text-harmony-text-primary text-sm sm:text-base font-bold truncate">
-                        {selectedUser.song.title}
-                      </span>
-                      <span className="text-harmony-text-secondary text-xs sm:text-sm truncate">
-                        {selectedUser.song.artist}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">                
+              {/* Panel derecho: Amigos / Recomendaciones */}
+              <div>
+              <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-harmony-text-secondary/10 flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh] mb-4">
+                  {/* Botones de pestañas */}
+                  <div className="flex items-center mb-4 gap-2">
                     <button
-                      onClick={async () => {
-                        try {
-                          await friendService.sendRequest(currentUserId, selectedUser._id);
-                          try {
-                            await notificationService.createNotification(
-                              selectedUser._id,
-                              `${selectedUser.nombre} te ha enviado una solicitud de amistad`
-                            );
-                          } catch (notifErr) {
-                            console.warn('Error al crear notificación:', notifErr);
-                          }
-                          toast.success('Solicitud enviada correctamente');
-                        } catch (error) {
-                          console.error('Error al enviar solicitud:', error);
-                          toast.error(error?.response?.data?.mensaje || 'Error al enviar la solicitud');
-                        }
-                      }}                                            
-                      className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
+                      onClick={() => setActiveTab("friends")}
+                      className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-semibold text-sm transition border shadow-sm focus:outline-none ${
+                        activeTab === "friends"
+                          ? "bg-harmony-accent text-white border-harmony-accent"
+                          : "bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10"
+                      }`}
                     >
-                      Seguir
+                      Amigos
                     </button>
+                    <button
+                      onClick={() => setActiveTab("recomendaciones")}
+                      className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-semibold text-sm transition border shadow-sm focus:outline-none ${
+                        activeTab === "recomendaciones"
+                          ? "bg-harmony-accent text-white border-harmony-accent"
+                          : "bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10"
+                      }`}
+                    >
+                      Recomendaciones
+                    </button>
+                  </div>
 
-                    {selectedUser.song?.uri && (
-                      <button
-                        onClick={() => playTrack(selectedUser.song.uri)}
-                        className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent"
-                      >
-                        Escuchar
-                      </button>
+                  <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent pr-1">
+                    {/* =====================================
+                        PESTAÑA “AMIGOS”
+                        ===================================== */}
+                    {activeTab === "friends" && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {realFriends.map((amigo) => (
+                          <div
+                            key={amigo.id}
+                            className="friend-card relative flex flex-col justify-end h-48 sm:h-64 rounded-xl overflow-hidden group shadow-lg border border-harmony-secondary/30"
+                          >
+                            <img
+                              src={amigo.foto_perfil}
+                              alt={amigo.nombre}
+                              className="absolute inset-0 w-full h-full object-cover scale-105 
+                                        transition-all duration-300 
+                                        group-hover:scale-110 
+                                        group-hover:blur-sm group-active:blur-sm"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-harmony-primary/80 via-harmony-primary/40 to-transparent" />
+                            <div className="relative flex flex-col justify-end h-full px-4 sm:px-5 pb-3 sm:pb-4 pt-8 w-full">
+                              <div className="font-bold text-harmony-accent text-lg sm:text-xl drop-shadow mb-1 sm:mb-2 truncate">
+                                {amigo.nombre}
+                              </div>
+                              <div className="text-harmony-text-secondary text-sm">
+                                Canción destacada no disponible
+                              </div>
+                            </div>
+                            <span
+                              className={`absolute top-2 right-2 w-3 h-3 rounded-full border-2 border-white shadow ${
+                                amigo.online ? "bg-green-500" : "bg-gray-500"
+                              }`}
+                            />
+                            <button
+                              onClick={() => navigate(`/friends/${amigo.id}`)}
+                              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            />
+                          </div>
+                        ))}
+                        <button
+                          className="flex flex-col items-center justify-center h-48 sm:h-64 rounded-xl border-2 border-dashed border-harmony-accent text-harmony-accent hover:bg-harmony-accent/10 transition shadow-lg"
+                          onClick={() => setShowAddFriendModal(true)}
+                        >
+                          <span className="text-4xl mb-2">+</span>
+                          <span className="font-semibold">Agregar amigo</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* =====================================
+                        PESTAÑA “RECOMENDACIONES”
+                        ===================================== */}
+                    {activeTab === "recomendaciones" && (
+                      <div className="flex flex-col gap-3 transition-opacity duration-300 opacity-100">
+                        {/* Si no hay token de Spotify, mostrar botón para conectar */}
+                        {!spotifyToken ? (
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <span className="text-harmony-text-primary mb-4">
+                              Debes conectar tu cuenta de Spotify para ver las
+                              recomendaciones
+                            </span>
+                            <button
+                              onClick={handleConnectSpotify}
+                              className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
+                            >
+                              Conectar con Spotify
+                            </button>
+                          </div>
+                        ) : (
+                          /* Si existe token, renderizar recomendaciones */
+                          <>
+                            {spotifyRecommendations.length === 0 ? (
+                              <div className="text-center text-harmony-text-secondary mt-4">
+                                Cargando recomendaciones...
+                              </div>
+                            ) : (
+                              spotifyRecommendations.map((song) => (
+                                <div
+                                  key={song.spotifyUri}
+                                  className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
+                                  onClick={async () => {
+                                    await playAndStoreTrack(song.spotifyUri);
+                                  }}
+                                >
+                                  <img
+                                    src={song.img || "https://via.placeholder.com/48"}
+                                    alt={song.title}
+                                    className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
+                                  />
+                                  <div className="min-w-0 flex-1">
+                                    <div className="font-semibold text-harmony-text-primary truncate">
+                                      {song.title}
+                                    </div>
+                                    <div className="text-xs text-harmony-text-secondary truncate">
+                                      {song.artist}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Panel derecho: Amigos / Recomendaciones */}
-          <div>
-            <div
-              className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6
-                            border border-harmony-text-secondary/10 flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh]"
-            >
-              {/* Botones de pestañas */}
-              <div className="flex items-center mb-4 gap-2">
-                <button
-                  onClick={() => setActiveTab("friends")}
-                  className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-semibold text-sm transition border shadow-sm focus:outline-none ${
-                    activeTab === "friends"
-                      ? "bg-harmony-accent text-white border-harmony-accent"
-                      : "bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10"
-                  }`}
-                >
-                  Amigos
-                </button>
-                <button
-                  onClick={() => setActiveTab("recomendaciones")}
-                  className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-semibold text-sm transition border shadow-sm focus:outline-none ${
-                    activeTab === "recomendaciones"
-                      ? "bg-harmony-accent text-white border-harmony-accent"
-                      : "bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10"
-                  }`}
-                >
-                  Recomendaciones
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent pr-1">
-                {/* =====================================
-                     PESTAÑA “AMIGOS”
-                     ===================================== */}
-                {activeTab === "friends" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {realFriends.map((amigo) => (
-                      <div
-                        key={amigo.id}
-                        className="friend-card relative flex flex-col justify-end h-48 sm:h-64 rounded-xl overflow-hidden group shadow-lg border border-harmony-secondary/30"
-                      >
-                        <img
-                          src={amigo.foto_perfil}
-                          alt={amigo.nombre}
-                          className="absolute inset-0 w-full h-full object-cover scale-105 
-                                     transition-all duration-300 
-                                     group-hover:scale-110 
-                                     group-hover:blur-sm group-active:blur-sm"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-harmony-primary/80 via-harmony-primary/40 to-transparent" />
-                        <div className="relative flex flex-col justify-end h-full px-4 sm:px-5 pb-3 sm:pb-4 pt-8 w-full">
-                          <div className="font-bold text-harmony-accent text-lg sm:text-xl drop-shadow mb-1 sm:mb-2 truncate">
-                            {amigo.nombre}
-                          </div>
-                          <div className="text-harmony-text-secondary text-sm">
-                            Canción destacada no disponible
-                          </div>
-                        </div>
-                        <span
-                          className={`absolute top-2 right-2 w-3 h-3 rounded-full border-2 border-white shadow ${
-                            amigo.online ? "bg-green-500" : "bg-gray-500"
-                          }`}
-                        />
-                        <button
-                          onClick={() => navigate(`/friends/${amigo.id}`)}
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        />
-                      </div>
-                    ))}
-                    <button
-                      className="flex flex-col items-center justify-center h-48 sm:h-64 rounded-xl border-2 border-dashed border-harmony-accent text-harmony-accent hover:bg-harmony-accent/10 transition shadow-lg"
-                      onClick={() => setShowAddFriendModal(true)}
-                    >
-                      <span className="text-4xl mb-2">+</span>
-                      <span className="font-semibold">Agregar amigo</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* =====================================
-                     PESTAÑA “RECOMENDACIONES”
-                     ===================================== */}
-                {activeTab === "recomendaciones" && (
-                  <div className="flex flex-col gap-3 transition-opacity duration-300 opacity-100">
-                    {/* Si no hay token de Spotify, mostrar botón para conectar */}
-                    {!spotifyToken ? (
-                      <div className="flex flex-col items-center justify-center h-full">
-                        <span className="text-harmony-text-primary mb-4">
-                          Debes conectar tu cuenta de Spotify para ver las
-                          recomendaciones
-                        </span>
-                        <button
-                          onClick={handleConnectSpotify}
-                          className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
-                        >
-                          Conectar con Spotify
-                        </button>
-                      </div>
-                    ) : (
-                      /* Si existe token, renderizar recomendaciones */
-                      <>
-                        {spotifyRecommendations.length === 0 ? (
-                          <div className="text-center text-harmony-text-secondary mt-4">
-                            Cargando recomendaciones...
-                          </div>
-                        ) : (
-                          spotifyRecommendations.map((song) => (
-                            <div
-                              key={song.spotifyUri}
-                              className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
-                              onClick={async () => {
-                                await playAndStoreTrack(song.spotifyUri);
-                              }}
-                            >
-                              <img
-                                src={song.img || "https://via.placeholder.com/48"}
-                                alt={song.title}
-                                className="w-12 h-12 rounded shadow object-cover border-2 border-harmony-accent"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="font-semibold text-harmony-text-primary truncate">
-                                  {song.title}
-                                </div>
-                                <div className="text-xs text-harmony-text-secondary truncate">
-                                  {song.artist}
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
       </div>
-
       <FooterPlayer />
 
       {showAddFriendModal && currentUserId && (

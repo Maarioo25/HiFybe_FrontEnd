@@ -146,7 +146,7 @@ const FooterPlayer = () => {
 
   if (!spotifyToken) {
     return (
-      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex flex-col items-center justify-center p-4 text-center">
+      <div className="now-playing-bar sticky bottom-0 z-50 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex flex-col items-center justify-center p-4 text-center">
         <span className="text-harmony-text-primary mb-2">
           Debes conectar tu cuenta de Spotify para usar el reproductor
         </span>
@@ -162,7 +162,7 @@ const FooterPlayer = () => {
 
   if (!currentTrack?.album?.images?.[0]?.url) {
     return (
-      <div className="now-playing-bar fixed left-0 bottom-0 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
+      <div className="now-playing-bar sticky bottom-0 z-50 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
         <span className="text-harmony-text-primary">Selecciona una canción para reproducir</span>
       </div>
     );
@@ -175,7 +175,7 @@ const FooterPlayer = () => {
           {toastMessage}
         </div>
       )}
-      <div className="now-playing-bar fixed left-0 bottom-0 w-full shadow-2xl">
+      <div className="now-playing-bar sticky bottom-0 z-50 w-full shadow-2xl">
         <div className="absolute inset-0 bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 z-0" />
         <div className="relative mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-2 md:gap-4 px-4 py-3">
           <div

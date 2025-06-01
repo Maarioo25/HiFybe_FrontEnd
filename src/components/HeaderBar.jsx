@@ -153,7 +153,7 @@ export default function HeaderBar({ children, onSongSelect }) {
   return (
     <nav
       className="relative flex flex-col md:flex-row items-center justify-between
-                 bg-harmony-primary/90 px-6 py-4 rounded-b-3xl shadow-lg mb-8"
+                 bg-harmony-primary/90 px-6 py-4 rounded-b-3xl shadow-lg mb-0 md:mb-4"
     >
       {/* Logo y búsqueda */}
       <div className="flex items-center gap-4">
