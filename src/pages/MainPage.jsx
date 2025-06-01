@@ -30,6 +30,19 @@ export default function MainPage() {
   const mapInstance = useRef(null);
   const markerRefs = useRef([]);
 
+  const playAndStoreTrack = async (uri) => {
+    try {
+      await playTrack(uri);
+      const trackId = uri?.split(":").pop();
+      if (!trackId) return;
+      const currentUser = await userService.getCurrentUser();
+      await userService.setCancionUsuario(currentUser.user._id, trackId);
+    } catch (err) {
+      console.error("Error al reproducir o guardar canción:", err);
+    }
+  };
+
+  
   // Detectar token de Spotify
   const spotifyToken = localStorage.getItem("sp_token");
   const handleConnectSpotify = () => {
@@ -464,12 +477,7 @@ export default function MainPage() {
                               key={song.spotifyUri}
                               className="playlist-item recommendation-card flex items-center gap-4 p-3 rounded-xl cursor-pointer"
                               onClick={async () => {
-                                try {
-                                  await playTrack(song.spotifyUri);
-                                } catch (err) {
-                                  console.error("playTrack error:", err);
-                                  alert("No se pudo reproducir: " + err.message);
-                                }
+                                await playAndStoreTrack(song.spotifyUri);
                               }}
                             >
                               <img
