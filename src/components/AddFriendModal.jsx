@@ -1,4 +1,3 @@
-// components/AddFriendModal.jsx
 import React, { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { userService } from '../services/userService';
@@ -8,6 +7,8 @@ import { notificationService } from '../services/notificationService';
 export default function AddFriendModal({ currentUserId, existingFriends, onClose }) {
   const [allUsers, setAllUsers] = useState([]);
   const [search, setSearch] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastError, setToastError] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -28,10 +29,12 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
         targetId,
         `${nombre} te ha enviado una solicitud de amistad`
       );
-      alert('Solicitud enviada correctamente');
-      onClose();
+      setToastMessage('Solicitud enviada correctamente');
+      setToastError(false);
+      setTimeout(() => onClose(), 2000);
     } catch {
-      alert('Error al enviar solicitud');
+      setToastMessage('Error al enviar solicitud');
+      setToastError(true);
     }
   };
 
@@ -74,6 +77,11 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
             <p className="text-center text-harmony-text-secondary">No hay usuarios disponibles</p>
           )}
         </div>
+        {toastMessage && (
+          <div className={`mt-4 text-sm px-4 py-2 rounded ${toastError ? 'bg-red-500 text-white' : 'bg-green-600 text-white'}`}>
+            {toastMessage}
+          </div>
+        )}
       </div>
     </div>
   );
