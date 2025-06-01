@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
 import { useAuth } from '../context/AuthContext';
+import { userService } from '../services/userService';
 
 export default function Playlists() {
   const { connectSpotifyUrl } = useAuth();
@@ -17,6 +18,18 @@ export default function Playlists() {
   const [loading, setLoading] = useState(false);
   const { playTrack } = usePlayer();
 
+  const playAndStoreTrack = async (uri) => {
+    try {
+      await playTrack(uri);
+      const trackId = uri?.split(':').pop();
+      if (!trackId) return;
+      const currentUser = await userService.getCurrentUser();
+      await userService.setCancionUsuario(currentUser.user._id, trackId);
+    } catch (err) {
+      console.error("Error al guardar canción desde Playlists:", err);
+    }
+  };
+  
   // Fetch playlists de Spotify cuando cambie el token
   useEffect(() => {
     if (spotifyToken) {
@@ -82,10 +95,10 @@ export default function Playlists() {
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
                           <button
                             className="text-white"
-                            onClick={e => {
+                            onClick={async e => {
                               e.preventDefault();
-                              setCurrentSong({ title: '', artist: '', img: '' });
-                              setIsPlaying(true);
+                              const uri = `spotify:playlist:${pl.id}`;
+                              await playAndStoreTrack(uri);
                             }}
                           >
                             <FaPlay className="text-xl" />

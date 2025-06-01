@@ -11,6 +11,7 @@ import {
   FaPlus,
   FaTimes,
 } from 'react-icons/fa';
+import { userService } from "../services/userService";
 import { usePlayer } from '../context/PlayerContext';
 
 const FooterPlayer = () => {
@@ -170,6 +171,22 @@ const FooterPlayer = () => {
     const vol = Number(e.target.value);
     changeVolume(vol);
   };
+
+  useEffect(() => {
+    const guardarCancion = async () => {
+      if (!currentTrack?.uri) return;
+      try {
+        const currentUser = await userService.getCurrentUser();
+        const trackId = currentTrack.uri.split(":").pop();
+        await userService.setCancionUsuario(currentUser.user._id, trackId);
+      } catch (err) {
+        console.error("Error guardando canción en FooterPlayer:", err);
+      }
+    };
+  
+    guardarCancion();
+  }, [currentTrack]);
+  
 
   return (
     <>

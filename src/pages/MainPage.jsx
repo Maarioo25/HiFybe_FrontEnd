@@ -156,14 +156,32 @@ export default function MainPage() {
 
         return L.marker([coords[1], coords[0]], { icon })
           .addTo(mapInstance.current)
-          .on("click", () => {
-            setSelectedUser({
-              nombre: user.nombre,
-              foto_perfil: user.foto_perfil,
-              song: { title: "No disponible", artist: "", img: "" },
-            });
-            mapInstance.current.setView([coords[1], coords[0]], 15);
+          .on("click", async () => {
+            try {
+              const songData = await userService.getCancionUsuario(user._id);
+          
+              setSelectedUser({
+                nombre: user.nombre,
+                foto_perfil: user.foto_perfil,
+                song: songData && songData.nombre
+                  ? {
+                      title: songData.nombre,
+                      artist: songData.artista,
+                      img: songData.imagen
+                    }
+                  : {
+                      title: "No disponible",
+                      artist: "",
+                      img: ""
+                    },
+              });
+          
+              mapInstance.current.setView([coords[1], coords[0]], 15);
+            } catch (error) {
+              console.error("Error al obtener canción del usuario:", error);
+            }
           });
+          
       })
       .filter(Boolean);
   }, [usuariosCercanos]);

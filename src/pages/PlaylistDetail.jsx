@@ -15,6 +15,7 @@ import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
 import { toast } from 'react-hot-toast';
 import { playlistService } from '../services/playlistService';
+import { userService } from '../services/userService';
 
 export default function PlaylistDetail() {
   const { id, userId, playlistId } = useParams();
@@ -36,6 +37,18 @@ export default function PlaylistDetail() {
 
   // ¿Es playlist propia o pública?
   const isOwnPlaylist = Boolean(id && !userId && !playlistId);
+
+  const playAndStoreTrack = async (uri) => {
+    try {
+      await playTrack(uri);
+      const trackId = uri?.split(':').pop();
+      if (!trackId) return;
+      const currentUser = await userService.getCurrentUser();
+      await userService.setCancionUsuario(currentUser.user._id, trackId);
+    } catch (err) {
+      console.error("Error al reproducir o guardar canción:", err);
+    }
+  };
 
   useEffect(() => {
     async function fetchOwnPlaylist() {
@@ -365,7 +378,7 @@ export default function PlaylistDetail() {
                 </div>
                 <div className="mt-4 flex items-center gap-4">
                   <button
-                    onClick={() => playTrack(tracks[0]?.uri)}
+                    onClick={() => playAndStoreTrack(tracks[0]?.uri)}
                     className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
                     title="Reproducir todo"
                   >
@@ -399,7 +412,7 @@ export default function PlaylistDetail() {
               {tracks.map((song, idx) => (
                 <div
                   key={song.id + idx}
-                  onClick={() => playTrack(song.uri)}
+                  onClick={() => playAndStoreTrack(song.uri)}
                   className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer"
                 >
                   <div className="flex items-center gap-3 flex-1">
@@ -443,8 +456,8 @@ export default function PlaylistDetail() {
                     <button
                       onClick={e => {
                         e.stopPropagation();
-                        playTrack(song.uri);
-                      }}
+                        playAndStoreTrack(song.uri);
+                      }}                      
                       className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full transition"
                       title="Reproducir canción"
                     >

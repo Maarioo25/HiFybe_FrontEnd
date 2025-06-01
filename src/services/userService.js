@@ -37,5 +37,23 @@ export const userService = {
   logout: async () => {
     const res = await api.post('/usuarios/logout');
     return res.data;
+  },
+  setCancionUsuario: async (userId, trackId) => {
+    try {
+      const res = await api.put(`/usuarios/${userId}/cancion`, { trackId });
+      return res.data;
+    } catch (err) {
+      console.error("Error en setCancionUsuario:", err);
+      return null;
+    }
+  },
+  getCancionUsuario: async (userId) => {
+    try {
+      const res = await api.get(`/usuarios/${userId}/cancion`);
+      return res.data;
+    } catch (err) {
+      console.error("Error en getCancionUsuario:", err);
+      return null;
+    }
   }
 };

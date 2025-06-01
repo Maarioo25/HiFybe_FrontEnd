@@ -7,6 +7,8 @@ import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
 import { friendService } from '../services/friendService';
 import { playlistService } from '../services/playlistService';
+import { userService } from '../services/userService';
+
 
 export default function FriendDetail() {
   const { id } = useParams();
@@ -102,9 +104,18 @@ export default function FriendDetail() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-2">
                       <button
                         className="text-harmony-accent hover:text-harmony-accent/80"
-                        onClick={() => {
+                        onClick={async () => {
                           setCurrentSong(friend.song);
                           setIsPlaying(true);
+                          try {
+                            const currentUser = await userService.getCurrentUser();
+                            const trackId = friend.song.spotifyUri?.split(':').pop(); // asegúrate de que exista
+                            if (trackId) {
+                              await userService.setCancionUsuario(currentUser.user._id, trackId);
+                            }
+                          } catch (err) {
+                            console.error("Error al guardar canción destacada:", err);
+                          }
                         }}
                       >
                         <FaPlay className="text-xl" />
@@ -159,11 +170,21 @@ export default function FriendDetail() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-2">
                       <button
                         className="text-harmony-accent hover:text-harmony-accent/80"
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.preventDefault();
                           if (playlist.songs && playlist.songs.length > 0) {
-                            setCurrentSong(playlist.songs[0]);
+                            const song = playlist.songs[0];
+                            setCurrentSong(song);
                             setIsPlaying(true);
+                            try {
+                              const currentUser = await userService.getCurrentUser();
+                              const trackId = song.spotifyUri?.split(':').pop();
+                              if (trackId) {
+                                await userService.setCancionUsuario(currentUser.user._id, trackId);
+                              }
+                            } catch (err) {
+                              console.error("Error al guardar canción desde playlist:", err);
+                            }
                           }
                         }}
                       >

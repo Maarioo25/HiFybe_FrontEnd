@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { userService } from "../services/userService";
 import debounce from "lodash.debounce";
 
 export default function HeaderBar({ children, onSongSelect }) {
@@ -122,10 +123,19 @@ export default function HeaderBar({ children, onSongSelect }) {
   };
 
   // Al seleccionar una pista, llamamos a onSongSelect(uri)
-  const handleSelectTrack = (track) => {
+  const handleSelectTrack = async (track) => {
     if (onSongSelect) {
       onSongSelect(track.uri);
     }
+  
+    try {
+      const currentUser = await userService.getCurrentUser();
+      const trackId = track.uri.split(":").pop();
+      await userService.setCancionUsuario(currentUser.user._id, trackId);
+    } catch (err) {
+      console.error("Error guardando canción:", err);
+    }
+  
     setShowSearch(false);
     setSearchValue("");
     setSearchResults([]);
