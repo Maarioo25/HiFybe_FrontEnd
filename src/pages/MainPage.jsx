@@ -328,7 +328,7 @@ export default function MainPage() {
                 className="rounded-2xl shadow-lg h-full"
               />
               {selectedUser && (
-                <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 max-w-xs backdrop-blur-md transition-all animate-fade-in-down">
+                <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 max-w-100 backdrop-blur-md transition-all animate-fade-in-down">
                   <div className="flex flex-col items-center mr-2">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-harmony-accent shadow-lg bg-harmony-primary flex items-center justify-center overflow-hidden mb-1">
                       <img
@@ -368,13 +368,40 @@ export default function MainPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">
-                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow">
+                  <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">                
+                    <button
+                      onClick={async () => {
+                        try {
+                          await friendService.sendRequest(currentUserId, selectedUser._id);
+                          await notificationService.createNotification(
+                            selectedUser._id,
+                            `${selectedUser.nombre} te ha enviado una solicitud de amistad`
+                          );
+                          toast.success('Solicitud enviada correctamente');
+                        } catch (error) {
+                          toast.error('Error al enviar la solicitud');
+                        }
+                      }}
+                      className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
+                    >
                       Seguir
                     </button>
-                    <button className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent">
-                      Escuchar
-                    </button>
+
+                    {selectedUser.song?.title !== "No disponible" && (
+                      <button
+                        onClick={() => {
+                          if (selectedUser.song?.uri) {
+                            playTrack(selectedUser.song.uri);
+                          } else {
+                            toast.error('Canción no disponible');
+                          }
+                        }}
+                        className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent"
+                      >
+                        Escuchar
+                      </button>
+                    )}
+
                   </div>
                 </div>
               )}
