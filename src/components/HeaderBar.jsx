@@ -13,7 +13,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../services/userService";
 import debounce from "lodash.debounce";
-import NotificationBell from "./notificationBell";
+import NotificationBell from "./notificationBell"; 
+
 
 export default function HeaderBar({ children, onSongSelect }) {
   const { user, logout } = useAuth();
