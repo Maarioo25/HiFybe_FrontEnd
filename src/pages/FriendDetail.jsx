@@ -8,7 +8,7 @@ import { usePlayer } from '../context/PlayerContext';
 import { friendService } from '../services/friendService';
 import { playlistService } from '../services/playlistService';
 import { userService } from '../services/userService';
-
+import { conversationService } from '../services/conversationService';
 
 export default function FriendDetail() {
   const { id } = useParams();
@@ -24,7 +24,6 @@ export default function FriendDetail() {
         const userData = await friendService.getFriendById(id);
         setFriend(userData);
 
-        // Si el amigo tiene cuenta de Spotify vinculada, obtenemos sus playlists
         if (userData.auth_proveedor === 'spotify' || userData.spotifyId) {
           const rawPlaylists = await playlistService.getSpotifyPlaylists(userData._id);
           setPlaylists(rawPlaylists);
@@ -37,6 +36,28 @@ export default function FriendDetail() {
     };
     fetchData();
   }, [id]);
+
+  const handleIniciarConversacion = async () => {
+    try {
+      const currentUser = await userService.getCurrentUser();
+      const userId = currentUser.user._id;
+      const conversaciones = await conversationService.getConversacionesDeUsuario(userId);
+
+      const yaExiste = conversaciones.find(conv =>
+        (conv.usuario1_id._id === userId && conv.usuario2_id._id === friend._id) ||
+        (conv.usuario2_id._id === userId && conv.usuario1_id._id === friend._id)
+      );
+
+      if (yaExiste) {
+        navigate(`/chat/${yaExiste._id}`);
+      } else {
+        const nueva = await conversationService.crearConversacion([userId, friend._id]);
+        navigate(`/chat/${nueva._id}`);
+      }
+    } catch (error) {
+      console.error("Error al iniciar conversación:", error);
+    }
+  };
 
   if (error) {
     return (
@@ -109,7 +130,7 @@ export default function FriendDetail() {
                           setIsPlaying(true);
                           try {
                             const currentUser = await userService.getCurrentUser();
-                            const trackId = friend.song.spotifyUri?.split(':').pop(); // asegúrate de que exista
+                            const trackId = friend.song.spotifyUri?.split(':').pop();
                             if (trackId) {
                               await userService.setCancionUsuario(currentUser.user._id, trackId);
                             }
@@ -136,6 +157,13 @@ export default function FriendDetail() {
               <p className="text-harmony-text-secondary line-clamp-3">
                 {friend.biografia || 'Sin biografía.'}
               </p>
+
+              <button
+                onClick={handleIniciarConversacion}
+                className="inline-block mt-2 px-4 py-2 bg-harmony-accent text-white text-sm font-semibold rounded-full hover:bg-harmony-accent/80 transition"
+              >
+                Enviar mensaje
+              </button>
             </div>
           </div>
         </div>
