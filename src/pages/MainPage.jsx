@@ -176,6 +176,7 @@ export default function MainPage() {
               console.log('Canción obtenida correctamente: ' + songData.nombre);
           
               setSelectedUser({
+                _id: user._id,
                 nombre: user.nombre,
                 foto_perfil: user.foto_perfil,
                 song: songData && songData.nombre
