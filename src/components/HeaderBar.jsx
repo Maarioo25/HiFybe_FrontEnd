@@ -13,7 +13,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../services/userService";
 import debounce from "lodash.debounce";
-import NotificationBell from "./NotificationBell";
+import NotificationBell from "./notificationBell";
 
 export default function HeaderBar({ children, onSongSelect }) {
   const { user, logout } = useAuth();
@@ -286,7 +286,6 @@ export default function HeaderBar({ children, onSongSelect }) {
         })}
       </div>
 
-      {/* Notificaciones + Perfil */}
       <div className="flex items-center gap-2 mt-4 md:mt-0">
         <NotificationBell />
         <ProfileMenu user={user} logout={logout} />

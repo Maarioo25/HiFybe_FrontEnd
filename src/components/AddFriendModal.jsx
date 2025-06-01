@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { userService } from '../services/userService';
 import { friendService } from '../services/friendService';
-import { notificationService } from '../services/notificationService';
+import { notificationService } from '../services/notificationesService';
 import { toast } from 'react-hot-toast';
 
 export default function AddFriendModal({ currentUserId, existingFriends, onClose }) {
