@@ -1,4 +1,3 @@
-// components/Friends.jsx
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaTimes } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
@@ -8,6 +7,7 @@ import { userService } from '../services/userService';
 import { friendService } from '../services/friendService';
 import { notificationService } from '../services/notificationService';
 import { usePlayer } from '../context/PlayerContext';
+import { toast } from 'react-hot-toast';
 
 export default function Friends() {
   const [friendsList, setFriendsList] = useState([]);
@@ -59,19 +59,26 @@ export default function Friends() {
         targetId,
         `${nombre} te ha enviado una solicitud de amistad`
       );
-      alert('Solicitud enviada correctamente');
+      toast.success('Solicitud enviada correctamente');
       setShowModal(false);
     } catch {
-      alert('Error al enviar solicitud');
+      toast.error('Error al enviar solicitud');
     }
   };
 
   const handleRespondRequest = async (id, estado) => {
-    await friendService.respondRequest(id, estado);
-    setSolicitudes(prev => prev.filter(s => s._id !== id));
-    if (estado === 'aceptada') {
-      const updated = await friendService.getFriends(currentUserId);
-      setFriendsList(updated);
+    try {
+      await friendService.respondRequest(id, estado);
+      setSolicitudes(prev => prev.filter(s => s._id !== id));
+      if (estado === 'aceptada') {
+        const updated = await friendService.getFriends(currentUserId);
+        setFriendsList(updated);
+        toast.success('Solicitud aceptada');
+      } else {
+        toast.success('Solicitud rechazada');
+      }
+    } catch {
+      toast.error('Error al responder solicitud');
     }
   };
 
