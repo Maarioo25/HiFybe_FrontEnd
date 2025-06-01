@@ -394,21 +394,14 @@ export default function MainPage() {
                       Seguir
                     </button>
 
-                    {selectedUser.song?.title !== "No disponible" && (
+                    {selectedUser.song?.uri && (
                       <button
-                        onClick={() => {
-                          if (selectedUser.song?.uri) {
-                            playTrack(selectedUser.song.uri);
-                          } else {
-                            toast.error('Canción no disponible');
-                          }
-                        }}
+                        onClick={() => playTrack(selectedUser.song.uri)}
                         className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent"
                       >
                         Escuchar
                       </button>
                     )}
-
                   </div>
                 </div>
               )}
