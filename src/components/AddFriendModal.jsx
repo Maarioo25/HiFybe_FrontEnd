@@ -21,13 +21,17 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
     fetchUsers();
   }, [currentUserId, existingFriends]);
 
-  const handleAddFriend = async (targetId, nombre) => {
+  const handleAddFriend = async (targetId) => {
     try {
-      await friendService.sendRequest(currentUserId, targetId);
+      const emisor = await userService.getCurrentUser();
+      const nombreEmisor = emisor.user.nombre;
+  
+      await friendService.sendRequest(emisor.user._id, targetId);
       await notificationService.crear(
-        currentUserId,
-        `${nombre} te ha enviado una solicitud de amistad`
+        targetId,
+        `${nombreEmisor} te ha enviado una solicitud de amistad`
       );
+  
       toast.success('Solicitud enviada correctamente');
       onClose();
     } catch {
