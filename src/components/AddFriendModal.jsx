@@ -26,7 +26,7 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
       const emisor = await userService.getCurrentUser();
       const nombreEmisor = emisor.user.nombre;
   
-      await friendService.sendRequest(emisor.user._id, targetId);
+      await friendService.sendRequest(emisor.user._id || emisor.user.id, targetId);
       await notificationService.crear(
         targetId,
         `${nombreEmisor} te ha enviado una solicitud de amistad`
@@ -67,7 +67,7 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
                   <span className="text-white truncate max-w-[140px]">{u.nombre}</span>
                 </div>
                 <button
-                  onClick={() => handleAddFriend(u._id, u.nombre)}
+                  onClick={() => handleAddFriend(u._id)}
                   className="px-3 py-1 rounded-full bg-harmony-accent text-sm text-white hover:bg-harmony-accent/80 transition"
                 >
                   Enviar solicitud
