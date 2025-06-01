@@ -388,7 +388,7 @@ export default function MainPage() {
                           console.error('Error al enviar solicitud:', error);
                           toast.error(error?.response?.data?.mensaje || 'Error al enviar la solicitud');
                         }
-                      }}                                          
+                      }}                                            
                       className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
                     >
                       Seguir
