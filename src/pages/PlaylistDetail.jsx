@@ -273,42 +273,40 @@ export default function PlaylistDetail() {
 
   // ------------------ RENDERIZADO ------------------
 
-  if (loading) {
+  if (loading || error || !playlist) {
     return (
-      <div className="min-h-screen bg-harmony-primary flex items-center justify-center">
-        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
-        <div className="text-white text-lg">Cargando playlist...</div>
-        <FooterPlayer />
-      </div>
-    );
-  }
-
-  if (error || !playlist) {
-    return (
-      <div className="min-h-screen bg-harmony-primary">
-        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
+      <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
+        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />
+  
         <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
-          <div className="container mx-auto px-6 pt-8">
-            <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 p-6">
-              <button
-                onClick={() => navigate(-1)}
-                className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
-              >
-                <FaArrowLeft className="text-lg" />
-              </button>
-              <p className="mt-4 text-xl font-semibold">
-                {isOwnPlaylist ? 'Playlist no encontrada' : 'Playlist pública no encontrada'}
-              </p>
-              <p className="mt-2 text-sm">
-                {error || 'No se pudieron obtener los datos.'}
-              </p>
+          <div className="h-[calc(100vh-222px)] bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex items-center justify-center p-6">
+            <div className="text-center text-harmony-text-primary">
+              {loading ? (
+                <p className="text-lg">Cargando playlist...</p>
+              ) : (
+                <>
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition mb-4"
+                  >
+                    <FaArrowLeft className="text-lg inline-block mr-2" />
+                    Volver
+                  </button>
+                  <p className="text-xl font-semibold mb-2">
+                    {isOwnPlaylist ? 'Playlist no encontrada' : 'Playlist pública no encontrada'}
+                  </p>
+                  <p className="text-sm">{error || 'No se pudieron obtener los datos.'}</p>
+                </>
+              )}
             </div>
           </div>
         </div>
+  
         <FooterPlayer />
       </div>
     );
   }
+  
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
