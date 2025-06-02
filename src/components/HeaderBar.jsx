@@ -115,6 +115,17 @@ export default function HeaderBar({ children, onSongSelect }) {
     [spotifyToken]
   );
 
+  const isActive = (path) => {
+    if (path === "/") return location.pathname === "/";
+    if (path === "/chats") {
+      return (
+        location.pathname === "/chats" ||
+        location.pathname.startsWith("/chat/")
+      );
+    }
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   // Maneja cambio en el input de búsqueda
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -264,8 +275,7 @@ export default function HeaderBar({ children, onSongSelect }) {
           { icon: <FaMusic />, label: "Playlists", to: "/playlists" },
           { icon: <FaComments />, label: "Chats", to: "/chats" },
         ].map(({ icon, label, to }) => {
-          const active =
-            to === "/" ? location.pathname === to : location.pathname.startsWith(to);
+          const active = isActive(to);
           return (
             <Link
               key={to}

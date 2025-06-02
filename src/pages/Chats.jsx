@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { FaEllipsisH } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
@@ -45,12 +44,8 @@ export default function Chats() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-harmony-accent">Chats</h2>
-                  <button className="text-harmony-accent hover:text-harmony-accent/80">
-                    <FaEllipsisH className="text-lg" />
-                  </button>
-                </div>
-
-                <div className="flex flex-col gap-2">
+              </div>
+              <div className="flex flex-col gap-2">
                   {conversaciones.map((conv) => {
                     const { nombre, foto } = obtenerNombreYFotoDelOtro(conv);
                     return (
