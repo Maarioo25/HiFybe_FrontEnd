@@ -193,6 +193,7 @@ export const PlayerProvider = ({ children }) => {
         newHistory.splice(historyIndex + 1);
       }
       newHistory.push(uri);
+      console.log("Historial actualizado:", newHistory);
       setHistoryIndex(newHistory.length - 1);
       return newHistory;
     });
