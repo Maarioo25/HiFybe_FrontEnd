@@ -25,7 +25,7 @@ export default function MainPage() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState("friends");
   const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
-  const [mostrarUbicacion, setMostrarUbicacion] = useState(true);
+  const [mostrarUbicacion, setMostrarUbicacion] = useState(false);
 
 
   const { loading } = useAuth();
@@ -90,24 +90,6 @@ export default function MainPage() {
     }
   };
   
-
-  // Geolocalización inicial
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) => {
-        setCurrentPosition([latitude, longitude]);
-        if (mapInstance.current) {
-          mapInstance.current.setView([latitude, longitude], 13);
-        }
-        if (mostrarUbicacion) {
-          fetchUsersAtPosition(latitude, longitude);
-        }
-      },
-      (error) => {
-        console.error("Error al pedir permiso de geolocalización:", error);
-      }
-    );
-  }, [mostrarUbicacion]);
 
   // Inicializar Leaflet
   useEffect(() => {
@@ -213,6 +195,9 @@ export default function MainPage() {
         navigator.geolocation.getCurrentPosition(
           ({ coords: { latitude, longitude } }) => {
             setCurrentPosition([latitude, longitude]);
+            if (mapInstance.current) {
+              mapInstance.current.setView([latitude, longitude], 13);
+            }
             fetchUsersAtPosition(latitude, longitude);
           },
           (error) => {
