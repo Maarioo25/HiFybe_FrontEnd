@@ -14,6 +14,9 @@ export const PlayerProvider = ({ children }) => {
   const [isPremium, setIsPremium] = useState(null);
   const [queue, setQueue] = useState([]);
   const [queueIndex, setQueueIndex] = useState(0);
+  const [playHistory, setPlayHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
 
 
   // 1) Obtener token de URL o localStorage
@@ -168,31 +171,28 @@ export const PlayerProvider = ({ children }) => {
         offset: { position: startIndex }
       })
     });
+    if (!Array.isArray(spotifyUriOrUris)) {
+      addToHistory(spotifyUriOrUris);
+    }
   };
   
 
   const pause = () => player && player.pause();
   const resume = () => player && player.resume();
 
-
-
-  const updateCurrentTrack = async () => {
-    try {
-      const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      if (data?.item) {
-        setCurrentTrack(data.item);
-        setIsPlaying(data.is_playing ?? false);
-        setPosition(data.progress_ms || 0);
-        setDuration(data.item.duration_ms || 0);
+  const addToHistory = (uri) => {
+    setPlayHistory((prev) => {
+      const newHistory = [...prev];
+      // Si estamos navegando hacia atrás y reproducimos algo nuevo, truncamos lo posterior
+      if (historyIndex < newHistory.length - 1) {
+        newHistory.splice(historyIndex + 1);
       }
-    } catch (err) {
-      console.error("Error actualizando track:", err);
-    }
+      newHistory.push(uri);
+      return newHistory;
+    });
+    setHistoryIndex(-1); // resetea la posición del historial a la canción actual
   };
+  
   
   const getRandomTrackUri = async () => {
     try {
@@ -228,18 +228,30 @@ export const PlayerProvider = ({ children }) => {
   
   
   const previousTrack = async () => {
-    const prevIndex = queueIndex - 1;
+    try {
+      const state = await player.getCurrentState();
+      if (!state) return;
   
-    if (queue.length > 0 && queueIndex > 0) {
-      setQueueIndex(queueIndex - 1);
-      await playTrack(queue, queueIndex - 1);
-    } else if (queue.length > 0) {
-      await playTrack(queue, 0);
-    } else {
-      const randomUri = await getRandomTrackUri();
-      if (randomUri) await playTrack(randomUri);
+      const currentPosition = state.position;
+  
+      if (currentPosition > 2000) {
+        await seekTo(0);
+        return;
+      }
+  
+      const newIndex = historyIndex === -1 ? playHistory.length - 2 : historyIndex - 1;
+  
+      if (newIndex >= 0 && playHistory[newIndex]) {
+        setHistoryIndex(newIndex);
+        await playTrack(playHistory[newIndex], 0, false);
+      } else {
+        console.log("No hay más canciones anteriores en el historial.");
+      }
+    } catch (err) {
+      console.error("Error en previousTrack:", err);
     }
   };
+  
 
   const seekTo = (ms) => player && player.seek(ms);
   const changeVolume = (vol) => {
