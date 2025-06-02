@@ -160,6 +160,11 @@ export const PlayerProvider = ({ children }) => {
       ? spotifyUriOrUris
       : [spotifyUriOrUris];
   
+    if (resetQueue) {
+      setQueue(uris);
+      setQueueIndex(startIndex);
+    }
+  
     await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
       method: 'PUT',
       headers: {
@@ -172,15 +177,11 @@ export const PlayerProvider = ({ children }) => {
       })
     });
   
-    if (resetQueue) {
-      setQueue(uris);
-      setQueueIndex(startIndex);
+    if (updateHistory && !Array.isArray(spotifyUriOrUris)) {
+      addToHistory(spotifyUriOrUris);
     }
+  };
   
-    if (updateHistory && uris.length === 1) {
-      addToHistory(uris[0]);
-    }
-  };  
   
   const pause = () => player && player.pause();
   const resume = () => player && player.resume();

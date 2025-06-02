@@ -55,7 +55,7 @@ export default function PlaylistDetail() {
   const playSingleTrack = async (uri) => {
     if (!uri) return;
     try {
-      await playTrack(uri); // ← mantiene funcionalidad individual
+      await playTrack(uri, 0, false, true);
       const trackId = uri.split(":").pop();
       const currentUser = await userService.getCurrentUser();
       await userService.setCancionUsuario(currentUser.user._id, trackId);
