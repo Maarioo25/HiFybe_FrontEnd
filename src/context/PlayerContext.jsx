@@ -11,7 +11,10 @@ export const PlayerProvider = ({ children }) => {
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(10);
-  const [isPremium, setIsPremium] = useState(null); // <- nuevo
+  const [isPremium, setIsPremium] = useState(null);
+  const [queue, setQueue] = useState([]);
+  const [queueIndex, setQueueIndex] = useState(0);
+
 
   // 1) Obtener token de URL o localStorage
   useEffect(() => {
@@ -143,17 +146,30 @@ export const PlayerProvider = ({ children }) => {
   }, [token, isPremium]);
 
   // Funciones de control (solo válidas si hay player activo)
-  const playTrack = async (spotifyUri) => {
+  const playTrack = async (spotifyUriOrUris, startIndex = 0) => {
     if (!deviceId) return;
+  
+    const uris = Array.isArray(spotifyUriOrUris)
+      ? spotifyUriOrUris
+      : [spotifyUriOrUris];
+  
+    // Actualizamos cola
+    setQueue(uris);
+    setQueueIndex(startIndex);
+  
     await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ uris: [spotifyUri] })
+      body: JSON.stringify({
+        uris,
+        offset: { position: startIndex }
+      })
     });
   };
+  
 
   const pause = () => player && player.pause();
   const resume = () => player && player.resume();
@@ -179,16 +195,21 @@ export const PlayerProvider = ({ children }) => {
   };
   
   const nextTrack = async () => {
-    if (!player) return;
-    await player.nextTrack();
-    setTimeout(updateCurrentTrack, 1000);
+    const nextIndex = queueIndex + 1;
+    if (nextIndex < queue.length) {
+      setQueueIndex(nextIndex);
+      await playTrack(queue, nextIndex);
+    }
   };
   
   const previousTrack = async () => {
-    if (!player) return;
-    await player.previousTrack();
-    setTimeout(updateCurrentTrack, 1000);
+    const prevIndex = queueIndex - 1;
+    if (prevIndex >= 0) {
+      setQueueIndex(prevIndex);
+      await playTrack(queue, prevIndex);
+    }
   };
+  
   
 
 
@@ -214,8 +235,12 @@ export const PlayerProvider = ({ children }) => {
       previousTrack,
       seek: seekTo,
       changeVolume,
-      setIsPlaying
+      setIsPlaying,
+      queue,
+      queueIndex,
+      setQueue,
     }}>
+
       {children}
     </PlayerContext.Provider>
   );

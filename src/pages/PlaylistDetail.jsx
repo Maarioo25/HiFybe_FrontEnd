@@ -38,17 +38,33 @@ export default function PlaylistDetail() {
   // ¿Es playlist propia o pública?
   const isOwnPlaylist = Boolean(id && !userId && !playlistId);
 
-  const playAndStoreTrack = async (uri) => {
+  const playFullPlaylist = async () => {
+    const uris = tracks.map(t => t.uri).filter(Boolean);
+    if (uris.length === 0) return;
+  
     try {
-      await playTrack(uri);
-      const trackId = uri?.split(':').pop();
-      if (!trackId) return;
+      await playTrack(uris); // ← NUEVO: envías toda la playlist
+      const currentUser = await userService.getCurrentUser();
+      const trackId = uris[0].split(":").pop();
+      await userService.setCancionUsuario(currentUser.user._id, trackId);
+    } catch (err) {
+      console.error("Error al reproducir playlist:", err);
+    }
+  };
+
+  const playSingleTrack = async (uri) => {
+    if (!uri) return;
+    try {
+      await playTrack(uri); // ← mantiene funcionalidad individual
+      const trackId = uri.split(":").pop();
       const currentUser = await userService.getCurrentUser();
       await userService.setCancionUsuario(currentUser.user._id, trackId);
     } catch (err) {
-      console.error("Error al reproducir o guardar canción:", err);
+      console.error("Error al reproducir canción:", err);
     }
   };
+  
+  
 
   useEffect(() => {
     async function fetchOwnPlaylist() {
@@ -380,7 +396,7 @@ export default function PlaylistDetail() {
                 </div>
                 <div className="mt-4 flex items-center gap-4">
                   <button
-                    onClick={() => playAndStoreTrack(tracks[0]?.uri)}
+                    onClick={playFullPlaylist}
                     className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
                     title="Reproducir todo"
                   >
@@ -414,7 +430,7 @@ export default function PlaylistDetail() {
               {tracks.map((song, idx) => (
                 <div
                   key={song.id + idx}
-                  onClick={() => playAndStoreTrack(song.uri)}
+                  onClick={() => playSingleTrack(song.uri)}
                   className="group flex items-center justify-between gap-3 p-3 rounded-xl bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition cursor-pointer max-w-full overflow-hidden"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -458,7 +474,7 @@ export default function PlaylistDetail() {
                     <button
                       onClick={e => {
                         e.stopPropagation();
-                        playAndStoreTrack(song.uri);
+                        playSingleTrack(song.uri);
                       }}                      
                       className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full transition"
                       title="Reproducir canción"
