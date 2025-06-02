@@ -189,15 +189,15 @@ export const PlayerProvider = ({ children }) => {
   const addToHistory = (uri) => {
     setPlayHistory((prev) => {
       const newHistory = [...prev];
-      // Si estamos navegando hacia atrás y reproducimos algo nuevo, truncamos lo posterior
       if (historyIndex < newHistory.length - 1) {
         newHistory.splice(historyIndex + 1);
       }
       newHistory.push(uri);
+      setHistoryIndex(newHistory.length - 1);
       return newHistory;
     });
-    setHistoryIndex(-1); // resetea la posición del historial a la canción actual
   };
+  
   
   
   const getRandomTrackUri = async () => {
