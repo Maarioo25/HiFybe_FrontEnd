@@ -229,15 +229,17 @@ export const PlayerProvider = ({ children }) => {
   
   const previousTrack = async () => {
     const prevIndex = queueIndex - 1;
-    if (prevIndex >= 0) {
-      setQueueIndex(prevIndex);
-      await playTrack(queue, prevIndex);
+  
+    if (queue.length > 0 && queueIndex > 0) {
+      setQueueIndex(queueIndex - 1);
+      await playTrack(queue, queueIndex - 1);
+    } else if (queue.length > 0) {
+      await playTrack(queue, 0);
+    } else {
+      const randomUri = await getRandomTrackUri();
+      if (randomUri) await playTrack(randomUri);
     }
   };
-  
-  
-
-
 
   const seekTo = (ms) => player && player.seek(ms);
   const changeVolume = (vol) => {
