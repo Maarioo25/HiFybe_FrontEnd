@@ -137,7 +137,7 @@ export default function HeaderBar({ children, onSongSelect }) {
   // Al seleccionar una pista, llamamos a onSongSelect(uri)
   const handleSelectTrack = async (track) => {
     if (onSongSelect) {
-      onSongSelect(track.uri);
+      onSongSelect(track.uri, { updateHistory: true, resetQueue: false });
     }
   
     try {

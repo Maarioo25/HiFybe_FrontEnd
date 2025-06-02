@@ -91,7 +91,7 @@ export default function ChatDetalle() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-harmony-primary">
       <div className="shrink-0">
-        <HeaderBar onSongSelect={playTrack} />
+        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 mx-4 bg-harmony-secondary/30 border border-harmony-text-secondary/10 rounded-2xl backdrop-blur-sm scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">

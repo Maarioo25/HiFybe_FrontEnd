@@ -62,7 +62,7 @@ export default function FriendDetail() {
   if (error) {
     return (
       <div className="flex flex-col h-screen bg-harmony-primary">
-        <HeaderBar onSongSelect={setCurrentSong}/>
+        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
           <div className="container mx-auto px-6 py-8">
             <div className="container mx-auto px-6 py-8">
@@ -85,7 +85,7 @@ export default function FriendDetail() {
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary">
-      <HeaderBar onSongSelect={setCurrentSong} />
+      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="container mx-auto px-6 py-8"></div>
           <div className="container mx-auto px-6 py-8">

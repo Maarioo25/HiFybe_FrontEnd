@@ -276,7 +276,9 @@ export default function PlaylistDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-harmony-primary flex items-center justify-center">
+        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
         <div className="text-white text-lg">Cargando playlist...</div>
+        <FooterPlayer />
       </div>
     );
   }
@@ -284,7 +286,7 @@ export default function PlaylistDetail() {
   if (error || !playlist) {
     return (
       <div className="min-h-screen bg-harmony-primary">
-        <HeaderBar onSongSelect={playTrack} />
+        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
         <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
           <div className="container mx-auto px-6 pt-8">
             <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 p-6">
@@ -310,7 +312,7 @@ export default function PlaylistDetail() {
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
-      <HeaderBar onSongSelect={playTrack} />
+      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
       <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="h-[calc(100vh-222px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col min-h-0">

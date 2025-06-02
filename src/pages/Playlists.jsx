@@ -60,7 +60,7 @@ export default function Playlists() {
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
-      <HeaderBar onSongSelect={playTrack} />
+      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
       
       <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="container mx-auto">

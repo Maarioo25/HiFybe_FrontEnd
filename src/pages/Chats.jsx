@@ -37,7 +37,7 @@ export default function Chats() {
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary">
-      <HeaderBar onSongSelect={playTrack} />
+      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />
       <div className="flex-1 overflow-y-auto">
         <div className="container mx-auto px-6 py-8">
           <div className="bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10">

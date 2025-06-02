@@ -148,17 +148,17 @@ export const PlayerProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, [token, isPremium]);
 
-  // Funciones de control (solo válidas si hay player activo)
-  const playTrack = async (spotifyUriOrUris, startIndex = 0) => {
+  const playTrack = async (
+    spotifyUriOrUris,
+    startIndex = 0,
+    resetQueue = true,
+    updateHistory = true
+  ) => {
     if (!deviceId) return;
   
     const uris = Array.isArray(spotifyUriOrUris)
       ? spotifyUriOrUris
       : [spotifyUriOrUris];
-  
-    // Actualizamos cola
-    setQueue(uris);
-    setQueueIndex(startIndex);
   
     await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
       method: 'PUT',
@@ -171,12 +171,17 @@ export const PlayerProvider = ({ children }) => {
         offset: { position: startIndex }
       })
     });
-    if (!Array.isArray(spotifyUriOrUris)) {
-      addToHistory(spotifyUriOrUris);
-    }
-  };
   
-
+    if (resetQueue) {
+      setQueue(uris);
+      setQueueIndex(startIndex);
+    }
+  
+    if (updateHistory && uris.length === 1) {
+      addToHistory(uris[0]);
+    }
+  };  
+  
   const pause = () => player && player.pause();
   const resume = () => player && player.resume();
 
@@ -243,7 +248,7 @@ export const PlayerProvider = ({ children }) => {
   
       if (newIndex >= 0 && playHistory[newIndex]) {
         setHistoryIndex(newIndex);
-        await playTrack(playHistory[newIndex], 0, false);
+        await playTrack(playHistory[newIndex], 0, false, false);
       } else {
         console.log("No hay más canciones anteriores en el historial.");
       }

@@ -296,7 +296,7 @@ export default function MainPage() {
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary text-harmony-text-primary">
-      <HeaderBar onSongSelect={playTrack} />
+      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
 
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
