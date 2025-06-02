@@ -157,8 +157,42 @@ export const PlayerProvider = ({ children }) => {
 
   const pause = () => player && player.pause();
   const resume = () => player && player.resume();
-  const nextTrack = () => player && player.nextTrack();
-  const previousTrack = () => player && player.previousTrack();
+
+
+
+  const updateCurrentTrack = async () => {
+    try {
+      const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.item) {
+        setCurrentTrack(data.item);
+        setIsPlaying(data.is_playing ?? false);
+        setPosition(data.progress_ms || 0);
+        setDuration(data.item.duration_ms || 0);
+      }
+    } catch (err) {
+      console.error("Error actualizando track:", err);
+    }
+  };
+  
+  const nextTrack = async () => {
+    if (!player) return;
+    await player.nextTrack();
+    setTimeout(updateCurrentTrack, 1000);
+  };
+  
+  const previousTrack = async () => {
+    if (!player) return;
+    await player.previousTrack();
+    setTimeout(updateCurrentTrack, 1000);
+  };
+  
+
+
+
   const seekTo = (ms) => player && player.seek(ms);
   const changeVolume = (vol) => {
     setVolume(vol);
