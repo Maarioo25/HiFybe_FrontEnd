@@ -194,13 +194,38 @@ export const PlayerProvider = ({ children }) => {
     }
   };
   
+  const getRandomTrackUri = async () => {
+    try {
+      const res = await fetch("https://api.spotify.com/v1/me/top/tracks?limit=20", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const uris = data.items?.map(t => t.uri).filter(Boolean);
+      if (!uris?.length) return null;
+  
+      const randomIndex = Math.floor(Math.random() * uris.length);
+      return uris[randomIndex];
+    } catch (err) {
+      console.error("Error al obtener canción aleatoria:", err);
+      return null;
+    }
+  };
+  
+
   const nextTrack = async () => {
     const nextIndex = queueIndex + 1;
+  
     if (nextIndex < queue.length) {
       setQueueIndex(nextIndex);
       await playTrack(queue, nextIndex);
+    } else {
+      const randomUri = await getRandomTrackUri();
+      if (randomUri) {
+        await playTrack(randomUri); 
+      }
     }
   };
+  
   
   const previousTrack = async () => {
     const prevIndex = queueIndex - 1;
