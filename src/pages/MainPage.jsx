@@ -13,6 +13,8 @@ import L from "leaflet";
 import "./style.css";
 import AddFriendModal from "../components/AddFriendModal";
 import axios from "axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 
 export default function MainPage() {
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
@@ -23,6 +25,8 @@ export default function MainPage() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState("friends");
   const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
+  const [mostrarUbicacion, setMostrarUbicacion] = useState(true);
+
 
   const { loading } = useAuth();
   const navigate = useNavigate();
@@ -66,26 +70,18 @@ export default function MainPage() {
   // Función para obtener usuarios cercanos
   const fetchUsersAtPosition = async (latitude, longitude) => {
     try {
-      let res = await fetch(
-        `${import.meta.env.VITE_API_URL}/usuarios/ubicacion`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ latitude, longitude }),
-        }
-      );
-      if (!res.ok) console.error("POST /ubicacion fallo:", await res.text());
-
-      res = await fetch(
+      await userService.actualizarUbicacion(latitude, longitude);
+  
+      const res = await fetch(
         `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
         { credentials: "include" }
       );
+  
       if (!res.ok) {
         console.error("GET /cerca fallo:", await res.text());
         return;
       }
-
+  
       const data = await res.json();
       if (Array.isArray(data)) setUsuariosCercanos(data);
       else console.error("GET /cerca devolvió data no-array:", data);
@@ -93,6 +89,7 @@ export default function MainPage() {
       console.error("Error al obtener usuarios cercanos:", err);
     }
   };
+  
 
   // Geolocalización inicial
   useEffect(() => {
@@ -102,13 +99,15 @@ export default function MainPage() {
         if (mapInstance.current) {
           mapInstance.current.setView([latitude, longitude], 13);
         }
-        fetchUsersAtPosition(latitude, longitude);
+        if (mostrarUbicacion) {
+          fetchUsersAtPosition(latitude, longitude);
+        }
       },
       (error) => {
         console.error("Error al pedir permiso de geolocalización:", error);
       }
     );
-  }, []);
+  }, [mostrarUbicacion]);
 
   // Inicializar Leaflet
   useEffect(() => {
@@ -137,6 +136,9 @@ export default function MainPage() {
       mapInstance.current = null;
     };
   }, []);
+
+  
+  
 
   // Marcadores de usuarios cercanos
   useEffect(() => {
@@ -204,6 +206,34 @@ export default function MainPage() {
       })
       .filter(Boolean);
   }, [usuariosCercanos]);
+
+  useEffect(() => {
+    const gestionarVisibilidad = async () => {
+      if (mostrarUbicacion) {
+        navigator.geolocation.getCurrentPosition(
+          ({ coords: { latitude, longitude } }) => {
+            setCurrentPosition([latitude, longitude]);
+            fetchUsersAtPosition(latitude, longitude);
+          },
+          (error) => {
+            console.error("Error al obtener ubicación para activarla:", error);
+          }
+        );
+      } else {
+        try {
+          await userService.ocultarUbicacion();
+          console.log("Ubicación ocultada con éxito");
+        } catch (error) {
+          console.error("Error al ocultar ubicación:", error);
+        }
+      }
+    };
+  
+    gestionarVisibilidad();
+  }, [mostrarUbicacion]);
+  
+  
+  
 
   // Animar icono del usuario seleccionado
   useEffect(() => {
@@ -282,7 +312,9 @@ export default function MainPage() {
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
         setCurrentPosition([latitude, longitude]);
-        fetchUsersAtPosition(latitude, longitude);
+        if (mostrarUbicacion) {
+          fetchUsersAtPosition(latitude, longitude);
+        }
       },
       (error) => console.error("Error al recargar usuarios:", error)
     );
@@ -310,27 +342,76 @@ export default function MainPage() {
                   </h2>
 
                   <div className="absolute top-4 right-4 flex space-x-2 z-20">
+                    <div className="flex items-center gap-2">
+                      {mostrarUbicacion ? (
+                        <FaEye className="text-harmony-accent w-5 h-5" title="Ubicación visible" />
+                      ) : (
+                        <FaEyeSlash className="text-harmony-text-secondary w-5 h-5" title="Ubicación oculta" />
+                      )}
+                      <button
+                        onClick={() => setMostrarUbicacion(!mostrarUbicacion)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
+                          mostrarUbicacion ? "bg-harmony-accent" : "bg-harmony-secondary"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                            mostrarUbicacion ? "translate-x-5" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
                     <button
                       onClick={reloadMap}
-                      className="p-2 h-10 w-10 bg-harmony-secondary rounded-full shadow hover:bg-harmony-secondary/80"
+                      disabled={!mostrarUbicacion}
+                      className={`p-2 h-10 w-10 rounded-full shadow transition ${
+                        mostrarUbicacion
+                          ? "bg-harmony-secondary hover:bg-harmony-secondary/80"
+                          : "bg-gray-500/30"
+                      }`}
                       title="Recargar mapa"
                     >
                       ⟳
                     </button>
+
                     <button
                       onClick={centerMap}
-                      className="p-2 h-10 w-10 bg-harmony-secondary rounded-full shadow hover:bg-harmony-secondary/80"
+                      disabled={!mostrarUbicacion}
+                      className={`p-2 h-10 w-10 rounded-full shadow transition ${
+                        mostrarUbicacion
+                          ? "bg-harmony-secondary hover:bg-harmony-secondary/80"
+                          : "bg-gray-500/30"
+                      }`}
                       title="Centrar en mi posición"
                     >
                       ⊕
                     </button>
+
                   </div>
 
-                  <div
-                    ref={mapRef}
-                    id="map"
-                    className="rounded-2xl shadow-lg h-full"
-                  />
+                  <div className="relative h-full">
+                    <div
+                      className={`absolute inset-0 z-10 pointer-events-none transition-all duration-300 ${
+                        !mostrarUbicacion ? "backdrop-blur-lg bg-harmony-primary/30 shadow-inner" : ""
+                      }`}
+                    />
+                    {!mostrarUbicacion && (
+                      <div className="absolute inset-0 z-20 flex items-center justify-center">
+                        <div className="bg-harmony-primary/60 text-white px-4 py-2 rounded-xl shadow text-sm sm:text-base font-semibold backdrop-blur-md">
+                          Tu ubicación está oculta
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      ref={mapRef}
+                      id="map"
+                      className="rounded-2xl shadow-lg h-full z-0"
+                    />
+                  </div>
+
+
                   {selectedUser && (
                     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 sm:bottom-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 w-[90%] sm:w-[60%] max-w-lg backdrop-blur-md transition-all animate-fade-in-down">
                       <div className="flex flex-col items-center mr-2">

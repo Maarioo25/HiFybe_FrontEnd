@@ -55,5 +55,26 @@ export const userService = {
       console.error("Error en getCancionUsuario:", err);
       return null;
     }
-  }
+  },
+  ocultarUbicacion: async () => {
+    try {
+      const res = await api.post("/usuarios/ocultar-ubicacion");
+      return res.data;
+    } catch (err) {
+      console.error("Error al ocultar ubicación:", err);
+      throw err;
+    }
+  },
+  actualizarUbicacion: async (latitude, longitude) => {
+    try {
+      const res = await api.post("/usuarios/ubicacion", {
+        latitude,
+        longitude
+      });
+      return res.data;
+    } catch (err) {
+      console.error("Error al actualizar ubicación:", err);
+      throw err;
+    }
+  },
 };
