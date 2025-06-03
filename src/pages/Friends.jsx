@@ -63,12 +63,15 @@ export default function Friends() {
 
   if (error) 
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
-        {error}
-        <FooterPlayer/>
+      <div className="min-h-screen flex flex-col">
+        <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />
+        <div className="flex-1 flex items-center justify-center text-white">
+          {error}
+        </div>
+        <FooterPlayer />
       </div>
     );
+  
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary">

@@ -114,6 +114,7 @@ export default function FriendDetail() {
                   <h1 className="text-3xl font-bold text-harmony-accent mb-2">
                     {friend.nombre}
                   </h1>
+
                   <div className="flex items-center gap-4 text-harmony-text-secondary">
                     <span>{playlists.length} playlists públicas</span>
                     <span>•</span>
@@ -160,18 +161,69 @@ export default function FriendDetail() {
                     </div>
                   )}
 
-                  <p className="text-harmony-text-secondary line-clamp-3">
+                  <p className="text-harmony-text-secondary line-clamp-4 whitespace-pre-wrap">
                     {friend.biografia || 'Sin biografía.'}
                   </p>
 
+                  {friend.ciudad && (
+                    <p className="text-sm text-harmony-text-secondary">
+                      🌍 Vive en <span className="text-harmony-text-primary">{friend.ciudad}</span>
+                    </p>
+                  )}
+
+                  {friend.generos_favoritos?.length > 0 && (
+                    <p className="text-sm text-harmony-text-secondary">
+                      🎵 Géneros favoritos:{" "}
+                      <span className="text-harmony-text-primary">
+                        {friend.generos_favoritos.join(', ')}
+                      </span>
+                    </p>
+                  )}
+
+                  {(friend.redes?.instagram || friend.redes?.twitter || friend.redes?.tiktok) && (
+                    <div className="flex flex-wrap gap-4 mt-2 text-sm">
+                      {friend.redes.instagram && (
+                        <a
+                          href={`https://instagram.com/${friend.redes.instagram.replace('@', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-harmony-accent hover:underline"
+                        >
+                          📸 Instagram
+                        </a>
+                      )}
+                      {friend.redes.twitter && (
+                        <a
+                          href={`https://twitter.com/${friend.redes.twitter.replace('@', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-harmony-accent hover:underline"
+                        >
+                          🐦 Twitter
+                        </a>
+                      )}
+                      {friend.redes.tiktok && (
+                        <a
+                          href={`https://www.tiktok.com/@${friend.redes.tiktok.replace('@', '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-harmony-accent hover:underline"
+                        >
+                          🎥 TikTok
+                        </a>
+                      )}
+                    </div>
+                  )}
+
                   <button
                     onClick={handleIniciarConversacion}
-                    className="inline-block mt-2 px-4 py-2 bg-harmony-accent text-white text-sm font-semibold rounded-full hover:bg-harmony-accent/80 transition"
+                    className="inline-block mt-4 px-4 py-2 bg-harmony-accent text-white text-sm font-semibold rounded-full hover:bg-harmony-accent/80 transition"
                   >
                     Enviar mensaje
                   </button>
                 </div>
               </div>
+
             </div>
 
             <div className="mt-8">
