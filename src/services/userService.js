@@ -79,13 +79,14 @@ export const userService = {
   },
   updateRedesSociales: async (id, redes) => {
     try {
-      const res = await api.put(`/usuarios/${id}/redes`, redes);
+      const res = await api.put(`/usuarios/${id}/redes`, { redes });
       return res.data;
     } catch (err) {
       console.error("Error al actualizar redes sociales:", err);
       throw err;
     }
   },
+  ,
 
   updatePreferencias: async (id, preferencias) => {
     try {
