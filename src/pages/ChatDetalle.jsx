@@ -19,6 +19,8 @@ export default function ChatDetalle() {
   const scrollRef = useRef(null);
   const { playTrack } = usePlayer();
   const busquedaRef = useRef(null);
+  const spotifyToken = localStorage.getItem("sp_token");
+
 
   useEffect(() => {
     const cargarMensajes = async () => {
@@ -69,24 +71,65 @@ export default function ChatDetalle() {
 
   const buscarCanciones = async (query) => {
     if (!query.trim()) return setResultados([]);
+  
+    if (!spotifyToken) {
+      console.warn("No hay token de Spotify.");
+      return setResultados([]);
+    }
+  
     try {
-      const res = await fetch(`https://api.mariobueno.info/canciones?query=${encodeURIComponent(query)}`, {
-        credentials: 'include'
+      const encoded = encodeURIComponent(query);
+      const res = await fetch(`https://api.spotify.com/v1/search?q=${encoded}&type=track&limit=5`, {
+        headers: {
+          Authorization: `Bearer ${spotifyToken}`
+        }
       });
+  
       const data = await res.json();
-      setResultados(data);
+      setResultados(data.tracks?.items || []);
     } catch (err) {
-      console.error('Error buscando canciones:', err);
+      console.error("Error buscando canciones en Spotify:", err);
     }
   };
+  
 
-  const enviarCancion = async (cancion) => {
-    const res = await conversationService.enviarMensaje(conversacionId, usuarioActualId, '', cancion._id);
-    setMensajes((prev) => [...prev, res]);
-    setMostrarBusqueda(false);
-    setBusqueda('');
-    setResultados([]);
+  const enviarCancion = async (track) => {
+    const trackData = {
+      titulo: track.name,
+      artista: track.artists.map((a) => a.name).join(", "),
+      uri: track.uri
+    };
+  
+    try {
+      // Paso 1: Crear la canción en tu sistema (si no existe)
+      const resCancion = await fetch(`https://api.mariobueno.info/canciones`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(trackData)
+      });
+  
+      const cancionGuardada = await resCancion.json();
+  
+      // Paso 2: Enviar como mensaje
+      const res = await conversationService.enviarMensaje(
+        conversacionId,
+        usuarioActualId,
+        '',
+        cancionGuardada._id
+      );
+  
+      setMensajes((prev) => [...prev, res]);
+      setMostrarBusqueda(false);
+      setBusqueda('');
+      setResultados([]);
+    } catch (err) {
+      console.error("Error al enviar canción:", err);
+    }
   };
+  
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-harmony-primary">
@@ -114,13 +157,21 @@ export default function ChatDetalle() {
               `}
             >
               <div className="text-sm font-semibold mb-1">{msg.emisor_id.nombre}</div>
-              <div>{msg.contenido}</div>
+              {msg.contenido && <div>{msg.contenido}</div>}
+
               {msg.cancion_id && (
                 <div className="mt-2 p-2 bg-harmony-secondary/20 rounded-xl text-sm border border-harmony-text-secondary/10">
                   <div className="font-bold">{msg.cancion_id.titulo}</div>
                   <div>{msg.cancion_id.artista}</div>
+                  <button
+                    onClick={() => playTrack(msg.cancion_id.uri, 0)}
+                    className="mt-1 text-xs text-harmony-accent hover:underline"
+                  >
+                    Reproducir
+                  </button>
                 </div>
               )}
+
               <div className="text-xs mt-1 text-right text-harmony-text-secondary">
                 {new Date(msg.fecha_envio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
@@ -150,16 +201,24 @@ export default function ChatDetalle() {
               {resultados.length === 0 && (
                 <p className="text-sm text-harmony-text-secondary">Sin resultados</p>
               )}
-              {resultados.map((cancion) => (
+              {resultados.map((track) => (
                 <div
-                  key={cancion._id}
-                  className="p-2 rounded-lg bg-harmony-primary/20 hover:bg-harmony-accent/20 cursor-pointer"
-                  onClick={() => enviarCancion(cancion)}
+                  key={track.id}
+                  className="p-2 rounded-lg bg-harmony-primary/20 hover:bg-harmony-accent/20 cursor-pointer flex gap-2"
+                  onClick={() => enviarCancion(track)}
                 >
-                  <div className="font-semibold text-harmony-text-primary">{cancion.titulo}</div>
-                  <div className="text-sm text-harmony-text-secondary">{cancion.artista}</div>
+                  <img
+                    src={track.album.images[0]?.url || "https://via.placeholder.com/40"}
+                    alt={track.name}
+                    className="w-10 h-10 rounded object-cover"
+                  />
+                  <div className="flex flex-col overflow-hidden">
+                    <div className="font-semibold text-harmony-text-primary truncate">{track.name}</div>
+                    <div className="text-sm text-harmony-text-secondary truncate">{track.artists.map((a) => a.name).join(", ")}</div>
+                  </div>
                 </div>
               ))}
+
             </div>
           </div>
         </div>
