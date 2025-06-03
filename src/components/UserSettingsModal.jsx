@@ -82,8 +82,8 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
   const inputClass = "w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition";
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[999]">
-      <div className="bg-harmony-primary rounded-2xl shadow-2xl border border-harmony-accent/20 w-[95%] md:w-[85%] max-w-4xl p-6 relative text-white">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm grid place-items-center p-2 z-[999]">
+      <div className="bg-harmony-primary rounded-2xl md:rounded-2xl rounded-t-3xl shadow-2xl border border-harmony-accent/20 w-full max-w-4xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto p-4 md:p-6 relative text-white scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <button
           className="absolute top-4 right-4 text-harmony-accent hover:text-red-400 text-xl"
           onClick={onClose}
@@ -91,12 +91,13 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
         >
           <FaTimes />
         </button>
-
+  
         <h2 className="text-2xl font-bold mb-6 text-harmony-accent text-center">
           Ajustes de perfil
         </h2>
-
-        <div className="flex justify-center mb-6">
+  
+        {/* Foto y nombre */}
+        <div className="flex flex-col items-center gap-4 mb-8">
           <div className="relative group w-28 h-28">
             <img
               src={foto || 'https://via.placeholder.com/150?text=Foto'}
@@ -117,89 +118,100 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
               onChange={handleFileChange}
             />
           </div>
+  
+          <input
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            className={`${inputClass} w-64`}
+            placeholder="Tu nombre"
+          />
         </div>
-
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="text-sm text-harmony-text-secondary">Nombre</label>
-            <input
-              type="text"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              className={inputClass}
-              placeholder="Tu nombre"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="text-sm text-harmony-text-secondary">Biografía</label>
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className={`${inputClass} resize-none`}
-              rows={3}
-              placeholder="Cuéntanos algo sobre ti..."
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-harmony-text-secondary">Ciudad</label>
-            <input
-              type="text"
-              value={ciudad}
-              onChange={(e) => setCiudad(e.target.value)}
-              className={inputClass}
-              placeholder="Madrid, Barcelona..."
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-harmony-text-secondary">Géneros favoritos</label>
-            <input
-              type="text"
-              value={generos}
-              onChange={(e) => setGeneros(e.target.value)}
-              className={inputClass}
-              placeholder="rock, pop, indie..."
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-harmony-text-secondary">Instagram</label>
-            <input
-              type="text"
-              value={instagram}
-              onChange={(e) => setInstagram(e.target.value)}
-              className={inputClass}
-              placeholder="@usuario"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-harmony-text-secondary">Twitter</label>
-            <input
-              type="text"
-              value={twitter}
-              onChange={(e) => setTwitter(e.target.value)}
-              className={inputClass}
-              placeholder="@usuario"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-harmony-text-secondary">TikTok</label>
-            <input
-              type="text"
-              value={tiktok}
-              onChange={(e) => setTiktok(e.target.value)}
-              className={inputClass}
-              placeholder="@usuario"
-            />
+  
+        {/* Información personal */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-harmony-accent mb-4">
+            Información personal
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="text-sm text-harmony-text-secondary">Biografía</label>
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                className={`${inputClass} resize-none`}
+                rows={3}
+                placeholder="Cuéntanos algo sobre ti..."
+              />
+            </div>
+            <div>
+              <label className="text-sm text-harmony-text-secondary">Ciudad</label>
+              <input
+                type="text"
+                value={ciudad}
+                onChange={(e) => setCiudad(e.target.value)}
+                className={inputClass}
+                placeholder="Madrid, Barcelona..."
+              />
+            </div>
           </div>
         </div>
-
-        <div className="flex justify-end gap-3 mt-8">
+  
+        {/* Géneros */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-harmony-accent mb-4">
+            Preferencias musicales
+          </h3>
+          <input
+            type="text"
+            value={generos}
+            onChange={(e) => setGeneros(e.target.value)}
+            className={inputClass}
+            placeholder="rock, pop, indie..."
+          />
+        </div>
+  
+        {/* Redes sociales */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-harmony-accent mb-4">
+            Redes sociales
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="text-sm text-harmony-text-secondary">Instagram</label>
+              <input
+                type="text"
+                value={instagram}
+                onChange={(e) => setInstagram(e.target.value)}
+                className={inputClass}
+                placeholder="@usuario"
+              />
+            </div>
+            <div>
+              <label className="text-sm text-harmony-text-secondary">Twitter</label>
+              <input
+                type="text"
+                value={twitter}
+                onChange={(e) => setTwitter(e.target.value)}
+                className={inputClass}
+                placeholder="@usuario"
+              />
+            </div>
+            <div>
+              <label className="text-sm text-harmony-text-secondary">TikTok</label>
+              <input
+                type="text"
+                value={tiktok}
+                onChange={(e) => setTiktok(e.target.value)}
+                className={inputClass}
+                placeholder="@usuario"
+              />
+            </div>
+          </div>
+        </div>
+  
+        {/* Botones */}
+        <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-full bg-gray-500 hover:bg-gray-400 text-white transition"
@@ -216,4 +228,5 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
       </div>
     </div>
   );
+  
 }
