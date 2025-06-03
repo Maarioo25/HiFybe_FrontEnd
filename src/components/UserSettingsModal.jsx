@@ -1,17 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { userService } from '../services/userService';
 import { toast } from 'react-hot-toast';
 
 export default function UserSettingsModal({ isOpen, onClose, user }) {
-  const [nombre, setNombre] = useState(user?.nombre || '');
-  const [foto, setFoto] = useState(user?.foto_perfil || '');
+  const [nombre, setNombre] = useState('');
+  const [foto, setFoto] = useState('');
+  const [bio, setBio] = useState('');
+  const [ciudad, setCiudad] = useState('');
+  const [generos, setGeneros] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [twitter, setTwitter] = useState('');
+  const [tiktok, setTiktok] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setNombre(user.nombre || '');
+      setFoto(user.foto_perfil || '');
+      setBio(user.biografia || '');
+      setCiudad(user.ciudad || '');
+      setGeneros((user.generos_favoritos || []).join(', '));
+      setInstagram(user.redes?.instagram || '');
+      setTwitter(user.redes?.twitter || '');
+      setTiktok(user.redes?.tiktok || '');
+    }
+  }, [user]);
 
   if (!isOpen) return null;
 
   const handleGuardar = async () => {
     try {
-      await userService.updateUser(user._id, { nombre, foto_perfil: foto });
+      await userService.updateProfile(user._id, {
+        nombre,
+        biografia: bio,
+        ciudad,
+        generos_favoritos: generos.split(',').map(g => g.trim()),
+        foto_perfil: foto,
+        redes: { instagram, twitter, tiktok }
+      });
       toast.success('Perfil actualizado');
       onClose();
     } catch (err) {
@@ -20,9 +46,11 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
     }
   };
 
+  const inputClass = "w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition";
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-harmony-primary rounded-2xl shadow-2xl border border-harmony-accent/20 w-[95%] md:w-[80%] max-w-3xl p-6 relative text-white">
+      <div className="bg-harmony-primary rounded-2xl shadow-2xl border border-harmony-accent/20 w-[95%] md:w-[85%] max-w-4xl p-6 relative text-white">
         <button
           className="absolute top-4 right-4 text-harmony-accent hover:text-red-400 text-xl"
           onClick={onClose}
@@ -37,24 +65,90 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block mb-2 text-sm text-harmony-text-secondary">Nombre</label>
+            <label className="text-sm text-harmony-text-secondary">Nombre</label>
             <input
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition"
+              className={inputClass}
               placeholder="Tu nombre"
             />
           </div>
 
           <div>
-            <label className="block mb-2 text-sm text-harmony-text-secondary">Foto de perfil (URL)</label>
+            <label className="text-sm text-harmony-text-secondary">Foto de perfil (URL)</label>
             <input
               type="text"
               value={foto}
               onChange={(e) => setFoto(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition"
+              className={inputClass}
               placeholder="https://..."
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="text-sm text-harmony-text-secondary">Biografía</label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              className={`${inputClass} resize-none`}
+              rows={3}
+              placeholder="Cuéntanos algo sobre ti..."
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-harmony-text-secondary">Ciudad</label>
+            <input
+              type="text"
+              value={ciudad}
+              onChange={(e) => setCiudad(e.target.value)}
+              className={inputClass}
+              placeholder="Madrid, Barcelona..."
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-harmony-text-secondary">Géneros favoritos</label>
+            <input
+              type="text"
+              value={generos}
+              onChange={(e) => setGeneros(e.target.value)}
+              className={inputClass}
+              placeholder="rock, pop, indie..."
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-harmony-text-secondary">Instagram</label>
+            <input
+              type="text"
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              className={inputClass}
+              placeholder="@usuario"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-harmony-text-secondary">Twitter</label>
+            <input
+              type="text"
+              value={twitter}
+              onChange={(e) => setTwitter(e.target.value)}
+              className={inputClass}
+              placeholder="@usuario"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-harmony-text-secondary">TikTok</label>
+            <input
+              type="text"
+              value={tiktok}
+              onChange={(e) => setTiktok(e.target.value)}
+              className={inputClass}
+              placeholder="@usuario"
             />
           </div>
         </div>

@@ -77,4 +77,24 @@ export const userService = {
       throw err;
     }
   },
+  updateRedesSociales: async (id, redes) => {
+    try {
+      const res = await api.put(`/usuarios/${id}/redes`, redes);
+      return res.data;
+    } catch (err) {
+      console.error("Error al actualizar redes sociales:", err);
+      throw err;
+    }
+  },
+
+  updatePreferencias: async (id, preferencias) => {
+    try {
+      const res = await api.put(`/usuarios/${id}/preferencias`, preferencias);
+      return res.data;
+    } catch (err) {
+      console.error("Error al actualizar preferencias:", err);
+      throw err;
+    }
+  },
+
 };
