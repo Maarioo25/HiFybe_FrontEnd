@@ -9,6 +9,8 @@ import { friendService } from '../services/friendService';
 import { playlistService } from '../services/playlistService';
 import { userService } from '../services/userService';
 import { conversationService } from '../services/conversationService';
+import { FaInstagram, FaTwitter, FaTiktok } from 'react-icons/fa';
+
 
 export default function FriendDetail() {
   const { id } = useParams();
@@ -179,17 +181,16 @@ export default function FriendDetail() {
                       </span>
                     </p>
                   )}
-
                   {(friend.redes?.instagram || friend.redes?.twitter || friend.redes?.tiktok) && (
-                    <div className="flex flex-wrap gap-4 mt-2 text-sm">
+                    <div className="flex flex-wrap gap-4 mt-2 text-sm items-center">
                       {friend.redes.instagram && (
                         <a
                           href={`https://instagram.com/${friend.redes.instagram.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-harmony-accent hover:underline"
+                          className="flex items-center gap-2 text-harmony-accent hover:underline"
                         >
-                          📸 Instagram
+                          <FaInstagram className="text-lg" /> Instagram
                         </a>
                       )}
                       {friend.redes.twitter && (
@@ -197,9 +198,9 @@ export default function FriendDetail() {
                           href={`https://twitter.com/${friend.redes.twitter.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-harmony-accent hover:underline"
+                          className="flex items-center gap-2 text-harmony-accent hover:underline"
                         >
-                          🐦 Twitter
+                          <FaTwitter className="text-lg" /> Twitter
                         </a>
                       )}
                       {friend.redes.tiktok && (
@@ -207,14 +208,13 @@ export default function FriendDetail() {
                           href={`https://www.tiktok.com/@${friend.redes.tiktok.replace('@', '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-harmony-accent hover:underline"
+                          className="flex items-center gap-2 text-harmony-accent hover:underline"
                         >
-                          🎥 TikTok
+                          <FaTiktok className="text-lg" /> TikTok
                         </a>
                       )}
                     </div>
                   )}
-
                   <button
                     onClick={handleIniciarConversacion}
                     className="inline-block mt-4 px-4 py-2 bg-harmony-accent text-white text-sm font-semibold rounded-full hover:bg-harmony-accent/80 transition"
