@@ -94,41 +94,18 @@ export default function ChatDetalle() {
   
 
   const enviarCancion = async (track) => {
-    const trackData = {
+    const cancion = {
+      uri: track.uri,
       titulo: track.name,
-      artista: track.artists.map((a) => a.name).join(", "),
-      uri: track.uri
+      artista: track.artists.map((a) => a.name).join(', ')
     };
   
-    try {
-      // Paso 1: Crear la canción en tu sistema (si no existe)
-      const resCancion = await fetch(`https://api.mariobueno.info/canciones`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify(trackData)
-      });
-  
-      const cancionGuardada = await resCancion.json();
-  
-      // Paso 2: Enviar como mensaje
-      const res = await conversationService.enviarMensaje(
-        conversacionId,
-        usuarioActualId,
-        '',
-        cancionGuardada._id
-      );
-  
-      setMensajes((prev) => [...prev, res]);
-      setMostrarBusqueda(false);
-      setBusqueda('');
-      setResultados([]);
-    } catch (err) {
-      console.error("Error al enviar canción:", err);
-    }
-  };
+    const res = await conversationService.enviarMensaje(conversacionId, usuarioActualId, '', cancion);
+    setMensajes((prev) => [...prev, res]);
+    setMostrarBusqueda(false);
+    setBusqueda('');
+    setResultados([]);
+  };  
   
 
   return (
@@ -159,12 +136,12 @@ export default function ChatDetalle() {
               <div className="text-sm font-semibold mb-1">{msg.emisor_id.nombre}</div>
               {msg.contenido && <div>{msg.contenido}</div>}
 
-              {msg.cancion_id && (
+              {msg.cancion && (
                 <div className="mt-2 p-2 bg-harmony-secondary/20 rounded-xl text-sm border border-harmony-text-secondary/10">
-                  <div className="font-bold">{msg.cancion_id.titulo}</div>
-                  <div>{msg.cancion_id.artista}</div>
+                  <div className="font-bold">{msg.cancion.titulo}</div>
+                  <div>{msg.cancion.artista}</div>
                   <button
-                    onClick={() => playTrack(msg.cancion_id.uri, 0)}
+                    onClick={() => playTrack(msg.cancion.uri, 0)}
                     className="mt-1 text-xs text-harmony-accent hover:underline"
                   >
                     Reproducir
