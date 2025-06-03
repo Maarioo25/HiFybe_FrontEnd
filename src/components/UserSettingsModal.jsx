@@ -30,14 +30,22 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
 
   const handleGuardar = async () => {
     try {
-      await userService.updateProfile(user._id, {
-        nombre,
-        biografia: bio,
-        ciudad,
-        generos_favoritos: generos.split(',').map(g => g.trim()),
-        foto_perfil: foto,
-        redes: { instagram, twitter, tiktok }
-      });
+        await Promise.all([
+            userService.updateProfile(user._id, {
+              nombre,
+              biografia: bio,
+              foto_perfil: foto
+            }),
+            userService.updatePreferencias(user._id, {
+              ciudad,
+              generos_favoritos: generos.split(',').map(g => g.trim())
+            }),
+            userService.updateRedesSociales(user._id, {
+              instagram,
+              twitter,
+              tiktok
+            })
+          ]);          
       toast.success('Perfil actualizado');
       onClose();
     } catch (err) {
