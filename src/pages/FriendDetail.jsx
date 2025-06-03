@@ -118,9 +118,7 @@ export default function FriendDetail() {
                   </h1>
 
                   <div className="flex items-center gap-4 text-harmony-text-secondary">
-                    <span>{playlists.length} playlists públicas</span>
-                    <span>•</span>
-                    <span>{friend.estado || 'sin estado'}</span>
+                    <span>{playlists.length} playlists públicas</span>ç
                   </div>
 
                   {friend.song && (
