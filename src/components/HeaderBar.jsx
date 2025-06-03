@@ -9,6 +9,7 @@ import {
   FaSignOutAlt,
   FaCog
 } from "react-icons/fa";
+import UserSettingsModal from "./UserSettingsModal";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../services/userService";
@@ -20,6 +21,8 @@ export default function HeaderBar({ children, onSongSelect }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showSettings, setShowSettings] = useState(false);
+
 
   // Estados para mostrar/ocultar el input de búsqueda
   const [showSearch, setShowSearch] = useState(false);
@@ -299,15 +302,20 @@ export default function HeaderBar({ children, onSongSelect }) {
 
       <div className="flex items-center gap-2 mt-4 md:mt-0">
         <NotificationBell />
-        <ProfileMenu user={user} logout={logout} />
+        <ProfileMenu user={user} logout={logout} onSettingsClick={() => setShowSettings(true)} />
       </div>
 
       {children}
+      <UserSettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        user={user}
+      />
     </nav>
   );
 }
 
-function ProfileMenu({ user, logout }) {
+function ProfileMenu({ user, logout, onSettingsClick }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -343,6 +351,7 @@ function ProfileMenu({ user, logout }) {
           <button
             className="w-full flex items-center gap-2 px-4 py-3 hover:bg-harmony-accent/10 text-harmony-text-primary text-sm transition"
             onClick={() => {
+              onSettingsClick();
               setOpen(false);
             }}
           >
