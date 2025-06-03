@@ -91,11 +91,7 @@ export const userService = {
     const formData = new FormData();
     formData.append('foto', file);
   
-    const res = await api.post(`/usuarios/${id}/foto`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    const res = await api.post(`/usuarios/${id}/foto`, formData);
   
     return res.data;
   },  
