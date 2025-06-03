@@ -165,17 +165,22 @@ export const PlayerProvider = ({ children }) => {
       setQueueIndex(startIndex);
     }
   
-    await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        uris,
-        offset: { position: startIndex }
-      })
-    });
+    try {
+      await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uris,
+          offset: { position: startIndex }
+        })
+      });
+    } catch (err) {
+      console.warn('[Spotify] Error en playTrack:', err.message || err);
+    }
+    
   
     if (updateHistory && !Array.isArray(spotifyUriOrUris)) {
       addToHistory(spotifyUriOrUris);
