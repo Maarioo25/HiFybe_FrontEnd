@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { userService } from '../services/userService';
 import { toast } from 'react-hot-toast';
+import { FaTimes, FaEdit } from 'react-icons/fa';
+
 
 export default function UserSettingsModal({ isOpen, onClose, user }) {
   const [nombre, setNombre] = useState('');
@@ -57,7 +59,7 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
   const inputClass = "w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition";
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[999]">
       <div className="bg-harmony-primary rounded-2xl shadow-2xl border border-harmony-accent/20 w-[95%] md:w-[85%] max-w-4xl p-6 relative text-white">
         <button
           className="absolute top-4 right-4 text-harmony-accent hover:text-red-400 text-xl"
@@ -83,16 +85,25 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
             />
           </div>
 
-          <div>
-            <label className="text-sm text-harmony-text-secondary">Foto de perfil (URL)</label>
-            <input
-              type="text"
-              value={foto}
-              onChange={(e) => setFoto(e.target.value)}
-              className={inputClass}
-              placeholder="https://..."
-            />
-          </div>
+          {foto && (
+            <div className="flex justify-center mb-6 relative group">
+                <img
+                src={foto}
+                alt="Foto de perfil"
+                className="w-28 h-28 rounded-full object-cover border-4 border-harmony-accent shadow-md transition-all duration-300"
+                />
+                <button
+                onClick={() => {
+                    const nueva = prompt('Pega aquí la nueva URL de tu foto de perfil:', foto);
+                    if (nueva !== null) setFoto(nueva);
+                }}
+                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center"
+                >
+                <FaEdit className="text-white text-xl" />
+                </button>
+            </div>
+            )}
+
 
           <div className="md:col-span-2">
             <label className="text-sm text-harmony-text-secondary">Biografía</label>
