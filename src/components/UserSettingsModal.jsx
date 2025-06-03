@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaEdit } from 'react-icons/fa';
 import { userService } from '../services/userService';
 import { toast } from 'react-hot-toast';
-import { FaTimes, FaEdit } from 'react-icons/fa';
 
 
 export default function UserSettingsModal({ isOpen, onClose, user }) {
