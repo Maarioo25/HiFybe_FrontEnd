@@ -25,7 +25,7 @@ export default function MainPage() {
   const [activeTab, setActiveTab] = useState("friends");
   const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
   const [mostrarUbicacion, setMostrarUbicacion] = useState(false);
-  const [mapMoving, setMapMoving] = useState(false); // Nuevo estado para controlar movimiento del mapa
+  const [mapMoving, setMapMoving] = useState(false); // Puedes conservarlo o eliminarlo si no lo vas a usar más
 
   const { loading } = useAuth();
   const navigate = useNavigate();
@@ -74,17 +74,17 @@ export default function MainPage() {
   const fetchUsersAtPosition = async (latitude, longitude) => {
     try {
       await userService.actualizarUbicacion(latitude, longitude);
-  
+
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
         { credentials: "include" }
       );
-  
+
       if (!res.ok) {
         console.error("GET /cerca fallo:", await res.text());
         return;
       }
-  
+
       const data = await res.json();
       if (Array.isArray(data)) setUsuariosCercanos(data);
       else console.error("GET /cerca devolvió data no-array:", data);
@@ -103,14 +103,14 @@ export default function MainPage() {
     }).setView(currentPosition, 13);
 
     // Control de movimiento del mapa
-    mapInstance.current.on('movestart', () => setMapMoving(true));
-    mapInstance.current.on('moveend', () => setMapMoving(false));
+    mapInstance.current.on("movestart", () => setMapMoving(true));
+    mapInstance.current.on("moveend", () => setMapMoving(false));
 
     L.tileLayer(
       "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png",
       { maxZoom: 19, attribution: "OpenStreetMap" }
     ).addTo(mapInstance.current);
-    
+
     L.control.zoom({ position: "topright" }).addTo(mapInstance.current);
 
     return () => {
@@ -124,13 +124,13 @@ export default function MainPage() {
     if (!mapInstance.current) return;
 
     // Limpiar marcadores anteriores
-    markerRefs.current.forEach(marker => {
+    markerRefs.current.forEach((marker) => {
       mapInstance.current.removeLayer(marker);
     });
     markerRefs.current = [];
 
     // Crear nuevos marcadores
-    usuariosCercanos.forEach(user => {
+    usuariosCercanos.forEach((user) => {
       const coords = user.ubicacion?.coordinates;
       if (!coords) return;
 
@@ -167,28 +167,29 @@ export default function MainPage() {
           try {
             // Obtener canción del usuario
             const songData = await userService.getCancionUsuario(user._id);
-            
+
             // Actualizar usuario seleccionado
             setSelectedUser({
               _id: user._id,
               nombre: user.nombre,
               foto_perfil: user.foto_perfil,
-              song: songData && songData.nombre
-                ? {
-                    title: songData.nombre,
-                    artist: songData.artista,
-                    img: songData.imagen,
-                    uri: songData.uri
-                  }
-                : {
-                    title: "No disponible",
-                    artist: "",
-                    img: "",
-                    uri: null
-                  },
-              position: [coords[1], coords[0]]
+              song:
+                songData && songData.nombre
+                  ? {
+                      title: songData.nombre,
+                      artist: songData.artista,
+                      img: songData.imagen,
+                      uri: songData.uri,
+                    }
+                  : {
+                      title: "No disponible",
+                      artist: "",
+                      img: "",
+                      uri: null,
+                    },
+              position: [coords[1], coords[0]],
             });
-            
+
             // Mover mapa a la posición del usuario
             mapInstance.current.setView([coords[1], coords[0]], 15);
           } catch (error) {
@@ -225,18 +226,18 @@ export default function MainPage() {
         }
       }
     };
-  
+
     gestionarVisibilidad();
   }, [mostrarUbicacion]);
 
-  // Animar icono del usuario seleccionado
+  // Animar icono del usuario seleccionado (opcional, puedes conservarlo)
   useEffect(() => {
     if (!markerRefs.current.length || !selectedUser) return;
 
     markerRefs.current.forEach((marker, idx) => {
       const user = usuariosCercanos[idx];
       if (!user) return;
-      
+
       const isSel = user.nombre === selectedUser.nombre;
       const pulseClass = isSel ? " animate-pulse" : "";
 
@@ -266,7 +267,7 @@ export default function MainPage() {
             <span class='absolute ${posClass} w-3 h-3 rounded-full bg-green-500 border-2 border-white shadow'></span>
           </div>`,
       });
-      
+
       marker.setIcon(icon);
     });
   }, [selectedUser]);
@@ -300,7 +301,7 @@ export default function MainPage() {
           })
         );
 
-        setSpotifyRecommendations(detalles.filter(item => item !== null));
+        setSpotifyRecommendations(detalles.filter((item) => item !== null));
       } catch (err) {
         console.error("Error al obtener recomendaciones:", err);
       }
@@ -338,7 +339,7 @@ export default function MainPage() {
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary text-harmony-text-primary">
-      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
+      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />
 
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -419,9 +420,9 @@ export default function MainPage() {
                   />
                 </div>
 
-                {/* Mostrar info de usuario solo cuando el mapa no se está moviendo */}
-                {selectedUser && !mapMoving && (
-                  <div 
+                {/* Mostrar info de usuario siempre que haya uno seleccionado */}
+                {selectedUser && (
+                  <div
                     ref={userInfoRef}
                     className="absolute bottom-4 left-1/2 transform -translate-x-1/2 sm:bottom-8 flex items-center bg-harmony-secondary/80 rounded-2xl p-2 sm:p-4 border border-harmony-text-secondary/20 gap-3 w-[90%] sm:w-[60%] max-w-lg backdrop-blur-md transition-all animate-fade-in-down"
                   >
@@ -464,25 +465,34 @@ export default function MainPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">                
+                    <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">
                       <button
                         onClick={async () => {
                           try {
-                            await friendService.sendRequest(currentUserId, selectedUser._id);
+                            await friendService.sendRequest(
+                              currentUserId,
+                              selectedUser._id
+                            );
                             try {
                               await notificationService.createNotification(
                                 selectedUser._id,
                                 `${selectedUser.nombre} te ha enviado una solicitud de amistad`
                               );
                             } catch (notifErr) {
-                              console.warn('Error al crear notificación:', notifErr);
+                              console.warn(
+                                "Error al crear notificación:",
+                                notifErr
+                              );
                             }
-                            toast.success('Solicitud enviada correctamente');
+                            toast.success("Solicitud enviada correctamente");
                           } catch (error) {
-                            console.error('Error al enviar solicitud:', error);
-                            toast.error(error?.response?.data?.mensaje || 'Error al enviar la solicitud');
+                            console.error("Error al enviar solicitud:", error);
+                            toast.error(
+                              error?.response?.data?.mensaje ||
+                                "Error al enviar la solicitud"
+                            );
                           }
-                        }}                                            
+                        }}
                         className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
                       >
                         Seguir
