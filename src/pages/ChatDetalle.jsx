@@ -97,8 +97,10 @@ export default function ChatDetalle() {
     const cancion = {
       uri: track.uri,
       titulo: track.name,
-      artista: track.artists.map((a) => a.name).join(', ')
+      artista: track.artists.map((a) => a.name).join(', '),
+      imagen: track.album.images[0]?.url || null
     };
+    
   
     const res = await conversationService.enviarMensaje(conversacionId, usuarioActualId, '', cancion);
     setMensajes((prev) => [...prev, res]);
@@ -137,17 +139,27 @@ export default function ChatDetalle() {
               {msg.contenido && <div>{msg.contenido}</div>}
 
               {msg.cancion && (
-                <div className="mt-2 p-2 bg-harmony-secondary/20 rounded-xl text-sm border border-harmony-text-secondary/10">
-                  <div className="font-bold">{msg.cancion.titulo}</div>
-                  <div>{msg.cancion.artista}</div>
-                  <button
-                    onClick={() => playTrack(msg.cancion.uri, 0)}
-                    className="mt-1 text-xs text-harmony-accent hover:underline"
-                  >
-                    Reproducir
-                  </button>
+                <div className="mt-2 p-2 bg-harmony-secondary/20 rounded-xl text-sm border border-harmony-text-secondary/10 flex gap-3 items-center">
+                  {msg.cancion.imagen && (
+                    <img
+                      src={msg.cancion.imagen}
+                      alt={msg.cancion.titulo}
+                      className="w-12 h-12 rounded object-cover border border-harmony-text-secondary/30"
+                    />
+                  )}
+                  <div className="flex flex-col overflow-hidden">
+                    <div className="font-bold truncate">{msg.cancion.titulo}</div>
+                    <div className="text-xs text-harmony-text-secondary truncate">{msg.cancion.artista}</div>
+                    <button
+                      onClick={() => playTrack(msg.cancion.uri, 0)}
+                      className="mt-1 text-xs text-harmony-accent hover:underline text-left"
+                    >
+                      Reproducir
+                    </button>
+                  </div>
                 </div>
               )}
+
 
               <div className="text-xs mt-1 text-right text-harmony-text-secondary">
                 {new Date(msg.fecha_envio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
