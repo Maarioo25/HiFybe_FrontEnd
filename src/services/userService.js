@@ -87,6 +87,19 @@ export const userService = {
     }
   },
 
+  updateFotoPerfil: async (id, file) => {
+    const formData = new FormData();
+    formData.append('foto', file);
+  
+    const res = await api.post(`/usuarios/${id}/foto`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  
+    return res.data;
+  },  
+
   updatePreferencias: async (id, preferencias) => {
     try {
       const res = await api.put(`/usuarios/${id}/preferencias`, preferencias);

@@ -13,6 +13,8 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
   const [instagram, setInstagram] = useState('');
   const [twitter, setTwitter] = useState('');
   const [tiktok, setTiktok] = useState('');
+  const fileInputRef = React.useRef(null);
+
 
   useEffect(() => {
     if (user) {
@@ -55,6 +57,25 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
     }
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    try {
+      const res = await userService.updateFotoPerfil(user._id, file);
+      if (res?.url) {
+        setFoto(res.url);
+        toast.success("Imagen subida con éxito");
+      } else {
+        throw new Error("No se recibió una URL");
+      }
+    } catch (err) {
+      console.error("Error al subir imagen:", err);
+      toast.error("Error al subir imagen");
+    }
+  };  
+  
+
   const inputClass = "w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition";
 
   return (
@@ -72,6 +93,30 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
           Ajustes de perfil
         </h2>
 
+        <div className="flex justify-center mb-6">
+          <div className="relative group w-28 h-28">
+            <img
+              src={foto || 'https://via.placeholder.com/150?text=Foto'}
+              alt="Foto de perfil"
+              className="w-full h-full rounded-full object-cover border-4 border-harmony-accent shadow-md transition-all duration-300"
+            />
+            <button
+              onClick={() => fileInputRef.current.click()}
+              className="absolute top-0 left-0 w-full h-full rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+            >
+              <FaEdit className="text-white text-xl" />
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
+        </div>
+
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="text-sm text-harmony-text-secondary">Nombre</label>
@@ -83,26 +128,6 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
               placeholder="Tu nombre"
             />
           </div>
-
-          {foto && (
-            <div className="flex justify-center mb-6 relative group">
-                <img
-                src={foto}
-                alt="Foto de perfil"
-                className="w-28 h-28 rounded-full object-cover border-4 border-harmony-accent shadow-md transition-all duration-300"
-                />
-                <button
-                onClick={() => {
-                    const nueva = prompt('Pega aquí la nueva URL de tu foto de perfil:', foto);
-                    if (nueva !== null) setFoto(nueva);
-                }}
-                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center"
-                >
-                <FaEdit className="text-white text-xl" />
-                </button>
-            </div>
-            )}
-
 
           <div className="md:col-span-2">
             <label className="text-sm text-harmony-text-secondary">Biografía</label>
