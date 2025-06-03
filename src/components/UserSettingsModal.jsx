@@ -64,7 +64,10 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
     try {
       const res = await userService.updateFotoPerfil(user._id, file);
       if (res?.url) {
-        setFoto(res.url);
+        setFoto(res.url.startsWith('/uploads/')
+          ? `https://api.mariobueno.info${res.url}`
+          : res.url
+        );
         toast.success("Imagen subida con éxito");
       } else {
         throw new Error("No se recibió una URL");
@@ -195,16 +198,6 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
             />
           </div>
         </div>
-
-        {foto && (
-          <div className="flex justify-center mt-6">
-            <img
-              src={foto}
-              alt="Preview"
-              className="w-24 h-24 rounded-full object-cover border-4 border-harmony-accent shadow-md"
-            />
-          </div>
-        )}
 
         <div className="flex justify-end gap-3 mt-8">
           <button
