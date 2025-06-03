@@ -86,7 +86,6 @@ export const userService = {
       throw err;
     }
   },
-  ,
 
   updatePreferencias: async (id, preferencias) => {
     try {
