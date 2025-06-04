@@ -1,0 +1,36 @@
+{
+    "addFriend": {
+      "title": "Freund hinzufügen",
+      "searchPlaceholder": "Nach Namen suchen...",
+      "sendRequest": "Anfrage senden",
+      "noUsers": "Keine verfügbaren Benutzer",
+      "success": "Anfrage erfolgreich gesendet",
+      "error": "Fehler beim Senden der Anfrage",
+      "notification": "{{name}} hat dir eine Freundschaftsanfrage gesendet"
+    },
+    "settings": {
+          "title": "Profileinstellungen",
+          "namePlaceholder": "Dein Name",
+          "personalInfo": "Persönliche Informationen",
+          "bio": "Biografie",
+          "bioPlaceholder": "Erzähle uns etwas über dich...",
+          "city": "Stadt",
+          "cityPlaceholder": "Madrid, Barcelona...",
+          "musicPrefs": "Musikpräferenzen",
+          "musicPlaceholder": "rock, pop, indie...",
+          "socialMedia": "Soziale Medien",
+          "instagram": "Instagram",
+          "twitter": "Twitter",
+          "tiktok": "TikTok",
+          "cancel": "Abbrechen",
+          "saveChanges": "Änderungen speichern",
+          "uploadSuccess": "Bild erfolgreich hochgeladen",
+          "uploadError": "Fehler beim Hochladen des Bildes",
+          "profileUpdated": "Profil aktualisiert",
+          "profileUpdateError": "Fehler beim Aktualisieren des Profils"
+        },
+        "common": {
+          "close": "Schließen"
+        }
+      }
+  

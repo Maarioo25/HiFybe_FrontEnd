@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FaTimes, FaEdit } from 'react-icons/fa';
 import { userService } from '../services/userService';
 import { toast } from 'react-hot-toast';
-
+import { useTranslation } from 'react-i18next';
 
 export default function UserSettingsModal({ isOpen, onClose, user }) {
+  const { t, i18n } = useTranslation();
   const [nombre, setNombre] = useState('');
   const [foto, setFoto] = useState('');
   const [bio, setBio] = useState('');
@@ -14,7 +15,6 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
   const [twitter, setTwitter] = useState('');
   const [tiktok, setTiktok] = useState('');
   const fileInputRef = React.useRef(null);
-
 
   useEffect(() => {
     if (user) {
@@ -33,53 +33,54 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
 
   const handleGuardar = async () => {
     try {
-        await Promise.all([
-            userService.updateProfile(user._id, {
-              nombre,
-              biografia: bio,
-              foto_perfil: foto
-            }),
-            userService.updatePreferencias(user._id, {
-              ciudad,
-              generos_favoritos: generos.split(',').map(g => g.trim())
-            }),
-            userService.updateRedesSociales(user._id, {
-              instagram,
-              twitter,
-              tiktok
-            })
-          ]);          
-      toast.success('Perfil actualizado');
+      await Promise.all([
+        userService.updateProfile(user._id, {
+          nombre,
+          biografia: bio,
+          foto_perfil: foto,
+        }),
+        userService.updatePreferencias(user._id, {
+          ciudad,
+          generos_favoritos: generos.split(',').map((g) => g.trim()),
+        }),
+        userService.updateRedesSociales(user._id, {
+          instagram,
+          twitter,
+          tiktok,
+        }),
+      ]);
+      toast.success(t('settings.profileUpdated'));
       onClose();
     } catch (err) {
       console.error('Error al guardar perfil:', err);
-      toast.error('Error al actualizar perfil');
+      toast.error(t('settings.profileUpdateError'));
     }
   };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-  
+
     try {
       const res = await userService.updateFotoPerfil(user._id, file);
       if (res?.url) {
-        setFoto(res.url.startsWith('/uploads/')
-          ? `https://api.mariobueno.info${res.url}`
-          : res.url
+        setFoto(
+          res.url.startsWith('/uploads/')
+            ? `https://api.mariobueno.info${res.url}`
+            : res.url
         );
-        toast.success("Imagen subida con éxito");
+        toast.success(t('settings.uploadSuccess'));
       } else {
-        throw new Error("No se recibió una URL");
+        throw new Error('No se recibió una URL');
       }
     } catch (err) {
-      console.error("Error al subir imagen:", err);
-      toast.error("Error al subir imagen");
+      console.error('Error al subir imagen:', err);
+      toast.error(t('settings.uploadError'));
     }
-  };  
-  
+  };
 
-  const inputClass = "w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition";
+  const inputClass =
+    'w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition';
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm grid place-items-center p-2 z-[999]">
@@ -87,21 +88,42 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
         <button
           className="absolute top-4 right-4 text-harmony-accent hover:text-red-400 text-xl"
           onClick={onClose}
-          aria-label="Cerrar"
+          aria-label={t('common.close')}
         >
           <FaTimes />
         </button>
-  
-        <h2 className="text-2xl font-bold mb-6 text-harmony-accent text-center">
-          Ajustes de perfil
+
+        <h2 className="text-2xl font-bold mb-2 text-harmony-accent text-center">
+          {t('settings.title')}
         </h2>
-  
+
+        <div className="flex justify-center gap-2 mb-6">
+          <button
+            onClick={() => i18n.changeLanguage('es')}
+            className="px-3 py-1 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+          >
+            ES
+          </button>
+          <button
+            onClick={() => i18n.changeLanguage('en')}
+            className="px-3 py-1 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+          >
+            EN
+          </button>
+          <button
+            onClick={() => i18n.changeLanguage('de')}
+            className="px-3 py-1 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+          >
+            DE
+          </button>
+        </div>
+
         {/* Foto y nombre */}
         <div className="flex flex-col items-center gap-4 mb-8">
           <div className="relative group w-28 h-28">
             <img
               src={foto || 'https://via.placeholder.com/150?text=Foto'}
-              alt="Foto de perfil"
+              alt={nombre || ''}
               className="w-full h-full rounded-full object-cover border-4 border-harmony-accent shadow-md transition-all duration-300"
             />
             <button
@@ -118,67 +140,73 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
               onChange={handleFileChange}
             />
           </div>
-  
+
           <input
             type="text"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             className={`${inputClass} w-64`}
-            placeholder="Tu nombre"
+            placeholder={t('settings.namePlaceholder')}
           />
         </div>
-  
+
         {/* Información personal */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-harmony-accent mb-4">
-            Información personal
+            {t('settings.personalInfo')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="text-sm text-harmony-text-secondary">Biografía</label>
+              <label className="text-sm text-harmony-text-secondary">
+                {t('settings.bio')}
+              </label>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 className={`${inputClass} resize-none`}
                 rows={3}
-                placeholder="Cuéntanos algo sobre ti..."
+                placeholder={t('settings.bioPlaceholder')}
               />
             </div>
             <div>
-              <label className="text-sm text-harmony-text-secondary">Ciudad</label>
+              <label className="text-sm text-harmony-text-secondary">
+                {t('settings.city')}
+              </label>
               <input
                 type="text"
                 value={ciudad}
                 onChange={(e) => setCiudad(e.target.value)}
                 className={inputClass}
-                placeholder="Madrid, Barcelona..."
+                placeholder={t('settings.cityPlaceholder')}
               />
             </div>
           </div>
         </div>
-  
+
         {/* Géneros */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-harmony-accent mb-4">
-            Preferencias musicales
+            {t('settings.musicPrefs')}
           </h3>
           <input
             type="text"
             value={generos}
             onChange={(e) => setGeneros(e.target.value)}
             className={inputClass}
-            placeholder="rock, pop, indie..."
+            placeholder={t('settings.musicPlaceholder')}
           />
         </div>
-  
+
         {/* Redes sociales */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-harmony-accent mb-4">
-            Redes sociales
+            {t('settings.socialMedia')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="text-sm text-harmony-text-secondary">Instagram</label>
+              <label className="text-sm text-harmony-text-secondary">
+                {t('settings.instagram')}
+              </label>
               <input
                 type="text"
                 value={instagram}
@@ -188,7 +216,9 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
               />
             </div>
             <div>
-              <label className="text-sm text-harmony-text-secondary">Twitter</label>
+              <label className="text-sm text-harmony-text-secondary">
+                {t('settings.twitter')}
+              </label>
               <input
                 type="text"
                 value={twitter}
@@ -198,7 +228,9 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
               />
             </div>
             <div>
-              <label className="text-sm text-harmony-text-secondary">TikTok</label>
+              <label className="text-sm text-harmony-text-secondary">
+                {t('settings.tiktok')}
+              </label>
               <input
                 type="text"
                 value={tiktok}
@@ -209,24 +241,23 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
             </div>
           </div>
         </div>
-  
+
         {/* Botones */}
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-full bg-gray-500 hover:bg-gray-400 text-white transition"
           >
-            Cancelar
+            {t('settings.cancel')}
           </button>
           <button
             onClick={handleGuardar}
             className="px-5 py-2 rounded-full bg-harmony-accent hover:bg-harmony-accent/80 text-white transition"
           >
-            Guardar cambios
+            {t('settings.saveChanges')}
           </button>
         </div>
       </div>
     </div>
   );
-  
 }

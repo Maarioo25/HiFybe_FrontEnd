@@ -4,8 +4,10 @@ import { userService } from '../services/userService';
 import { friendService } from '../services/friendService';
 import { notificationService } from '../services/notificationService';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function AddFriendModal({ currentUserId, existingFriends, onClose }) {
+  const { t } = useTranslation();
   const [allUsers, setAllUsers] = useState([]);
   const [search, setSearch] = useState('');
 
@@ -25,17 +27,17 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
     try {
       const emisor = await userService.getCurrentUser();
       const nombreEmisor = emisor.user.nombre;
-  
+
       await friendService.sendRequest(emisor.user._id || emisor.user.id, targetId);
       await notificationService.crear(
         targetId,
-        `${nombreEmisor} te ha enviado una solicitud de amistad`
+        t('addFriend.notification', { name: nombreEmisor })
       );
-  
-      toast.success('Solicitud enviada correctamente');
+
+      toast.success(t('addFriend.success'));
       onClose();
     } catch {
-      toast.error('Error al enviar solicitud');
+      toast.error(t('addFriend.error'));
     }
   };
 
@@ -45,15 +47,15 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
         <button
           className="absolute top-3 right-3 text-harmony-accent hover:text-red-400"
           onClick={onClose}
-          aria-label="Cerrar"
+          aria-label={t('common.close')}
         >
           <FaTimes />
         </button>
-        <h2 className="text-lg font-bold mb-4 text-harmony-accent">Añadir amigo</h2>
+        <h2 className="text-lg font-bold mb-4 text-harmony-accent">{t('addFriend.title')}</h2>
         <input
           type="text"
           className="w-full px-4 py-2 mb-4 rounded-full border border-harmony-text-secondary/10 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition"
-          placeholder="Buscar por nombre..."
+          placeholder={t('addFriend.searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -70,12 +72,14 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
                   onClick={() => handleAddFriend(u._id)}
                   className="px-3 py-1 rounded-full bg-harmony-accent text-sm text-white hover:bg-harmony-accent/80 transition"
                 >
-                  Enviar solicitud
+                  {t('addFriend.sendRequest')}
                 </button>
               </div>
             ))}
           {allUsers.length === 0 && (
-            <p className="text-center text-harmony-text-secondary">No hay usuarios disponibles</p>
+            <p className="text-center text-harmony-text-secondary">
+              {t('addFriend.noUsers')}
+            </p>
           )}
         </div>
       </div>
