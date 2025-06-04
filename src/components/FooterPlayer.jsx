@@ -1,3 +1,4 @@
+// src/components/FooterPlayer.jsx
 import React, { useState, useEffect } from 'react';
 import {
   FaPlay,
@@ -11,10 +12,12 @@ import {
   FaPlus,
   FaTimes,
 } from 'react-icons/fa';
-import { userService } from "../services/userService";
+import { useTranslation } from 'react-i18next';
+import { userService } from '../services/userService';
 import { usePlayer } from '../context/PlayerContext';
 
 const FooterPlayer = () => {
+  const { t } = useTranslation();
   const {
     currentTrack,
     isPlaying,
@@ -62,18 +65,18 @@ const FooterPlayer = () => {
             Authorization: `Bearer ${spotifyToken}`,
           },
         });
-        if (!res.ok) throw new Error(`Error al obtener playlists: ${res.statusText}`);
+        if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
         setPlaylists(data.items || []);
       } catch (err) {
         console.error(err);
-        setErrorMsg('No se pudieron cargar las playlists.');
+        setErrorMsg(t('footerPlayer.error.load_playlists'));
       } finally {
         setLoadingPlaylists(false);
       }
     };
     fetchPlaylists();
-  }, [showPlaylistModal, spotifyToken]);
+  }, [showPlaylistModal, spotifyToken, t]);
 
   useEffect(() => {
     if (!toastMessage) return;
@@ -97,13 +100,13 @@ const FooterPlayer = () => {
           body: JSON.stringify({ uris: [currentTrack.uri] }),
         }
       );
-      if (!res.ok) throw new Error(`Error al añadir a playlist: ${res.statusText}`);
-      setToastMessage('Canción añadida a la playlist.');
+      if (!res.ok) throw new Error(res.statusText);
+      setToastMessage(t('footerPlayer.success.added'));
       setShowPlaylistModal(false);
       setSelectedPlaylistId(null);
     } catch (err) {
       console.error(err);
-      setErrorMsg('No se pudo añadir a la playlist.');
+      setErrorMsg(t('footerPlayer.error.add_to_playlist'));
     } finally {
       setAddingTrack(false);
     }
@@ -135,10 +138,10 @@ const FooterPlayer = () => {
       if (!currentTrack?.uri) return;
       try {
         const currentUser = await userService.getCurrentUser();
-        const trackId = currentTrack.uri.split(":").pop();
+        const trackId = currentTrack.uri.split(':').pop();
         await userService.setCancionUsuario(currentUser.user._id, trackId);
       } catch (err) {
-        console.error("Error guardando canción en FooterPlayer:", err);
+        console.error('Error guardando canción en FooterPlayer:', err);
       }
     };
     guardarCancion();
@@ -148,13 +151,13 @@ const FooterPlayer = () => {
     return (
       <div className="now-playing-bar sticky bottom-0 z-50 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex flex-col items-center justify-center p-4 text-center">
         <span className="text-harmony-text-primary mb-2">
-          Debes conectar tu cuenta de Spotify para usar el reproductor
+          {t('footerPlayer.connect_prompt')}
         </span>
         <button
           onClick={handleConnectSpotify}
           className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
         >
-          Conectar con Spotify
+          {t('footerPlayer.connect')}
         </button>
       </div>
     );
@@ -163,7 +166,9 @@ const FooterPlayer = () => {
   if (!currentTrack?.album?.images?.[0]?.url) {
     return (
       <div className="now-playing-bar sticky bottom-0 z-50 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
-        <span className="text-harmony-text-primary">Selecciona una canción para reproducir</span>
+        <span className="text-harmony-text-primary">
+          {t('footerPlayer.select_song')}
+        </span>
       </div>
     );
   }
@@ -201,7 +206,7 @@ const FooterPlayer = () => {
           <div className="flex items-center z-10 gap-2 md:gap-4 min-w-[150px] md:min-w-[200px] max-w-[full] md:max-w-[320px] w-full md:w-[320px] overflow-hidden">
             <img
               src={currentTrack?.album?.images?.[0]?.url}
-              alt="Album cover"
+              alt={currentTrack?.name}
               className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg"
             />
             <div className="truncate text-harmony-text-primary">
@@ -219,7 +224,7 @@ const FooterPlayer = () => {
               </div>
               {!isPremium && (
                 <div className="text-xs text-yellow-500 mt-1">
-                  Estás usando una cuenta gratuita. Solo puedes ver lo que se está reproduciendo.
+                  {t('footerPlayer.free_account')}
                 </div>
               )}
             </div>
@@ -245,7 +250,7 @@ const FooterPlayer = () => {
             <div className="flex items-center justify-center gap-2 md:gap-4">
               <button
                 onClick={() => seek(0)}
-                aria-label="replay"
+                aria-label={t('footerPlayer.aria.replay')}
                 className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg"
               >
                 <FaRedo className="text-lg" />
@@ -258,6 +263,7 @@ const FooterPlayer = () => {
                     ? 'bg-harmony-secondary/50 hover:bg-harmony-secondary/60'
                     : 'bg-gray-300 cursor-not-allowed'
                 } flex items-center justify-center transition shadow-lg`}
+                aria-label={t('footerPlayer.aria.previous')}
               >
                 <FaStepBackward className="text-lg" />
               </button>
@@ -269,7 +275,7 @@ const FooterPlayer = () => {
                     ? 'bg-harmony-accent hover:bg-harmony-accent/80'
                     : 'bg-gray-400 cursor-not-allowed'
                 } flex items-center justify-center transition shadow-xl`}
-                aria-label="play/pause"
+                aria-label={t('footerPlayer.aria.play_pause')}
               >
                 {isPlaying ? <FaPause className="text-xl" /> : <FaPlay className="text-xl" />}
               </button>
@@ -281,11 +287,12 @@ const FooterPlayer = () => {
                     ? 'bg-harmony-secondary/50 hover:bg-harmony-secondary/60'
                     : 'bg-gray-300 cursor-not-allowed'
                 } flex items-center justify-center transition shadow-lg`}
+                aria-label={t('footerPlayer.aria.next')}
               >
                 <FaStepForward className="text-lg" />
               </button>
               <button
-                aria-label="share"
+                aria-label={t('footerPlayer.aria.share')}
                 className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg"
               >
                 <FaShareAlt className="text-lg" />
@@ -298,7 +305,7 @@ const FooterPlayer = () => {
                     ? 'bg-harmony-secondary/50 hover:bg-harmony-secondary/60'
                     : 'bg-gray-300 cursor-not-allowed'
                 } flex items-center justify-center transition shadow-lg`}
-                aria-label="Añadir a playlist"
+                aria-label={t('footerPlayer.aria.add_to_playlist')}
               >
                 <FaPlus className="text-lg" />
               </button>
@@ -338,16 +345,16 @@ const FooterPlayer = () => {
                 setErrorMsg('');
               }}
               className="absolute top-4 right-4 text-harmony-text-secondary hover:text-harmony-text-primary"
-              aria-label="Cerrar"
+              aria-label={t('footerPlayer.aria.close_modal')}
             >
               <FaTimes />
             </button>
             <h2 className="text-lg font-semibold text-harmony-accent mb-4">
-              Añadir a playlist
+              {t('footerPlayer.modal.title')}
             </h2>
             {loadingPlaylists && (
               <div className="px-4 py-2 text-center text-harmony-text-secondary">
-                Cargando playlists...
+                {t('footerPlayer.modal.loading')}
               </div>
             )}
             {!loadingPlaylists && errorMsg && (
@@ -355,14 +362,17 @@ const FooterPlayer = () => {
             )}
             {!loadingPlaylists && playlists.length === 0 && !errorMsg && (
               <div className="px-4 py-2 text-center text-harmony-text-secondary">
-                No se encontraron playlists.
+                {t('footerPlayer.modal.no_playlists')}
               </div>
             )}
             {!loadingPlaylists && playlists.length > 0 && (
               <div className="max-h-60 overflow-y-auto mb-4">
                 <ul>
                   {playlists.map((pl) => (
-                    <li key={pl.id} className="flex items-center gap-2 py-1 hover:bg-harmony-accent/10 rounded px-2 cursor-pointer">
+                    <li
+                      key={pl.id}
+                      className="flex items-center gap-2 py-1 hover:bg-harmony-accent/10 rounded px-2 cursor-pointer"
+                    >
                       <img
                         src={pl.images[0]?.url || '/avatars/default.jpg'}
                         alt={pl.name}
@@ -394,7 +404,7 @@ const FooterPlayer = () => {
                 }}
                 className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition"
               >
-                Cancelar
+                {t('footerPlayer.modal.cancel')}
               </button>
               <button
                 onClick={handleAddToPlaylist}
@@ -405,7 +415,9 @@ const FooterPlayer = () => {
                     : 'bg-gray-300 cursor-not-allowed'
                 } transition`}
               >
-                {addingTrack ? 'Añadiendo...' : 'Añadir'}
+                {addingTrack
+                  ? t('footerPlayer.modal.adding')
+                  : t('footerPlayer.modal.add')}
               </button>
             </div>
           </div>

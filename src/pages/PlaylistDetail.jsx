@@ -10,6 +10,7 @@ import {
   FaCheck,
   FaTimes
 } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
 import { usePlayer } from '../context/PlayerContext';
@@ -18,6 +19,7 @@ import { playlistService } from '../services/playlistService';
 import { userService } from '../services/userService';
 
 export default function PlaylistDetail() {
+  const { t } = useTranslation();
   const { id, userId, playlistId } = useParams();
   const navigate = useNavigate();
   const { playTrack } = usePlayer();
@@ -41,14 +43,15 @@ export default function PlaylistDetail() {
   const playFullPlaylist = async () => {
     const uris = tracks.map(t => t.uri).filter(Boolean);
     if (uris.length === 0) return;
-  
+
     try {
-      await playTrack(uris); // ← NUEVO: envías toda la playlist
+      await playTrack(uris);
       const currentUser = await userService.getCurrentUser();
       const trackId = uris[0].split(":").pop();
       await userService.setCancionUsuario(currentUser.user._id, trackId);
     } catch (err) {
       console.error("Error al reproducir playlist:", err);
+      toast.error(t('playlistDetail.error.play_playlist'));
     }
   };
 
@@ -61,10 +64,9 @@ export default function PlaylistDetail() {
       await userService.setCancionUsuario(currentUser.user._id, trackId);
     } catch (err) {
       console.error("Error al reproducir canción:", err);
+      toast.error(t('playlistDetail.error.play_song'));
     }
   };
-  
-  
 
   useEffect(() => {
     async function fetchOwnPlaylist() {
@@ -84,7 +86,7 @@ export default function PlaylistDetail() {
         setSnapshotId(data.snapshot_id);
       } catch (err) {
         console.error('Fetch playlist error:', err);
-        setError('No se pudo cargar tu playlist. Quizá no tengas permiso o el token expiró.');
+        setError(t('playlistDetail.error.load_own'));
       } finally {
         setLoading(false);
       }
@@ -99,7 +101,7 @@ export default function PlaylistDetail() {
           name: playlistInfo.nombre,
           description: playlistInfo.descripcion,
           images: [{ url: playlistInfo.imagen }],
-          owner: { display_name: playlistInfo.owner?.nombre || 'Desconocido' }
+          owner: { display_name: playlistInfo.owner?.nombre || t('playlistDetail.unknown_owner') }
         });
         // Adaptamos “canciones” públicas al formato básico que usa la UI (title, artist, duration y cover)
         setTracks(
@@ -114,7 +116,7 @@ export default function PlaylistDetail() {
         );
       } catch (err) {
         console.error('Carga playlist pública error:', err);
-        setError('No se encontró la playlist pública o hubo un error al cargarla.');
+        setError(t('playlistDetail.error.load_public'));
       } finally {
         setLoading(false);
       }
@@ -131,26 +133,26 @@ export default function PlaylistDetail() {
 
     if (isOwnPlaylist) {
       if (!token) {
-        setError('Necesitas iniciar sesión para ver tu playlist.');
+        setError(t('playlistDetail.error.need_login'));
         setLoading(false);
         return;
       }
       fetchOwnPlaylist();
     } else {
       if (!userId || !playlistId) {
-        setError('Parámetros inválidos para playlist pública.');
+        setError(t('playlistDetail.error.invalid_params'));
         setLoading(false);
         return;
       }
       fetchPublicPlaylist();
     }
-  }, [id, userId, playlistId, token, isOwnPlaylist]);
+  }, [id, userId, playlistId, token, isOwnPlaylist, t]);
 
   // ------------- FUNCIONES DE EDICIÓN (solo si isOwnPlaylist) -------------
 
   const handleSaveName = async () => {
     if (!newName.trim()) {
-      toast.error('El nombre no puede estar vacío');
+      toast.error(t('playlistDetail.error.name_empty'));
       return;
     }
     try {
@@ -174,10 +176,10 @@ export default function PlaylistDetail() {
       }
       setPlaylist(prev => ({ ...prev, name: newName }));
       setEditMode(false);
-      toast.success('Nombre de la playlist actualizado');
+      toast.success(t('playlistDetail.success.name_updated'));
     } catch (err) {
       console.error('Rename playlist error:', err);
-      toast.error('No se pudo renombrar: ' + err.message);
+      toast.error(t('playlistDetail.error.name_update_prefix') + err.message);
     }
   };
 
@@ -197,14 +199,14 @@ export default function PlaylistDetail() {
     if (!file) return;
 
     if (file.type !== 'image/jpeg') {
-      toast.error('La imagen debe estar en formato JPEG');
+      toast.error(t('playlistDetail.error.image_format'));
       return;
     }
 
     try {
       const b64 = await toBase64(file);
       if (b64.length > 350000) {
-        toast.error('La imagen debe pesar menos de 256 KB');
+        toast.error(t('playlistDetail.error.image_size'));
         return;
       }
       const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/images`, {
@@ -216,13 +218,13 @@ export default function PlaylistDetail() {
         body: b64
       });
       if (res.status === 202) {
-        toast.success('Portada de la playlist actualizada correctamente');
+        toast.success(t('playlistDetail.success.image_updated'));
         setPlaylist(prev => {
           const nuevaUrl = prev.images[0].url + `?v=${Date.now()}`;
           return { ...prev, images: [{ url: nuevaUrl }] };
         });
       } else if (res.status === 401) {
-        toast.error('Token expirado o inválido. Vuelve a iniciar sesión.');
+        toast.error(t('playlistDetail.error.token_invalid'));
       } else {
         const errJson = await res.json();
         const msg = errJson.error?.message || res.statusText;
@@ -230,13 +232,13 @@ export default function PlaylistDetail() {
       }
     } catch (err) {
       console.error('Error al actualizar la portada:', err);
-      toast.error('No se pudo actualizar la portada: ' + err.message);
+      toast.error(t('playlistDetail.error.image_update_prefix') + err.message);
     }
   };
 
   const handleRemoveTrack = async (e, trackUri) => {
     e.stopPropagation();
-    if (!window.confirm('¿Eliminar esta canción de la playlist?')) return;
+    if (!window.confirm(t('playlistDetail.confirm_remove_track'))) return;
 
     try {
       const res = await fetch(`https://api.spotify.com/v1/playlists/${id}/tracks`, {
@@ -257,10 +259,10 @@ export default function PlaylistDetail() {
       const result = await res.json();
       setSnapshotId(result.snapshot_id);
       setTracks(prev => prev.filter(t => t.uri !== trackUri));
-      toast.success('Canción eliminada');
+      toast.success(t('playlistDetail.success.track_removed'));
     } catch (err) {
       console.error('Remove track error:', err);
-      toast.error('No se pudo eliminar la canción: ' + err.message);
+      toast.error(t('playlistDetail.error.track_remove_prefix') + err.message);
     }
   };
 
@@ -277,12 +279,12 @@ export default function PlaylistDetail() {
     return (
       <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
         <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />
-  
+
         <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
           <div className="h-[calc(100vh-222px)] bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex items-center justify-center p-6">
             <div className="text-center text-harmony-text-primary">
               {loading ? (
-                <p className="text-lg">Cargando playlist...</p>
+                <p className="text-lg">{t('playlistDetail.loading')}</p>
               ) : (
                 <>
                   <button
@@ -290,27 +292,30 @@ export default function PlaylistDetail() {
                     className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition mb-4"
                   >
                     <FaArrowLeft className="text-lg inline-block mr-2" />
-                    Volver
+                    {t('playlistDetail.back')}
                   </button>
                   <p className="text-xl font-semibold mb-2">
-                    {isOwnPlaylist ? 'Playlist no encontrada' : 'Playlist pública no encontrada'}
+                    {isOwnPlaylist
+                      ? t('playlistDetail.own.not_found')
+                      : t('playlistDetail.public.not_found')}
                   </p>
-                  <p className="text-sm">{error || 'No se pudieron obtener los datos.'}</p>
+                  <p className="text-sm">
+                    {error || t('playlistDetail.error.generic')}
+                  </p>
                 </>
               )}
             </div>
           </div>
         </div>
-  
+
         <FooterPlayer />
       </div>
     );
   }
-  
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary overflow-hidden">
-      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)}/>
+      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />
       <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="h-[calc(100vh-222px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col min-h-0">
@@ -355,7 +360,7 @@ export default function PlaylistDetail() {
                         onChange={e => setNewName(e.target.value)}
                         className="border-b border-harmony-text-secondary bg-transparent focus:outline-none text-4xl font-bold text-harmony-accent"
                       />
-                      <button onClick={handleSaveName} title="Guardar">
+                      <button onClick={handleSaveName} title={t('playlistDetail.save')}>
                         <FaCheck />
                       </button>
                       <button
@@ -363,7 +368,7 @@ export default function PlaylistDetail() {
                           setEditMode(false);
                           setNewName(playlist.name);
                         }}
-                        title="Cancelar"
+                        title={t('playlistDetail.cancel')}
                       >
                         <FaTimes />
                       </button>
@@ -377,7 +382,7 @@ export default function PlaylistDetail() {
                         <button
                           onClick={() => setEditMode(true)}
                           className="text-harmony-accent hover:text-harmony-accent/80"
-                          title="Editar nombre"
+                          title={t('playlistDetail.edit_name')}
                         >
                           <FaEdit />
                         </button>
@@ -386,29 +391,26 @@ export default function PlaylistDetail() {
                   )}
                 </div>
                 <p className="mt-2 text-harmony-text-secondary truncate">
-                  {playlist.description || 'Sin descripción'}
+                  {playlist.description || t('playlistDetail.no_description')}
                 </p>
                 <div className="mt-1 text-sm text-harmony-text-secondary">
-                  Creada{' '}
-                  {isOwnPlaylist
-                    ? `por ${playlist.owner.display_name}`
-                    : `por ${playlist.owner.display_name || 'Desconocido'}`}
+                  {t('playlistDetail.created_by', { user: playlist.owner.display_name })}
                 </div>
                 <div className="mt-4 flex items-center gap-4">
                   <button
                     onClick={playFullPlaylist}
                     className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
-                    title="Reproducir todo"
+                    title={t('playlistDetail.play_all')}
                   >
                     <FaPlay className="text-xl" />
                   </button>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href);
-                      alert('Enlace copiado');
+                      alert(t('playlistDetail.link_copied'));
                     }}
                     className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full hover:bg-harmony-accent/10 transition"
-                    title="Compartir playlist"
+                    title={t('playlistDetail.share_playlist')}
                   >
                     <FaShareAlt className="text-xl" />
                   </button>
@@ -419,9 +421,13 @@ export default function PlaylistDetail() {
             {/* Stats: número de canciones y duración total */}
             <div className="flex-none px-6 mb-4">
               <div className="flex items-center gap-4 text-harmony-text-secondary">
-                <span>{tracks.length} canciones</span>
+                <span>
+                  {tracks.length} {t('playlistDetail.songs')}
+                </span>
                 <span>•</span>
-                <span>{totalDurationMin} min</span>
+                <span>
+                  {totalDurationMin} {t('playlistDetail.minutes')}
+                </span>
               </div>
             </div>
 
@@ -466,7 +472,7 @@ export default function PlaylistDetail() {
                       <button
                         onClick={e => handleRemoveTrack(e, song.uri)}
                         className="text-red-500 hover:text-red-600 p-2 rounded-full transition"
-                        title="Eliminar canción"
+                        title={t('playlistDetail.delete_song')}
                       >
                         <FaTrashAlt />
                       </button>
@@ -475,9 +481,9 @@ export default function PlaylistDetail() {
                       onClick={e => {
                         e.stopPropagation();
                         playSingleTrack(song.uri);
-                      }}                      
+                      }}
                       className="text-harmony-accent hover:text-harmony-accent/80 p-2 rounded-full transition"
-                      title="Reproducir canción"
+                      title={t('playlistDetail.play_song')}
                     >
                       <FaPlay />
                     </button>

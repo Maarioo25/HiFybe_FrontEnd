@@ -1,36 +1,273 @@
 {
-    "addFriend": {
-      "title": "Freund hinzufügen",
-      "searchPlaceholder": "Nach Namen suchen...",
-      "sendRequest": "Anfrage senden",
-      "noUsers": "Keine verfügbaren Benutzer",
-      "success": "Anfrage erfolgreich gesendet",
-      "error": "Fehler beim Senden der Anfrage",
-      "notification": "{{name}} hat dir eine Freundschaftsanfrage gesendet"
+  "addFriend": {
+    "title": "Freund hinzufügen",
+    "searchPlaceholder": "Nach Namen suchen...",
+    "sendRequest": "Anfrage senden",
+    "noUsers": "Keine verfügbaren Benutzer",
+    "success": "Anfrage erfolgreich gesendet",
+    "error": "Fehler beim Senden der Anfrage",
+    "notification": "{{name}} hat dir eine Freundschaftsanfrage gesendet"
+  },
+  "settings": {
+    "title": "Profileinstellungen",
+    "namePlaceholder": "Dein Name",
+    "personalInfo": "Persönliche Informationen",
+    "bio": "Biografie",
+    "bioPlaceholder": "Erzähle uns etwas über dich...",
+    "city": "Stadt",
+    "cityPlaceholder": "Madrid, Barcelona...",
+    "musicPrefs": "Musikpräferenzen",
+    "musicPlaceholder": "rock, pop, indie...",
+    "socialMedia": "Soziale Medien",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "tiktok": "TikTok",
+    "cancel": "Abbrechen",
+    "saveChanges": "Änderungen speichern",
+    "uploadSuccess": "Bild erfolgreich hochgeladen",
+    "uploadError": "Fehler beim Hochladen des Bildes",
+    "profileUpdated": "Profil aktualisiert",
+    "profileUpdateError": "Fehler beim Aktualisieren des Profils"
+  },
+  "common": {
+    "close": "Schließen"
+  },
+  "auth": {
+    "welcome": "Willkommen bei HiFybe!",
+    "register_error": "Registrierungsfehler",
+    "email_error": "E-Mail-Fehler.",
+    "logged_out": "Abgemeldet!",
+    "logout_error": "Fehler beim Abmelden",
+    "logoAlt": "HiFybe Logo",
+    "tagline": {
+      "line1": "Verbinde dich mit Musik",
+      "line2": "und denen, die sie lieben"
     },
-    "settings": {
-          "title": "Profileinstellungen",
-          "namePlaceholder": "Dein Name",
-          "personalInfo": "Persönliche Informationen",
-          "bio": "Biografie",
-          "bioPlaceholder": "Erzähle uns etwas über dich...",
-          "city": "Stadt",
-          "cityPlaceholder": "Madrid, Barcelona...",
-          "musicPrefs": "Musikpräferenzen",
-          "musicPlaceholder": "rock, pop, indie...",
-          "socialMedia": "Soziale Medien",
-          "instagram": "Instagram",
-          "twitter": "Twitter",
-          "tiktok": "TikTok",
-          "cancel": "Abbrechen",
-          "saveChanges": "Änderungen speichern",
-          "uploadSuccess": "Bild erfolgreich hochgeladen",
-          "uploadError": "Fehler beim Hochladen des Bildes",
-          "profileUpdated": "Profil aktualisiert",
-          "profileUpdateError": "Fehler beim Aktualisieren des Profils"
-        },
-        "common": {
-          "close": "Schließen"
-        }
-      }
-  
+    "tabs": {
+      "login": "Anmelden",
+      "register": "Registrieren"
+    },
+    "login": {
+      "emailPlaceholder": "E-Mail",
+      "passwordPlaceholder": "Passwort",
+      "submit": "Anmelden",
+      "loading": "Anmeldung läuft...",
+      "socialOrContinue": "Oder fahre fort mit"
+    },
+    "register": {
+      "firstNamePlaceholder": "Vorname",
+      "lastNamePlaceholder": "Nachname",
+      "emailPlaceholder": "E-Mail",
+      "passwordPlaceholder": "Passwort",
+      "confirmPasswordPlaceholder": "Passwort wiederholen",
+      "acceptTermsPrefix": "Ich akzeptiere die",
+      "terms": "Nutzungsbedingungen",
+      "and": "und",
+      "privacyPolicy": "Datenschutzrichtlinie",
+      "submit": "Konto erstellen",
+      "loading": "Konto wird erstellt...",
+      "haveAccount": "Hast du bereits ein Konto?",
+      "loginLink": "Anmelden"
+    },
+    "validation": {
+      "requiredFields": "Bitte fülle alle erforderlichen Felder aus",
+      "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
+      "passwordLength": "Das Passwort muss zwischen 6 und 12 Zeichen lang sein",
+      "confirmPassword": "Du musst dein Passwort bestätigen",
+      "passwordsMismatch": "Die Passwörter stimmen nicht überein",
+      "acceptTerms": "Du musst die Nutzungsbedingungen akzeptieren"
+    },
+    "toast": {
+      "loginError": "Fehler bei der Anmeldung",
+      "welcome": "Willkommen bei HiFybe!"
+    }
+  },
+  "footerPlayer": {
+    "connect_prompt": "Du musst dein Spotify-Konto verbinden, um den Player zu benutzen",
+    "connect": "Mit Spotify verbinden",
+    "select_song": "Wähle einen Titel zum Abspielen aus",
+    "free_account": "Du verwendest ein kostenloses Konto. Du kannst nur sehen, was gerade gespielt wird.",
+    "error": {
+      "load_playlists": "Playlists konnten nicht geladen werden.",
+      "add_to_playlist": "Konnte nicht zur Playlist hinzufügen."
+    },
+    "success": {
+      "added": "Titel zur Playlist hinzugefügt."
+    },
+    "modal": {
+      "title": "Zur Playlist hinzufügen",
+      "loading": "Playlists werden geladen...",
+      "no_playlists": "Keine Playlists gefunden.",
+      "cancel": "Abbrechen",
+      "add": "Hinzufügen",
+      "adding": "Wird hinzugefügt..."
+    },
+    "aria": {
+      "replay": "Wiederholen",
+      "previous": "Vorheriger Titel",
+      "play_pause": "Abspielen/Pause",
+      "next": "Nächster Titel",
+      "share": "Teilen",
+      "add_to_playlist": "Zur Playlist hinzufügen",
+      "close_modal": "Fenster schließen"
+    }
+  },
+  "headerBar": {
+    "logo": "HiFybe",
+    "search_placeholder": "Auf Spotify suchen...",
+    "searching": "Suche läuft...",
+    "no_results": "Keine Ergebnisse gefunden.",
+    "error": {
+      "connect_spotify_search": "Verbinde dich mit Spotify, um nach Titeln zu suchen.",
+      "expired_token": "Spotify-Token ist abgelaufen. Bitte verbinde dein Konto erneut.",
+      "generic": "Fehler",
+      "search_failed": "Beim Suchen auf Spotify ist ein Fehler aufgetreten."
+    },
+    "aria": {
+      "search": "Suchen",
+      "profile_options": "Profiloptionen"
+    },
+    "nav": {
+      "home": "Startseite",
+      "friends": "Freunde",
+      "playlists": "Playlists",
+      "chats": "Chats"
+    },
+    "profile": {
+      "my_profile": "Mein Profil",
+      "settings": "Profileinstellungen",
+      "logout": "Abmelden"
+    }
+  },
+  "notificationBell": {
+    "ariaLabel": "Benachrichtigungen",
+    "title": "Benachrichtigungen",
+    "noNotifications": "Du hast keine ausstehenden Benachrichtigungen",
+    "deleteAria": "Benachrichtigung löschen"
+  },
+  "protected": {
+    "loadingAria": "Laden..."
+  },
+  "chatDetalle": {
+    "noMessages": "In dieser Unterhaltung gibt es noch keine Nachrichten.",
+    "play": "Abspielen",
+    "searchPlaceholder": "Titel suchen...",
+    "noResults": "Keine Ergebnisse",
+    "messagePlaceholder": "Nachricht eingeben...",
+    "sendButton": "Nachricht senden",
+    "searchButton": "Titel suchen"
+  },
+  "chats": {
+    "title": "Chats",
+    "subtext": "Tippe, um die Unterhaltung anzusehen",
+    "available": "Chat verfügbar",
+    "noChats": "Du hast noch keine Chats. Unterhalte dich mit deinen Freunden!"
+  },
+  "friendDetail": {
+    "error": "Freund nicht gefunden oder Fehler beim Laden der Daten",
+    "loading": "Profil wird geladen...",
+    "back": "Zurück",
+    "title": "Profil",
+    "publicPlaylists": "{{count}} öffentliche Playlists",
+    "noBio": "Keine Biografie vorhanden.",
+    "livesIn": "🌍 Lebt in {{city}}",
+    "favoriteGenres": "🎵 Lieblingsgenres: {{genres}}",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "tiktok": "TikTok",
+    "sendMessage": "Nachricht senden",
+    "playlistSectionTitle": "Öffentliche Playlists",
+    "noSpotifyLinked": "Dieser Benutzer hat sein Spotify-Konto nicht verknüpft.",
+    "noPublicPlaylists": "Keine öffentlichen Playlists verfügbar.",
+    "play": "Abspielen",
+    "songsCount": "{{count}} Titel"
+  },
+  "friends": {
+    "title": "Meine Freunde",
+    "tabFriends": "Freunde",
+    "tabRequests": "Anfragen",
+    "loading": "Daten werden geladen...",
+    "noRequests": "Du hast keine ausstehenden Anfragen",
+    "accept": "Annehmen",
+    "reject": "Ablehnen",
+    "requestAccepted": "Anfrage angenommen",
+    "requestRejected": "Anfrage abgelehnt",
+    "requestError": "Fehler beim Beantworten der Anfrage",
+    "errorLoading": "Fehler beim Laden der Daten",
+    "unknownUser": "Unbekannter Benutzer"
+  },
+  "main": {
+    "loading": "Lädt...",
+    "nearbyUsersTitle": "Nutzer in der Nähe hören",
+    "locationVisible": "Standort sichtbar",
+    "locationHidden": "Standort versteckt",
+    "reloadMap": "Karte neu laden",
+    "centerMap": "Auf meine Position zentrieren",
+    "locationHiddenOverlay": "Dein Standort ist versteckt",
+    "listening": "Hört gerade",
+    "noSong": "Nicht verfügbar",
+    "sentFriendRequest": "hat dir eine Freundschaftsanfrage gesendet",
+    "requestSent": "Anfrage erfolgreich gesendet",
+    "requestError": "Fehler beim Senden der Anfrage",
+    "tabFriends": "Freunde",
+    "tabRecommendations": "Empfehlungen",
+    "noHighlightedSong": "Keine hervorgehobene Wiedergabe verfügbar",
+    "addFriend": "Freund hinzufügen",
+    "mustConnectSpotify": "Du musst dein Spotify-Konto verbinden, um Empfehlungen zu sehen",
+    "connectSpotifyButton": "Mit Spotify verbinden",
+    "loadingRecommendations": "Lade Empfehlungen..."
+  },
+  "playlistDetail": {
+    "loading": "Wiedergabeliste wird geladen...",
+    "back": "Zurück",
+    "own": {
+      "not_found": "Playlist nicht gefunden"
+    },
+    "public": {
+      "not_found": "Öffentliche Playlist nicht gefunden"
+    },
+    "error": {
+      "generic": "Daten konnten nicht abgerufen werden.",
+      "load_own": "Deine Playlist konnte nicht geladen werden. Du hast möglicherweise keine Berechtigung oder dein Token ist abgelaufen.",
+      "load_public": "Öffentliche Playlist nicht gefunden oder es gab einen Fehler beim Laden.",
+      "need_login": "Du musst angemeldet sein, um deine Playlist anzusehen.",
+      "invalid_params": "Ungültige Parameter für öffentliche Playlist.",
+      "name_empty": "Name darf nicht leer sein",
+      "name_update_prefix": "Konnte nicht umbenennen: ",
+      "image_format": "Bild muss im JPEG-Format sein",
+      "image_size": "Bild muss kleiner als 256 KB sein",
+      "token_invalid": "Token abgelaufen oder ungültig. Bitte melde dich erneut an.",
+      "image_update_prefix": "Coverbild konnte nicht aktualisiert werden: ",
+      "track_remove_prefix": "Titel konnte nicht entfernt werden: ",
+      "play_song": "Fehler beim Abspielen des Titels",
+      "play_playlist": "Fehler beim Abspielen der Playlist"
+    },
+    "unknown_owner": "Unbekannt",
+    "no_description": "Keine Beschreibung",
+    "created_by": "Erstellt von {{user}}",
+    "play_all": "Alle abspielen",
+    "share_playlist": "Playlist teilen",
+    "link_copied": "Link kopiert",
+    "songs": "Titel",
+    "minutes": "Min",
+    "confirm_remove_track": "Diesen Titel aus der Playlist entfernen?",
+    "success": {
+      "name_updated": "Playlist-Name aktualisiert",
+      "image_updated": "Playlist-Cover erfolgreich aktualisiert",
+      "track_removed": "Titel entfernt"
+    },
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "edit_name": "Namen bearbeiten",
+    "delete_song": "Titel löschen",
+    "play_song": "Titel abspielen"
+  },
+  "playlists": {
+    "title": "Playlists",
+    "new_playlist": "Neue Playlist",
+    "songs": "Titel",
+    "connect_prompt": "Verbinde dein Spotify-Konto, um deine Playlists zu sehen",
+    "connect": "Verbinden",
+    "loading": "Laden..."
+  }
+}

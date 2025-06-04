@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaEdit } from 'react-icons/fa';
+import ReactCountryFlag from 'react-country-flag';
 import { userService } from '../services/userService';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -97,24 +98,48 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
           {t('settings.title')}
         </h2>
 
-        <div className="flex justify-center gap-2 mb-6">
+        {/* Selector de idioma con banderas coloreadas */}
+        <div className="flex justify-center gap-4 mb-6">
           <button
             onClick={() => i18n.changeLanguage('es')}
-            className="px-3 py-1 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+            className="p-2 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+            aria-label="Español"
+            title="Español"
           >
-            ES
+            <ReactCountryFlag
+              countryCode="ES"
+              svg
+              style={{ width: '1.5em', height: '1.5em' }}
+              alt="🇪🇸"
+            />
           </button>
+
           <button
             onClick={() => i18n.changeLanguage('en')}
-            className="px-3 py-1 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+            className="p-2 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+            aria-label="English"
+            title="English"
           >
-            EN
+            <ReactCountryFlag
+              countryCode="GB"
+              svg
+              style={{ width: '1.5em', height: '1.5em' }}
+              alt="🇬🇧"
+            />
           </button>
+
           <button
             onClick={() => i18n.changeLanguage('de')}
-            className="px-3 py-1 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+            className="p-2 rounded-full bg-harmony-secondary/20 hover:bg-harmony-secondary/30 transition"
+            aria-label="Deutsch"
+            title="Deutsch"
           >
-            DE
+            <ReactCountryFlag
+              countryCode="DE"
+              svg
+              style={{ width: '1.5em', height: '1.5em' }}
+              alt="🇩🇪"
+            />
           </button>
         </div>
 

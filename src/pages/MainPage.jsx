@@ -14,8 +14,10 @@ import "./style.css"; // Asegúrate de añadir la animación aquí
 import AddFriendModal from "../components/AddFriendModal";
 import axios from "axios";
 import { FaEye, FaEyeSlash, FaMapMarkerAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export default function MainPage() {
+  const { t } = useTranslation();
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [spotifyRecommendations, setSpotifyRecommendations] = useState([]);
@@ -25,7 +27,7 @@ export default function MainPage() {
   const [activeTab, setActiveTab] = useState("friends");
   const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
   const [mostrarUbicacion, setMostrarUbicacion] = useState(false);
-  const [mapMoving, setMapMoving] = useState(false); // Puedes conservarlo o eliminarlo si no lo vas a usar más
+  const [mapMoving, setMapMoving] = useState(false);
 
   const { loading } = useAuth();
   const navigate = useNavigate();
@@ -48,7 +50,6 @@ export default function MainPage() {
     }
   };
 
-  // Detectar token de Spotify
   const spotifyToken = localStorage.getItem("sp_token");
   const handleConnectSpotify = () => {
     window.location.href = "https://api.mariobueno.info/usuarios/spotify/connect";
@@ -98,11 +99,10 @@ export default function MainPage() {
     if (!mapRef.current) return;
 
     mapInstance.current = L.map(mapRef.current, {
-      preferCanvas: true, // Mejor rendimiento
+      preferCanvas: true,
       zoomControl: false,
     }).setView(currentPosition, 13);
 
-    // Control de movimiento del mapa
     mapInstance.current.on("movestart", () => setMapMoving(true));
     mapInstance.current.on("moveend", () => setMapMoving(false));
 
@@ -123,13 +123,11 @@ export default function MainPage() {
   useEffect(() => {
     if (!mapInstance.current) return;
 
-    // Limpiar marcadores anteriores
     markerRefs.current.forEach((marker) => {
       mapInstance.current.removeLayer(marker);
     });
     markerRefs.current = [];
 
-    // Crear nuevos marcadores
     usuariosCercanos.forEach((user) => {
       const coords = user.ubicacion?.coordinates;
       if (!coords) return;
@@ -143,8 +141,6 @@ export default function MainPage() {
         html: `
           <div class='${sizeClass} rounded-full relative shadow-lg overflow-hidden
                        bg-gradient-to-br from-indigo-400 to-purple-500 custom-marker'>
-            
-            <!-- Contenedor cuadrado para recorte -->
             <div class="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden">
               <img 
                 src='${user.foto_perfil || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.nombre)}' 
@@ -152,11 +148,7 @@ export default function MainPage() {
                 class='min-w-full min-h-full object-cover object-center'
               />
             </div>
-            
-            <!-- Marco circular y borde -->
             <div class="absolute inset-0 rounded-full border-2 border-white"></div>
-            
-            <!-- Indicador de estado -->
             <span class='absolute ${posClass} w-3 h-3 rounded-full bg-green-500 border-2 border-white shadow'></span>
           </div>`,
       });
@@ -165,10 +157,8 @@ export default function MainPage() {
         .addTo(mapInstance.current)
         .on("click", async () => {
           try {
-            // Obtener canción del usuario
             const songData = await userService.getCancionUsuario(user._id);
 
-            // Actualizar usuario seleccionado
             setSelectedUser({
               _id: user._id,
               nombre: user.nombre,
@@ -182,7 +172,7 @@ export default function MainPage() {
                       uri: songData.uri,
                     }
                   : {
-                      title: "No disponible",
+                      title: t("main.noSong"),
                       artist: "",
                       img: "",
                       uri: null,
@@ -190,7 +180,6 @@ export default function MainPage() {
               position: [coords[1], coords[0]],
             });
 
-            // Mover mapa a la posición del usuario
             mapInstance.current.setView([coords[1], coords[0]], 15);
           } catch (error) {
             console.error("Error al obtener canción del usuario:", error);
@@ -199,7 +188,7 @@ export default function MainPage() {
 
       markerRefs.current.push(marker);
     });
-  }, [usuariosCercanos]);
+  }, [usuariosCercanos, t]);
 
   // Gestión de visibilidad de ubicación
   useEffect(() => {
@@ -220,7 +209,7 @@ export default function MainPage() {
       } else {
         try {
           await userService.ocultarUbicacion();
-          setUsuariosCercanos([]); // Limpiar usuarios
+          setUsuariosCercanos([]);
         } catch (error) {
           console.error("Error al ocultar ubicación:", error);
         }
@@ -230,7 +219,7 @@ export default function MainPage() {
     gestionarVisibilidad();
   }, [mostrarUbicacion]);
 
-  // Animar icono del usuario seleccionado (opcional, puedes conservarlo)
+  // Animar icono del usuario seleccionado
   useEffect(() => {
     if (!markerRefs.current.length || !selectedUser) return;
 
@@ -250,8 +239,6 @@ export default function MainPage() {
         html: `
           <div class='${sizeClass} rounded-full relative shadow-lg overflow-hidden
                        bg-gradient-to-br from-indigo-400 to-purple-500 custom-marker${pulseClass}'>
-            
-            <!-- Contenedor cuadrado para recorte -->
             <div class="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden">
               <img 
                 src='${user.foto_perfil || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.nombre)}' 
@@ -259,18 +246,14 @@ export default function MainPage() {
                 class='min-w-full min-h-full object-cover object-center'
               />
             </div>
-            
-            <!-- Marco circular y borde -->
             <div class="absolute inset-0 rounded-full border-2 border-white"></div>
-            
-            <!-- Indicador de estado -->
             <span class='absolute ${posClass} w-3 h-3 rounded-full bg-green-500 border-2 border-white shadow'></span>
           </div>`,
       });
 
       marker.setIcon(icon);
     });
-  }, [selectedUser]);
+  }, [selectedUser, usuariosCercanos]);
 
   // Obtener recomendaciones de Spotify
   useEffect(() => {
@@ -332,7 +315,7 @@ export default function MainPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-harmony-primary">
-        <div className="text-harmony-text-primary text-xl">Cargando...</div>
+        <div className="text-harmony-text-primary text-xl">{t("main.loading")}</div>
       </div>
     );
   }
@@ -348,15 +331,21 @@ export default function MainPage() {
             <div className="lg:col-span-2">
               <div className="bg-harmony-secondary/30 rounded-2xl p-4 sm:p-6 border border-harmony-text-secondary/10 flex flex-col h-[50vh] sm:h-[70vh] max-h-[70vh] relative mt-4 sm:mt-0">
                 <h2 className="text-lg sm:text-xl font-bold mb-4 text-harmony-accent">
-                  Usuarios escuchando cerca
+                  {t("main.nearbyUsersTitle")}
                 </h2>
 
                 <div className="absolute top-4 right-4 flex space-x-2 z-20">
                   <div className="flex items-center gap-2">
                     {mostrarUbicacion ? (
-                      <FaEye className="text-harmony-accent w-5 h-5" title="Ubicación visible" />
+                      <FaEye
+                        className="text-harmony-accent w-5 h-5"
+                        title={t("main.locationVisible")}
+                      />
                     ) : (
-                      <FaEyeSlash className="text-harmony-text-secondary w-5 h-5" title="Ubicación oculta" />
+                      <FaEyeSlash
+                        className="text-harmony-text-secondary w-5 h-5"
+                        title={t("main.locationHidden")}
+                      />
                     )}
                     <button
                       onClick={() => setMostrarUbicacion(!mostrarUbicacion)}
@@ -380,7 +369,7 @@ export default function MainPage() {
                         ? "bg-harmony-secondary hover:bg-harmony-secondary/80"
                         : "bg-gray-500/30"
                     }`}
-                    title="Recargar mapa"
+                    title={t("main.reloadMap")}
                   >
                     ⟳
                   </button>
@@ -393,7 +382,7 @@ export default function MainPage() {
                         ? "bg-harmony-secondary hover:bg-harmony-secondary/80"
                         : "bg-gray-500/30"
                     }`}
-                    title="Centrar en mi posición"
+                    title={t("main.centerMap")}
                   >
                     <FaMapMarkerAlt className="mx-auto" />
                   </button>
@@ -408,7 +397,7 @@ export default function MainPage() {
                   {!mostrarUbicacion && (
                     <div className="absolute inset-0 z-20 flex items-center justify-center">
                       <div className="bg-harmony-primary/60 text-white px-4 py-2 rounded-xl shadow text-sm sm:text-base font-semibold backdrop-blur-md">
-                        Tu ubicación está oculta
+                        {t("main.locationHiddenOverlay")}
                       </div>
                     </div>
                   )}
@@ -454,7 +443,7 @@ export default function MainPage() {
                       )}
                       <div className="flex flex-col min-w-0">
                         <span className="text-harmony-accent text-xs sm:text-sm font-bold uppercase tracking-wide mb-1">
-                          Escuchando
+                          {t("main.listening")}
                         </span>
                         <span className="text-harmony-text-primary text-sm sm:text-base font-bold truncate">
                           {selectedUser.song.title}
@@ -476,7 +465,9 @@ export default function MainPage() {
                             try {
                               await notificationService.createNotification(
                                 selectedUser._id,
-                                `${selectedUser.nombre} te ha enviado una solicitud de amistad`
+                                `${selectedUser.nombre} ${t(
+                                  "main.sentFriendRequest"
+                                )}`
                               );
                             } catch (notifErr) {
                               console.warn(
@@ -484,18 +475,18 @@ export default function MainPage() {
                                 notifErr
                               );
                             }
-                            toast.success("Solicitud enviada correctamente");
+                            toast.success(t("main.requestSent"));
                           } catch (error) {
                             console.error("Error al enviar solicitud:", error);
                             toast.error(
                               error?.response?.data?.mensaje ||
-                                "Error al enviar la solicitud"
+                                t("main.requestError")
                             );
                           }
                         }}
                         className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
                       >
-                        Seguir
+                        {t("main.follow")}
                       </button>
 
                       {selectedUser.song?.uri && (
@@ -503,7 +494,7 @@ export default function MainPage() {
                           onClick={() => playTrack(selectedUser.song.uri)}
                           className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent"
                         >
-                          Escuchar
+                          {t("main.listen")}
                         </button>
                       )}
                     </div>
@@ -525,7 +516,7 @@ export default function MainPage() {
                         : "bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10"
                     }`}
                   >
-                    Amigos
+                    {t("main.tabFriends")}
                   </button>
                   <button
                     onClick={() => setActiveTab("recomendaciones")}
@@ -535,7 +526,7 @@ export default function MainPage() {
                         : "bg-transparent text-harmony-accent border-transparent hover:bg-harmony-accent/10"
                     }`}
                   >
-                    Recomendaciones
+                    {t("main.tabRecommendations")}
                   </button>
                 </div>
 
@@ -562,7 +553,7 @@ export default function MainPage() {
                               {amigo.nombre}
                             </div>
                             <div className="text-harmony-text-secondary text-sm">
-                              Canción destacada no disponible
+                              {t("main.noHighlightedSong")}
                             </div>
                           </div>
                           <span
@@ -581,7 +572,7 @@ export default function MainPage() {
                         onClick={() => setShowAddFriendModal(true)}
                       >
                         <span className="text-4xl mb-2">+</span>
-                        <span className="font-semibold">Agregar amigo</span>
+                        <span className="font-semibold">{t("main.addFriend")}</span>
                       </button>
                     </div>
                   )}
@@ -592,20 +583,20 @@ export default function MainPage() {
                       {!spotifyToken ? (
                         <div className="flex flex-col items-center justify-center h-full">
                           <span className="text-harmony-text-primary mb-4">
-                            Debes conectar tu cuenta de Spotify para ver las recomendaciones
+                            {t("main.mustConnectSpotify")}
                           </span>
                           <button
                             onClick={handleConnectSpotify}
                             className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
                           >
-                            Conectar con Spotify
+                            {t("main.connectSpotifyButton")}
                           </button>
                         </div>
                       ) : (
                         <>
                           {spotifyRecommendations.length === 0 ? (
                             <div className="text-center text-harmony-text-secondary mt-4">
-                              Cargando recomendaciones...
+                              {t("main.loadingRecommendations")}
                             </div>
                           ) : (
                             spotifyRecommendations.map((song) => (

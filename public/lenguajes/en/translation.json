@@ -12,24 +12,262 @@
     "close": "Close"
   },
   "settings": {
-      "title": "Profile Settings",
-      "namePlaceholder": "Your name",
-      "personalInfo": "Personal Information",
-      "bio": "Biography",
-      "bioPlaceholder": "Tell us something about yourself...",
-      "city": "City",
-      "cityPlaceholder": "Madrid, Barcelona...",
-      "musicPrefs": "Music Preferences",
-      "musicPlaceholder": "rock, pop, indie...",
-      "socialMedia": "Social Media",
-      "instagram": "Instagram",
-      "twitter": "Twitter",
-      "tiktok": "TikTok",
-      "cancel": "Cancel",
-      "saveChanges": "Save Changes",
-      "uploadSuccess": "Image uploaded successfully",
-      "uploadError": "Error uploading image",
-      "profileUpdated": "Profile updated",
-      "profileUpdateError": "Error updating profile"
+    "title": "Profile Settings",
+    "namePlaceholder": "Your name",
+    "personalInfo": "Personal Information",
+    "bio": "Biography",
+    "bioPlaceholder": "Tell us something about yourself...",
+    "city": "City",
+    "cityPlaceholder": "Madrid, Barcelona...",
+    "musicPrefs": "Music Preferences",
+    "musicPlaceholder": "rock, pop, indie...",
+    "socialMedia": "Social Media",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "tiktok": "TikTok",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes",
+    "uploadSuccess": "Image uploaded successfully",
+    "uploadError": "Error uploading image",
+    "profileUpdated": "Profile updated",
+    "profileUpdateError": "Error updating profile"
+  },
+  "auth": {
+    "welcome": "Welcome to HiFybe!",
+    "register_error": "Registration error",
+    "email_error": "Email error.",
+    "logged_out": "Logged out!",
+    "logout_error": "Error logging out",
+    "logoAlt": "HiFybe Logo",
+    "tagline": {
+      "line1": "Connect with music",
+      "line2": "and those who love it"
+    },
+    "tabs": {
+      "login": "Log In",
+      "register": "Register"
+    },
+    "login": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "submit": "Log In",
+      "loading": "Logging in...",
+      "socialOrContinue": "Or continue with"
+    },
+    "register": {
+      "firstNamePlaceholder": "First Name",
+      "lastNamePlaceholder": "Last Name",
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordPlaceholder": "Confirm Password",
+      "acceptTermsPrefix": "I accept the",
+      "terms": "Terms",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "submit": "Create Account",
+      "loading": "Creating account...",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log In"
+    },
+    "validation": {
+      "requiredFields": "Please fill in all required fields",
+      "invalidEmail": "Please enter a valid email",
+      "passwordLength": "Password must be between 6 and 12 characters",
+      "confirmPassword": "You must confirm your password",
+      "passwordsMismatch": "Passwords do not match",
+      "acceptTerms": "You must accept the terms and conditions"
+    },
+    "toast": {
+      "loginError": "Error logging in",
+      "welcome": "Welcome to HiFybe!"
     }
+  },
+  "footerPlayer": {
+    "connect_prompt": "You must connect your Spotify account to use the player",
+    "connect": "Connect with Spotify",
+    "select_song": "Select a track to play",
+    "free_account": "You are using a free account. You can only see what is currently playing.",
+    "error": {
+      "load_playlists": "Could not load playlists.",
+      "add_to_playlist": "Could not add to playlist."
+    },
+    "success": {
+      "added": "Track added to playlist."
+    },
+    "modal": {
+      "title": "Add to playlist",
+      "loading": "Loading playlists...",
+      "no_playlists": "No playlists found.",
+      "cancel": "Cancel",
+      "add": "Add",
+      "adding": "Adding..."
+    },
+    "aria": {
+      "replay": "Replay",
+      "previous": "Previous track",
+      "play_pause": "Play/Pause",
+      "next": "Next track",
+      "share": "Share",
+      "add_to_playlist": "Add to playlist",
+      "close_modal": "Close modal"
+    }
+  },
+  "headerBar": {
+    "logo": "HiFybe",
+    "search_placeholder": "Search Spotify...",
+    "searching": "Searching...",
+    "no_results": "No results found.",
+    "error": {
+      "connect_spotify_search": "Connect to Spotify to search for songs.",
+      "expired_token": "Spotify token expired. Please reconnect your account.",
+      "generic": "Error",
+      "search_failed": "An error occurred while searching Spotify."
+    },
+    "aria": {
+      "search": "Search",
+      "profile_options": "Profile options"
+    },
+    "nav": {
+      "home": "Home",
+      "friends": "Friends",
+      "playlists": "Playlists",
+      "chats": "Chats"
+    },
+    "profile": {
+      "my_profile": "My Profile",
+      "settings": "Profile Settings",
+      "logout": "Log Out"
+    }
+  },
+  "notificationBell": {
+    "ariaLabel": "Notifications",
+    "title": "Notifications",
+    "noNotifications": "You have no pending notifications",
+    "deleteAria": "Delete notification"
+  },
+  "protected": {
+    "loadingAria": "Loading..."
+  },
+  "chatDetalle": {
+    "noMessages": "There are no messages in this conversation yet.",
+    "play": "Play",
+    "searchPlaceholder": "Search track...",
+    "noResults": "No results",
+    "messagePlaceholder": "Type a message...",
+    "sendButton": "Send message",
+    "searchButton": "Search track"
+  },
+  "chats": {
+    "title": "Chats",
+    "subtext": "Tap to view the conversation",
+    "available": "Chat available",
+    "noChats": "You have no chats yet. Talk to your friends!"
+  },
+  "friendDetail": {
+    "error": "Friend not found or error loading data",
+    "loading": "Loading profile...",
+    "back": "Back",
+    "title": "Profile",
+    "publicPlaylists": "{{count}} public playlists",
+    "noBio": "No bio available.",
+    "livesIn": "🌍 Lives in {{city}}",
+    "favoriteGenres": "🎵 Favorite genres: {{genres}}",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "tiktok": "TikTok",
+    "sendMessage": "Send Message",
+    "playlistSectionTitle": "Public Playlists",
+    "noSpotifyLinked": "This user has not linked their Spotify account.",
+    "noPublicPlaylists": "No public playlists available.",
+    "play": "Play",
+    "songsCount": "{{count}} songs"
+  },
+  "friends": {
+    "title": "My Friends",
+    "tabFriends": "Friends",
+    "tabRequests": "Requests",
+    "loading": "Loading data...",
+    "noRequests": "You have no pending requests",
+    "accept": "Accept",
+    "reject": "Reject",
+    "requestAccepted": "Request accepted",
+    "requestRejected": "Request rejected",
+    "requestError": "Error responding to request",
+    "errorLoading": "Error loading data",
+    "unknownUser": "Unknown user"
+  },
+  "main": {
+    "loading": "Loading...",
+    "nearbyUsersTitle": "Users Listening Nearby",
+    "locationVisible": "Location Visible",
+    "locationHidden": "Location Hidden",
+    "reloadMap": "Reload Map",
+    "centerMap": "Center on My Position",
+    "locationHiddenOverlay": "Your location is hidden",
+    "listening": "Listening",
+    "noSong": "Not available",
+    "sentFriendRequest": "has sent you a friend request",
+    "requestSent": "Request sent successfully",
+    "requestError": "Error sending request",
+    "tabFriends": "Friends",
+    "tabRecommendations": "Recommendations",
+    "noHighlightedSong": "No highlighted song available",
+    "addFriend": "Add Friend",
+    "mustConnectSpotify": "You must connect your Spotify account to see recommendations",
+    "connectSpotifyButton": "Connect with Spotify",
+    "loadingRecommendations": "Loading recommendations..."
+  },
+  "playlistDetail": {
+    "loading": "Loading playlist...",
+    "back": "Back",
+    "own": {
+      "not_found": "Playlist not found"
+    },
+    "public": {
+      "not_found": "Public playlist not found"
+    },
+    "error": {
+      "generic": "Could not retrieve data.",
+      "load_own": "Could not load your playlist. You may not have permission or your token expired.",
+      "load_public": "Public playlist not found or there was an error loading it.",
+      "need_login": "You need to be logged in to view your playlist.",
+      "invalid_params": "Invalid parameters for public playlist.",
+      "name_empty": "Name cannot be empty",
+      "name_update_prefix": "Could not rename: ",
+      "image_format": "Image must be in JPEG format",
+      "image_size": "Image must be smaller than 256 KB",
+      "token_invalid": "Token expired or invalid. Please log in again.",
+      "image_update_prefix": "Could not update cover image: ",
+      "track_remove_prefix": "Could not remove track: ",
+      "play_song": "Error playing song",
+      "play_playlist": "Error playing playlist"
+    },
+    "unknown_owner": "Unknown",
+    "no_description": "No description",
+    "created_by": "Created by {{user}}",
+    "play_all": "Play all",
+    "share_playlist": "Share playlist",
+    "link_copied": "Link copied",
+    "songs": "songs",
+    "minutes": "min",
+    "confirm_remove_track": "Remove this song from the playlist?",
+    "success": {
+      "name_updated": "Playlist name updated",
+      "image_updated": "Playlist cover updated successfully",
+      "track_removed": "Song removed"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit_name": "Edit name",
+    "delete_song": "Delete song",
+    "play_song": "Play song"
+  },
+  "playlists": {
+    "title": "Playlists",
+    "new_playlist": "New Playlist",
+    "songs": "songs",
+    "connect_prompt": "Connect your Spotify account to see your playlists",
+    "connect": "Connect",
+    "loading": "Loading..."
+  }
 }

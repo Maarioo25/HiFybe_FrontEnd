@@ -31,6 +31,243 @@
   },
   "common": {
     "close": "Cerrar"
+  },
+  "auth": {
+    "welcome": "Bienvenido a HiFybe!",
+    "register_error": "Error en el registro",
+    "email_error": "Error en email.",
+    "logged_out": "¡Sesión cerrada!",
+    "logout_error": "Error al cerrar sesión",
+    "logoAlt": "Logo de HiFybe",
+    "tagline": {
+      "line1": "Conecta con la música",
+      "line2": "y con quienes la aman"
+    },
+    "tabs": {
+      "login": "Iniciar Sesión",
+      "register": "Registrarse"
+    },
+    "login": {
+      "emailPlaceholder": "Correo electrónico",
+      "passwordPlaceholder": "Contraseña",
+      "submit": "Iniciar Sesión",
+      "loading": "Iniciando sesión...",
+      "socialOrContinue": "O continúa con"
+    },
+    "register": {
+      "firstNamePlaceholder": "Nombre",
+      "lastNamePlaceholder": "Apellidos",
+      "emailPlaceholder": "Correo electrónico",
+      "passwordPlaceholder": "Contraseña",
+      "confirmPasswordPlaceholder": "Repetir contraseña",
+      "acceptTermsPrefix": "Acepto los",
+      "terms": "Términos",
+      "and": "y",
+      "privacyPolicy": "Política de Privacidad",
+      "submit": "Crear Cuenta",
+      "loading": "Creando cuenta...",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "loginLink": "Inicia sesión"
+    },
+    "validation": {
+      "requiredFields": "Por favor, completa todos los campos requeridos",
+      "invalidEmail": "Por favor, ingresa un email válido",
+      "passwordLength": "La contraseña debe tener entre 6 y 12 caracteres",
+      "confirmPassword": "Debes confirmar tu contraseña",
+      "passwordsMismatch": "Las contraseñas no coinciden",
+      "acceptTerms": "Debes aceptar los términos y condiciones"
+    },
+    "toast": {
+      "loginError": "Error al iniciar sesión",
+      "welcome": "Bienvenido a HiFybe!"
+    }
+  },
+  "footerPlayer": {
+    "connect_prompt": "Debes conectar tu cuenta de Spotify para usar el reproductor",
+    "connect": "Conectar con Spotify",
+    "select_song": "Selecciona una canción para reproducir",
+    "free_account": "Estás usando una cuenta gratuita. Solo puedes ver lo que se está reproduciendo.",
+    "error": {
+      "load_playlists": "No se pudieron cargar las playlists.",
+      "add_to_playlist": "No se pudo añadir a la playlist."
+    },
+    "success": {
+      "added": "Canción añadida a la playlist."
+    },
+    "modal": {
+      "title": "Añadir a playlist",
+      "loading": "Cargando playlists...",
+      "no_playlists": "No se encontraron playlists.",
+      "cancel": "Cancelar",
+      "add": "Añadir",
+      "adding": "Añadiendo..."
+    },
+    "aria": {
+      "replay": "Repetir",
+      "previous": "Pista anterior",
+      "play_pause": "Reproducir/Pausar",
+      "next": "Siguiente pista",
+      "share": "Compartir",
+      "add_to_playlist": "Añadir a playlist",
+      "close_modal": "Cerrar ventana"
+    }
+  },
+  "headerBar": {
+    "logo": "HiFybe",
+    "search_placeholder": "Buscar en Spotify...",
+    "searching": "Buscando...",
+    "no_results": "No se encontraron resultados.",
+    "error": {
+      "connect_spotify_search": "Conéctate a Spotify para buscar canciones.",
+      "expired_token": "Token de Spotify expirado. Vuelve a conectar tu cuenta.",
+      "generic": "Error",
+      "search_failed": "Ocurrió un error al buscar en Spotify."
+    },
+    "aria": {
+      "search": "Buscar",
+      "profile_options": "Opciones de perfil"
+    },
+    "nav": {
+      "home": "Inicio",
+      "friends": "Amigos",
+      "playlists": "Playlists",
+      "chats": "Chats"
+    },
+    "profile": {
+      "my_profile": "Mi perfil",
+      "settings": "Ajustes de perfil",
+      "logout": "Cerrar sesión"
+    }
+  },
+  "notificationBell": {
+    "ariaLabel": "Notificaciones",
+    "title": "Notificaciones",
+    "noNotifications": "No tienes ninguna notificación pendiente",
+    "deleteAria": "Eliminar notificación"
+  },
+  "protected": {
+    "loadingAria": "Cargando..."
+  },
+  "chatDetalle": {
+    "noMessages": "No hay mensajes en esta conversación todavía.",
+    "play": "Reproducir",
+    "searchPlaceholder": "Buscar canción...",
+    "noResults": "Sin resultados",
+    "messagePlaceholder": "Escribe un mensaje...",
+    "sendButton": "Enviar mensaje",
+    "searchButton": "Buscar canción"
+  },
+  "chats": {
+    "title": "Chats",
+    "subtext": "Pulsa para ver la conversación",
+    "available": "Chat disponible",
+    "noChats": "No tienes chats todavía. ¡Habla con tus amigos!"
+  },
+  "friendDetail": {
+    "error": "Amigo no encontrado o error al cargar datos",
+    "loading": "Cargando perfil...",
+    "back": "Atrás",
+    "title": "Perfil",
+    "publicPlaylists": "{{count}} playlists públicas",
+    "noBio": "Sin biografía.",
+    "livesIn": "🌍 Vive en {{city}}",
+    "favoriteGenres": "🎵 Géneros favoritos: {{genres}}",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "tiktok": "TikTok",
+    "sendMessage": "Enviar mensaje",
+    "playlistSectionTitle": "Playlists Públicas",
+    "noSpotifyLinked": "Este usuario no tiene vinculada su cuenta de Spotify.",
+    "noPublicPlaylists": "No tiene playlists públicas disponibles.",
+    "play": "Reproducir",
+    "songsCount": "{{count}} canciones"
+  },
+  "friends": {
+    "title": "Mis Amigos",
+    "tabFriends": "Amigos",
+    "tabRequests": "Solicitudes",
+    "loading": "Cargando datos...",
+    "noRequests": "No tienes solicitudes pendientes",
+    "accept": "Aceptar",
+    "reject": "Rechazar",
+    "requestAccepted": "Solicitud aceptada",
+    "requestRejected": "Solicitud rechazada",
+    "requestError": "Error al responder solicitud",
+    "errorLoading": "Error al cargar datos",
+    "unknownUser": "Usuario desconocido"
+  },
+  "main": {
+    "loading": "Cargando...",
+    "nearbyUsersTitle": "Usuarios escuchando cerca",
+    "locationVisible": "Ubicación visible",
+    "locationHidden": "Ubicación oculta",
+    "reloadMap": "Recargar mapa",
+    "centerMap": "Centrar en mi posición",
+    "locationHiddenOverlay": "Tu ubicación está oculta",
+    "listening": "Escuchando",
+    "noSong": "No disponible",
+    "sentFriendRequest": "te ha enviado una solicitud de amistad",
+    "requestSent": "Solicitud enviada correctamente",
+    "requestError": "Error al enviar la solicitud",
+    "tabFriends": "Amigos",
+    "tabRecommendations": "Recomendaciones",
+    "noHighlightedSong": "Canción destacada no disponible",
+    "addFriend": "Agregar amigo",
+    "mustConnectSpotify": "Debes conectar tu cuenta de Spotify para ver las recomendaciones",
+    "connectSpotifyButton": "Conectar con Spotify",
+    "loadingRecommendations": "Cargando recomendaciones..."
+  },
+  "playlistDetail": {
+    "loading": "Cargando playlist...",
+    "back": "Volver",
+    "own": {
+      "not_found": "Playlist no encontrada"
+    },
+    "public": {
+      "not_found": "Playlist pública no encontrada"
+    },
+    "error": {
+      "generic": "No se pudieron obtener los datos.",
+      "load_own": "No se pudo cargar tu playlist. Quizá no tengas permiso o el token expiró.",
+      "load_public": "No se encontró la playlist pública o hubo un error al cargarla.",
+      "need_login": "Necesitas iniciar sesión para ver tu playlist.",
+      "invalid_params": "Parámetros inválidos para playlist pública.",
+      "name_empty": "El nombre no puede estar vacío",
+      "name_update_prefix": "No se pudo renombrar: ",
+      "image_format": "La imagen debe estar en formato JPEG",
+      "image_size": "La imagen debe pesar menos de 256 KB",
+      "token_invalid": "Token expirado o inválido. Vuelve a iniciar sesión.",
+      "image_update_prefix": "No se pudo actualizar la portada: ",
+      "track_remove_prefix": "No se pudo eliminar la canción: ",
+      "play_song": "Error al reproducir canción",
+      "play_playlist": "Error al reproducir playlist"
+    },
+    "unknown_owner": "Desconocido",
+    "no_description": "Sin descripción",
+    "created_by": "Creada por {{user}}",
+    "play_all": "Reproducir todo",
+    "share_playlist": "Compartir playlist",
+    "link_copied": "Enlace copiado",
+    "songs": "canciones",
+    "minutes": "min",
+    "confirm_remove_track": "¿Eliminar esta canción de la playlist?",
+    "success": {
+      "name_updated": "Nombre de la playlist actualizado",
+      "image_updated": "Portada de la playlist actualizada correctamente",
+      "track_removed": "Canción eliminada"
+    },
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit_name": "Editar nombre",
+    "delete_song": "Eliminar canción",
+    "play_song": "Reproducir canción"
+  },
+  "playlists": {
+    "title": "Playlists",
+    "new_playlist": "Nueva Playlist",
+    "songs": "canciones",
+    "connect_prompt": "Conecta tu cuenta de Spotify para ver tus playlists",
+    "connect": "Conectar",
+    "loading": "Cargando..."
   }
 }
-

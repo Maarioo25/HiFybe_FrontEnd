@@ -1,4 +1,3 @@
-// ✅ ChatDetalle.js
 import React, { useEffect, useState, useRef } from 'react';
 import { FaPaperclip, FaSmile, FaPaperPlane } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
@@ -7,8 +6,10 @@ import { userService } from '../services/userService';
 import { usePlayer } from '../context/PlayerContext';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
+import { useTranslation } from 'react-i18next';
 
 export default function ChatDetalle() {
+  const { t } = useTranslation();
   const { conversacionId } = useParams();
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState('');
@@ -19,8 +20,7 @@ export default function ChatDetalle() {
   const scrollRef = useRef(null);
   const { playTrack } = usePlayer();
   const busquedaRef = useRef(null);
-  const spotifyToken = localStorage.getItem("sp_token");
-
+  const spotifyToken = localStorage.getItem('sp_token');
 
   useEffect(() => {
     const cargarMensajes = async () => {
@@ -64,51 +64,59 @@ export default function ChatDetalle() {
 
   const handleEnviar = async () => {
     if (!nuevoMensaje.trim()) return;
-    const res = await conversationService.enviarMensaje(conversacionId, usuarioActualId, nuevoMensaje);
+    const res = await conversationService.enviarMensaje(
+      conversacionId,
+      usuarioActualId,
+      nuevoMensaje
+    );
     setMensajes((prev) => [...prev, res]);
     setNuevoMensaje('');
   };
 
   const buscarCanciones = async (query) => {
     if (!query.trim()) return setResultados([]);
-  
+
     if (!spotifyToken) {
-      console.warn("No hay token de Spotify.");
+      console.warn('No hay token de Spotify.');
       return setResultados([]);
     }
-  
+
     try {
       const encoded = encodeURIComponent(query);
-      const res = await fetch(`https://api.spotify.com/v1/search?q=${encoded}&type=track&limit=5`, {
-        headers: {
-          Authorization: `Bearer ${spotifyToken}`
+      const res = await fetch(
+        `https://api.spotify.com/v1/search?q=${encoded}&type=track&limit=5`,
+        {
+          headers: {
+            Authorization: `Bearer ${spotifyToken}`,
+          },
         }
-      });
-  
+      );
       const data = await res.json();
       setResultados(data.tracks?.items || []);
     } catch (err) {
-      console.error("Error buscando canciones en Spotify:", err);
+      console.error('Error buscando canciones en Spotify:', err);
     }
   };
-  
 
   const enviarCancion = async (track) => {
     const cancion = {
       uri: track.uri,
       titulo: track.name,
       artista: track.artists.map((a) => a.name).join(', '),
-      imagen: track.album.images[0]?.url || null
+      imagen: track.album.images[0]?.url || null,
     };
-    
-  
-    const res = await conversationService.enviarMensaje(conversacionId, usuarioActualId, '', cancion);
+
+    const res = await conversationService.enviarMensaje(
+      conversacionId,
+      usuarioActualId,
+      '',
+      cancion
+    );
     setMensajes((prev) => [...prev, res]);
     setMostrarBusqueda(false);
     setBusqueda('');
     setResultados([]);
-  };  
-  
+  };
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-harmony-primary">
@@ -119,21 +127,23 @@ export default function ChatDetalle() {
       <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 mx-4 bg-harmony-secondary/30 border border-harmony-text-secondary/10 rounded-2xl backdrop-blur-sm scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         {mensajes.length === 0 && (
           <div className="text-center text-harmony-text-secondary">
-            No hay mensajes en esta conversación todavía.
+            {t('chatDetalle.noMessages')}
           </div>
         )}
 
         {mensajes.map((msg) => (
           <div
             key={msg._id}
-            className={`flex ${msg.emisor_id._id === usuarioActualId ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${
+              msg.emisor_id._id === usuarioActualId ? 'justify-end' : 'justify-start'
+            }`}
           >
             <div
-              className={`max-w-[75%] p-3 rounded-2xl border backdrop-blur-sm transition
-                ${msg.emisor_id._id === usuarioActualId
+              className={`max-w-[75%] p-3 rounded-2xl border backdrop-blur-sm transition ${
+                msg.emisor_id._id === usuarioActualId
                   ? 'bg-harmony-accent/80 text-white border-white/20'
-                  : 'bg-harmony-secondary/30 text-harmony-text-primary border-harmony-text-secondary/10'}
-              `}
+                  : 'bg-harmony-secondary/30 text-harmony-text-primary border-harmony-text-secondary/10'
+              }`}
             >
               <div className="text-sm font-semibold mb-1">{msg.emisor_id.nombre}</div>
               {msg.contenido && <div>{msg.contenido}</div>}
@@ -149,20 +159,24 @@ export default function ChatDetalle() {
                   )}
                   <div className="flex flex-col overflow-hidden">
                     <div className="font-bold truncate">{msg.cancion.titulo}</div>
-                    <div className="text-xs text-harmony-text-secondary truncate">{msg.cancion.artista}</div>
+                    <div className="text-xs text-harmony-text-secondary truncate">
+                      {msg.cancion.artista}
+                    </div>
                     <button
                       onClick={() => playTrack(msg.cancion.uri, 0)}
                       className="mt-1 text-xs text-harmony-accent hover:underline text-left"
                     >
-                      Reproducir
+                      {t('chatDetalle.play')}
                     </button>
                   </div>
                 </div>
               )}
 
-
               <div className="text-xs mt-1 text-right text-harmony-text-secondary">
-                {new Date(msg.fecha_envio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {new Date(msg.fecha_envio).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </div>
             </div>
           </div>
@@ -171,15 +185,12 @@ export default function ChatDetalle() {
       </div>
 
       {mostrarBusqueda && (
-        <div
-          ref={busquedaRef}
-          className="fixed bottom-28 left-0 right-0 px-4 z-30"
-        >
+        <div ref={busquedaRef} className="fixed bottom-28 left-0 right-0 px-4 z-30">
           <div className="bg-harmony-secondary p-3 rounded-xl border border-harmony-text-secondary/20 shadow space-y-2">
             <input
               type="text"
               className="w-full bg-transparent border-b border-harmony-text-secondary text-harmony-text-primary placeholder:text-harmony-text-secondary outline-none mb-2"
-              placeholder="Buscar canción..."
+              placeholder={t('chatDetalle.searchPlaceholder')}
               value={busqueda}
               onChange={(e) => {
                 setBusqueda(e.target.value);
@@ -188,7 +199,9 @@ export default function ChatDetalle() {
             />
             <div className="max-h-40 overflow-y-auto space-y-2">
               {resultados.length === 0 && (
-                <p className="text-sm text-harmony-text-secondary">Sin resultados</p>
+                <p className="text-sm text-harmony-text-secondary">
+                  {t('chatDetalle.noResults')}
+                </p>
               )}
               {resultados.map((track) => (
                 <div
@@ -197,17 +210,20 @@ export default function ChatDetalle() {
                   onClick={() => enviarCancion(track)}
                 >
                   <img
-                    src={track.album.images[0]?.url || "https://via.placeholder.com/40"}
+                    src={track.album.images[0]?.url || 'https://via.placeholder.com/40'}
                     alt={track.name}
                     className="w-10 h-10 rounded object-cover"
                   />
                   <div className="flex flex-col overflow-hidden">
-                    <div className="font-semibold text-harmony-text-primary truncate">{track.name}</div>
-                    <div className="text-sm text-harmony-text-secondary truncate">{track.artists.map((a) => a.name).join(", ")}</div>
+                    <div className="font-semibold text-harmony-text-primary truncate">
+                      {track.name}
+                    </div>
+                    <div className="text-sm text-harmony-text-secondary truncate">
+                      {track.artists.map((a) => a.name).join(', ')}
+                    </div>
                   </div>
                 </div>
               ))}
-
             </div>
           </div>
         </div>
@@ -220,7 +236,7 @@ export default function ChatDetalle() {
           </button>
           <input
             type="text"
-            placeholder="Escribe un mensaje..."
+            placeholder={t('chatDetalle.messagePlaceholder')}
             className="flex-1 bg-transparent outline-none text-harmony-text-primary placeholder:text-harmony-text-secondary rounded-full px-2 py-1"
             value={nuevoMensaje}
             onChange={(e) => setNuevoMensaje(e.target.value)}
@@ -229,14 +245,14 @@ export default function ChatDetalle() {
           <button
             onClick={handleEnviar}
             className="p-2 hover:bg-harmony-secondary/50 rounded-full"
-            title="Enviar mensaje"
+            title={t('chatDetalle.sendButton')}
           >
             <FaPaperPlane className="text-lg" />
           </button>
           <button
             onClick={() => setMostrarBusqueda(!mostrarBusqueda)}
             className="p-2 hover:bg-harmony-secondary/50 rounded-full"
-            title="Buscar canción"
+            title={t('chatDetalle.searchButton')}
           >
             <FaPaperclip className="text-lg" />
           </button>
