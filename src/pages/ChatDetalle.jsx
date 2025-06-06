@@ -22,14 +22,18 @@ export default function ChatDetalle() {
   const busquedaRef = useRef(null);
   const spotifyToken = localStorage.getItem('sp_token');
 
+  // 1) Cargo usuario y mensajes una vez al inicializar o cuando cambia conversacionId
   useEffect(() => {
+    let isMounted = true;
     const cargarMensajes = async () => {
       try {
         const res = await userService.getCurrentUser();
         const user = res?.user;
         if (user?._id) {
+          if (!isMounted) return;
           setUsuarioActualId(user._id);
           const data = await conversationService.getMensajesDeConversacion(conversacionId);
+          if (!isMounted) return;
           setMensajes(data);
         }
       } catch (err) {
@@ -38,12 +42,43 @@ export default function ChatDetalle() {
     };
 
     cargarMensajes();
+
+    return () => {
+      isMounted = false;
+    };
   }, [conversacionId]);
 
+  // 2) Efecto que “escucha” nuevos mensajes cada cierto intervalo
+  useEffect(() => {
+    let intervalId = null;
+    const fetchNuevos = async () => {
+      try {
+        const data = await conversationService.getMensajesDeConversacion(conversacionId);
+        // Si el número de mensajes aumentó, los actualizo
+        if (data.length !== mensajes.length) {
+          setMensajes(data);
+        }
+      } catch (err) {
+        console.error('Error obteniendo mensajes en polling:', err);
+      }
+    };
+
+    // Arranco el intervalo solo si ya tengo usuarioActualId (para evitar llamadas redundantes muy tempranas)
+    if (usuarioActualId) {
+      intervalId = setInterval(fetchNuevos, 3000); // cada 3 segundos
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [conversacionId, usuarioActualId, mensajes.length]);
+
+  // 3) Scroll automático al cambiar mensajes
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [mensajes]);
 
+  // 4) Manejo clic fuera de búsqueda (sin cambios)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (busquedaRef.current && !busquedaRef.current.contains(event.target)) {
@@ -64,13 +99,17 @@ export default function ChatDetalle() {
 
   const handleEnviar = async () => {
     if (!nuevoMensaje.trim()) return;
-    const res = await conversationService.enviarMensaje(
-      conversacionId,
-      usuarioActualId,
-      nuevoMensaje
-    );
-    setMensajes((prev) => [...prev, res]);
-    setNuevoMensaje('');
+    try {
+      const res = await conversationService.enviarMensaje(
+        conversacionId,
+        usuarioActualId,
+        nuevoMensaje
+      );
+      setMensajes((prev) => [...prev, res]);
+      setNuevoMensaje('');
+    } catch (err) {
+      console.error('Error al enviar mensaje:', err);
+    }
   };
 
   const buscarCanciones = async (query) => {
@@ -106,16 +145,20 @@ export default function ChatDetalle() {
       imagen: track.album.images[0]?.url || null,
     };
 
-    const res = await conversationService.enviarMensaje(
-      conversacionId,
-      usuarioActualId,
-      '',
-      cancion
-    );
-    setMensajes((prev) => [...prev, res]);
-    setMostrarBusqueda(false);
-    setBusqueda('');
-    setResultados([]);
+    try {
+      const res = await conversationService.enviarMensaje(
+        conversacionId,
+        usuarioActualId,
+        '',
+        cancion
+      );
+      setMensajes((prev) => [...prev, res]);
+      setMostrarBusqueda(false);
+      setBusqueda('');
+      setResultados([]);
+    } catch (err) {
+      console.error('Error al enviar canción:', err);
+    }
   };
 
   return (
