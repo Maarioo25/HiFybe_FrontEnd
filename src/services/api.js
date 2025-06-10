@@ -1,3 +1,4 @@
+// src/services/api.js
 import axios from 'axios';
 
 const api = axios.create({
@@ -9,16 +10,6 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
-      document.cookie = [
-        `token=`,
-        `Domain=.mariobueno.info`,
-        `Path=/`,
-        `Expires=Thu, 01 Jan 1970 00:00:00 GMT`,
-        `Secure`,
-        `SameSite=None`
-      ].join('; ');
-      localStorage.removeItem('sp_token');
-      localStorage.removeItem('sp_refresh');
       return Promise.reject({
         response: {
           data: {
@@ -27,15 +18,7 @@ api.interceptors.response.use(
         }
       });
     }
-    if (error.response?.status === 500) {
-      return Promise.reject({
-        response: {
-          data: {
-            mensaje: 'Error en el servidor. Por favor, verifica que todos los campos estén correctamente completados.'
-          }
-        }
-      });
-    }
+
     return Promise.reject({
       response: {
         data: {

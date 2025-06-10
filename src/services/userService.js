@@ -1,3 +1,4 @@
+// src/services/userService.js
 import api from './api';
 
 export const userService = {
@@ -5,10 +6,12 @@ export const userService = {
     const res = await api.get('/usuarios');
     return res.data;
   },
+
   getUserById: async id => {
     const res = await api.get(`/usuarios/${id}`);
     return res.data;
   },
+
   updateProfile: async (id, data) => {
     const res = await api.put(`/usuarios/${id}`, {
       nombre: data.nombre,
@@ -18,26 +21,32 @@ export const userService = {
     });
     return res.data;
   },
+
   deleteUser: async id => {
     const res = await api.delete(`/usuarios/${id}`);
     return res.data;
   },
+
   login: async (email, password) => {
     const res = await api.post('/usuarios/login', { email, password });
     return res.data;
   },
+
   register: async data => {
     const res = await api.post('/usuarios/register', data);
     return res.data;
   },
+
   getCurrentUser: async () => {
     const res = await api.get('/usuarios/me');
     return res.data;
   },
+
   logout: async () => {
     const res = await api.post('/usuarios/logout');
     return res.data;
   },
+
   setCancionUsuario: async (userId, trackId) => {
     try {
       const res = await api.put(`/usuarios/${userId}/cancion`, { trackId });
@@ -47,6 +56,7 @@ export const userService = {
       return null;
     }
   },
+
   getCancionUsuario: async (userId) => {
     try {
       const res = await api.get(`/usuarios/${userId}/cancion`);
@@ -56,6 +66,7 @@ export const userService = {
       return null;
     }
   },
+
   ocultarUbicacion: async () => {
     try {
       const res = await api.post("/usuarios/ocultar-ubicacion");
@@ -65,6 +76,7 @@ export const userService = {
       throw err;
     }
   },
+
   actualizarUbicacion: async (latitude, longitude) => {
     try {
       const res = await api.post("/usuarios/ubicacion", {
@@ -77,6 +89,7 @@ export const userService = {
       throw err;
     }
   },
+
   updateRedesSociales: async (id, redes) => {
     try {
       const res = await api.put(`/usuarios/${id}/redes`, redes);
@@ -90,11 +103,10 @@ export const userService = {
   updateFotoPerfil: async (id, file) => {
     const formData = new FormData();
     formData.append('foto', file);
-  
+
     const res = await api.post(`/usuarios/${id}/foto`, formData);
-  
     return res.data;
-  },  
+  },
 
   updatePreferencias: async (id, preferencias) => {
     try {
@@ -105,5 +117,4 @@ export const userService = {
       throw err;
     }
   },
-
 };
