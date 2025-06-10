@@ -26,9 +26,9 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
   const handleAddFriend = async (targetId) => {
     try {
       const emisor = await userService.getCurrentUser();
-      const nombreEmisor = emisor.user.nombre;
+      const nombreEmisor = emisor.usuario.nombre;
 
-      await friendService.sendRequest(emisor.user._id || emisor.user.id, targetId);
+      await friendService.sendRequest(emisor.usuario._id || emisor.usuario.id, targetId);
       await notificationService.crear(
         targetId,
         t('addFriend.notification', { name: nombreEmisor })

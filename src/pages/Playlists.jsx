@@ -25,7 +25,7 @@ export default function Playlists() {
       const trackId = uri?.split(':').pop();
       if (!trackId) return;
       const currentUser = await userService.getCurrentUser();
-      await userService.setCancionUsuario(currentUser.user._id, trackId);
+      await userService.setCancionUsuario(currentUser.usuario._id, trackId);
     } catch (err) {
       console.error("Error al guardar canción desde Playlists:", err);
     }

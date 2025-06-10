@@ -48,7 +48,7 @@ export default function PlaylistDetail() {
       await playTrack(uris);
       const currentUser = await userService.getCurrentUser();
       const trackId = uris[0].split(":").pop();
-      await userService.setCancionUsuario(currentUser.user._id, trackId);
+      await userService.setCancionUsuario(currentUser.usuario._id, trackId);
     } catch (err) {
       console.error("Error al reproducir playlist:", err);
       toast.error(t('playlistDetail.error.play_playlist'));
@@ -61,7 +61,7 @@ export default function PlaylistDetail() {
       await playTrack(uri, 0, false, true);
       const trackId = uri.split(":").pop();
       const currentUser = await userService.getCurrentUser();
-      await userService.setCancionUsuario(currentUser.user._id, trackId);
+      await userService.setCancionUsuario(currentUser.usuario._id, trackId);
     } catch (err) {
       console.error("Error al reproducir canción:", err);
       toast.error(t('playlistDetail.error.play_song'));

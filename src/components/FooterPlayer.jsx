@@ -139,7 +139,7 @@ const FooterPlayer = () => {
       try {
         const currentUser = await userService.getCurrentUser();
         const trackId = currentTrack.uri.split(':').pop();
-        await userService.setCancionUsuario(currentUser.user._id, trackId);
+        await userService.setCancionUsuario(currentUser.usuario._id, trackId);
       } catch (err) {
         console.error('Error guardando canción en FooterPlayer:', err);
       }

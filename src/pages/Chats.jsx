@@ -17,7 +17,7 @@ export default function Chats() {
   useEffect(() => {
     const cargarConversaciones = async () => {
       const res = await userService.getCurrentUser();
-      const user = res?.user;
+      const user = res?.usuario;
       if (user?._id) {
         setUsuarioActualId(user._id);
         const data = await conversationService.getConversacionesDeUsuario(user._id);

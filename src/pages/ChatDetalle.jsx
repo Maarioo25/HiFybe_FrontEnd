@@ -28,7 +28,7 @@ export default function ChatDetalle() {
     const cargarMensajes = async () => {
       try {
         const res = await userService.getCurrentUser();
-        const user = res?.user;
+        const user = res?.usuario;
         if (user?._id) {
           if (!isMounted) return;
           setUsuarioActualId(user._id);

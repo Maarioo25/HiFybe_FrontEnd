@@ -139,7 +139,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     try {
       const currentUser = await userService.getCurrentUser();
       const trackId = track.uri.split(':').pop();
-      await userService.setCancionUsuario(currentUser.user._id, trackId);
+      await userService.setCancionUsuario(currentUser.usuario._id, trackId);
     } catch (err) {
       console.error('Error guardando canción:', err);
     }

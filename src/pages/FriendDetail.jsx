@@ -41,7 +41,7 @@ export default function FriendDetail() {
   const handleIniciarConversacion = async () => {
     try {
       const currentUser = await userService.getCurrentUser();
-      const userId = currentUser.user._id;
+      const userId = currentUser.usuario._id;
       const conversaciones = await conversationService.getConversacionesDeUsuario(userId);
 
       const yaExiste = conversaciones.find(conversacion =>
@@ -150,7 +150,7 @@ export default function FriendDetail() {
                               const trackId = friend.song.spotifyUri?.split(':').pop();
                               if (trackId) {
                                 await userService.setCancionUsuario(
-                                  currentUser.user._id,
+                                  currentUser.usuario._id,
                                   trackId
                                 );
                               }
@@ -295,7 +295,7 @@ export default function FriendDetail() {
                                 const trackId = song.spotifyUri?.split(':').pop();
                                 if (trackId) {
                                   await userService.setCancionUsuario(
-                                    currentUser.user._id,
+                                    currentUser.usuario._id,
                                     trackId
                                   );
                                 }
