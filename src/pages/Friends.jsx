@@ -26,7 +26,9 @@ export default function Friends() {
     const loadData = async () => {
       try {
         const currentUser = await userService.getCurrentUser();
-        const userId = currentUser.usuario?._id || currentUser.usuario?.id;
+        const usuario = currentUser?.usuario || currentUser?.user || currentUser;
+        const userId = usuario?._id || usuario?.id;
+        if (!userId) throw new Error("No se pudo obtener el ID del usuario");
         setCurrentUserId(userId);
         const [friends, requests] = await Promise.all([
           friendService.getFriends(userId),
