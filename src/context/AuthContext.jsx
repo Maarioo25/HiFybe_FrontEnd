@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const data = await userService.getCurrentUser();
-      setUser(data.user);
+      setUser(data.usuario);
     } catch {
       setUser(null);
     } finally {
