@@ -60,7 +60,7 @@ export default function MainPage() {
     const fetchFriends = async () => {
       try {
         const currentUser = await userService.getCurrentUser();
-        const userId = currentUser.user._id || currentUser.user.id;
+        const userId = currentUser.usuario._id || currentUser.usuario.id;
         setCurrentUserId(userId);
         const friends = await friendService.getFriends(userId);
         setRealFriends(friends);
