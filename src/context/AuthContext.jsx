@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("🔍 Comprobando autenticación...");
     checkAuth();
   }, []);
 
