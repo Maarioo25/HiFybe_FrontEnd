@@ -1,27 +1,25 @@
-import axios from 'axios';
 import api from './api';
 
 export const musicService = {
   getSongs: async filters => {
-    const res = await axios.get('/canciones', { params: filters });
+    const res = await api.get('/canciones', { params: filters });
     return res.data;
   },
   getPlaylists: async () => {
-    const res = await axios.get('/playlists');
+    const res = await api.get('/playlists');
     return res.data;
   },
   createPlaylist: async data => {
-    const res = await axios.post('/playlists', data);
+    const res = await api.post('/playlists', data);
     return res.data;
   },
   addSongToPlaylist: async (pid, sid) => {
-    const res = await axios.post(`/playlists/${pid}/canciones`, { songId: sid });
+    const res = await api.post(`/playlists/${pid}/canciones`, { songId: sid });
     return res.data;
   },
   getSpotifyRecommendations: async () => {
     try {
-      const res = await fetch('/data/recommendations.json');
-      const recomendaciones = await res.json();
+      const recomendaciones = await fetch('/data/recommendations.json').then(r => r.json());
 
       const detalles = await Promise.all(
         recomendaciones.map(async (rec) => {
