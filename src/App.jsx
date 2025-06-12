@@ -48,13 +48,8 @@ function App() {
             <Route path="/auth" element={<AuthForm />} />
             
             {/* Rutas protegidas */}
-            <Route
-              element={
-                <ProtectedRoute>
-                  <></>
-                </ProtectedRoute>
-              }
-            >
+            <Route element={<ProtectedRoute />}>
+
               <Route path="/" element={<MainPage />} />
               <Route path="/friends" element={<Friends />} />
               <Route path="/friends/:id" element={<FriendDetail />} />
