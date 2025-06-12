@@ -24,7 +24,7 @@ export default function ChatDetalle() {
 
   // 1) Cargo usuario y mensajes una vez al inicializar o cuando cambia conversacionId
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true; 
     const cargarMensajes = async () => {
       try {
         const res = await userService.getCurrentUser();
@@ -33,6 +33,10 @@ export default function ChatDetalle() {
           if (!isMounted) return;
           setUsuarioActualId(user._id);
           const data = await conversationService.getMensajesDeConversacion(conversacionId);
+          console.log('➡️ ID conversación:', conversacionId);
+          console.log('👤 Usuario actual:', user);
+          console.log('📥 Mensajes recibidos:', data);
+
           if (!isMounted) return;
           setMensajes(data);
         }
@@ -178,35 +182,37 @@ export default function ChatDetalle() {
           <div
             key={msg._id}
             className={`flex ${
-              msg.emisor_id._id === usuarioActualId ? 'justify-end' : 'justify-start'
+              msg?.emisor_id?._id === usuarioActualId
+                ? 'justify-end'
+                 : 'justify-start'
             }`}
           >
             <div
               className={`max-w-[75%] p-3 rounded-2xl border backdrop-blur-sm transition ${
-                msg.emisor_id._id === usuarioActualId
+                msg?.emisor_id?._id === usuarioActualId
                   ? 'bg-harmony-accent/80 text-white border-white/20'
                   : 'bg-harmony-secondary/30 text-harmony-text-primary border-harmony-text-secondary/10'
               }`}
             >
-              <div className="text-sm font-semibold mb-1">{msg.emisor_id.nombre}</div>
-              {msg.contenido && <div>{msg.contenido}</div>}
+              <div className="text-sm font-semibold mb-1">{msg?.emisor_id?.nombre}</div>
+              {msg?.contenido && <div>{msg?.contenido}</div>}
 
-              {msg.cancion && (
+              {msg?.cancion && (
                 <div className="mt-2 p-2 bg-harmony-secondary/20 rounded-xl text-sm border border-harmony-text-secondary/10 flex gap-3 items-center">
-                  {msg.cancion.imagen && (
+                  {msg?.cancion?.imagen && (
                     <img
-                      src={msg.cancion.imagen}
-                      alt={msg.cancion.titulo}
+                      src={msg?.cancion?.imagen}
+                      alt={msg?.cancion?.titulo}
                       className="w-12 h-12 rounded object-cover border border-harmony-text-secondary/30"
                     />
                   )}
                   <div className="flex flex-col overflow-hidden">
-                    <div className="font-bold truncate">{msg.cancion.titulo}</div>
+                    <div className="font-bold truncate">{msg?.cancion?.titulo}</div>
                     <div className="text-xs text-harmony-text-secondary truncate">
-                      {msg.cancion.artista}
+                      {msg?.cancion?.artista}
                     </div>
                     <button
-                      onClick={() => playTrack(msg.cancion.uri, 0)}
+                      onClick={() => playTrack(msg?.cancion?.uri, 0)}
                       className="mt-1 text-xs text-harmony-accent hover:underline text-left"
                     >
                       {t('chatDetalle.play')}
@@ -216,7 +222,7 @@ export default function ChatDetalle() {
               )}
 
               <div className="text-xs mt-1 text-right text-harmony-text-secondary">
-                {new Date(msg.fecha_envio).toLocaleTimeString([], {
+                {new Date(msg?.fecha_envio).toLocaleTimeString([], {
                   hour: '2-digit',
                   minute: '2-digit',
                 })}
