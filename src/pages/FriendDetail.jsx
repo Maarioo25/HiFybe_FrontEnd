@@ -47,9 +47,14 @@ export default function FriendDetail() {
       console.log("conversaciones extraídas:", conversaciones);
 
       const yaExiste = conversaciones.find(conversacion =>
-        (conversacion.usuario1_id._id === userId && conversacion.usuario2_id._id === friend._id) ||
-        (conversacion.usuario2_id._id === userId && conversacion.usuario1_id._id === friend._id)
+        conversacion.usuario1_id &&
+        conversacion.usuario2_id &&
+        (
+          (conversacion.usuario1_id._id === userId && conversacion.usuario2_id._id === friend._id) ||
+          (conversacion.usuario2_id._id === userId && conversacion.usuario1_id._id === friend._id)
+        )
       );
+      
 
       if (yaExiste) {
         navigate(`/chat/${yaExiste._id}`);
