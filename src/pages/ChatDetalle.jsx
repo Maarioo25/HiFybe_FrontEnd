@@ -32,10 +32,21 @@ export default function ChatDetalle() {
         if (user?._id) {
           if (!isMounted) return;
           setUsuarioActualId(user._id);
+          console.log('🧠 ID usuario actual seteado en estado:', user._id);
+
           const data = await conversationService.getMensajesDeConversacion(conversacionId);
-          console.log('➡️ ID conversación:', conversacionId);
-          console.log('👤 Usuario actual:', user);
-          console.log('📥 Mensajes recibidos:', data);
+            console.log('➡️ ID conversación:', conversacionId);
+            console.log('👤 Usuario actual:', user);
+            console.log('📥 Mensajes recibidos:', data);
+
+            if (!Array.isArray(data)) {
+              console.error('❌ La respuesta no es un array. Es:', data);
+              return;
+            }
+            if (data.length === 0) {
+              console.warn('⚠️ La conversación no tiene mensajes.');
+            }
+
 
           if (!isMounted) return;
           setMensajes(data);
@@ -179,6 +190,8 @@ export default function ChatDetalle() {
         )}
 
         {mensajes.map((msg) => (
+          console.log('🔁 Renderizando mensajes:', mensajes),
+          console.log('📌 Usuario actual ID (para comparar con emisor):', usuarioActualId),
           <div
             key={msg._id}
             className={`flex ${
