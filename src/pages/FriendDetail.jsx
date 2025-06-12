@@ -265,12 +265,15 @@ export default function FriendDetail() {
                 >
                   {t('friendDetail.sendMessage')}
                 </button>
+                {amistadId && (
                 <button
                   onClick={handleEliminarAmistad}
-                  className="inline-block mt-4 px-4 py-2 bg-harmony-accent text-white text-sm font-semibold rounded-full hover:bg-harmony-accent/80 transition"
+                  className="inline-block mt-2 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-full hover:bg-red-700 transition"
                 >
                   {t('friendDetail.deleteFriend')}
                 </button>
+              )}
+
               </div>
             </div>
           </div>
