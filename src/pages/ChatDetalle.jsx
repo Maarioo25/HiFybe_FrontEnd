@@ -122,6 +122,7 @@ export default function ChatDetalle() {
         usuarioActualId,
         nuevoMensaje
       );
+      console.log('✅ Mensaje enviado:', res);
       setMensajes((prev) => [...prev, res]);
       setNuevoMensaje('');
     } catch (err) {
@@ -134,6 +135,7 @@ export default function ChatDetalle() {
 
   const buscarCanciones = async (query) => {
     if (!query.trim()) return setResultados([]);
+    console.log('🔍 Buscando canciones para:', query);
 
     if (!spotifyToken) {
       console.warn('No hay token de Spotify.');
@@ -155,6 +157,7 @@ export default function ChatDetalle() {
     } catch (err) {
       console.error('Error buscando canciones en Spotify:', err);
     }
+    console.log('✅ Resultado de búsqueda:', resultados);
   };
 
   const enviarCancion = async (track) => {
@@ -172,6 +175,7 @@ export default function ChatDetalle() {
         '',
         cancion
       );
+      console.log('✅ Mensaje con canción enviado:', res);
       setMensajes((prev) => [...prev, res]);
       setMostrarBusqueda(false);
       setBusqueda('');
@@ -302,9 +306,6 @@ export default function ChatDetalle() {
 
       <div className="shrink-0 px-4 mt-4 mb-4 z-10">
         <div className="flex items-center gap-3 bg-harmony-secondary/40 backdrop-blur-md rounded-full px-4 py-2 border border-harmony-text-secondary/20">
-          <button className="p-2 hover:bg-harmony-secondary/50 rounded-full">
-            <FaSmile className="text-lg" />
-          </button>
           <input
             type="text"
             placeholder={t('chatDetalle.messagePlaceholder')}
