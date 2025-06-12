@@ -16,7 +16,7 @@ export default function FriendDetail() {
   const navigate = useNavigate();
   const [friend, setFriend] = useState(null);
   const [playlists, setPlaylists] = useState([]);
-  
+  const [amistadId, setAmistadId] = useState(null);
   const [error, setError] = useState(null);
   const { setCurrentSong, setIsPlaying } = usePlayer();
 
@@ -25,7 +25,14 @@ export default function FriendDetail() {
       try {
         const userData = await friendService.getFriendById(id);
         setFriend(userData);
+  
+        const currentUser = await userService.getCurrentUser();
+        const friendships = await friendService.getFriends(currentUser._id);
+  
+        const amistad = friendships.find(f => f.id === id);
+        if (amistad) setAmistadId(amistad.amistadId);
 
+  
         if (userData.auth_proveedor === 'spotify' || userData.spotifyId) {
           const rawPlaylists = await playlistService.getSpotifyPlaylists(userData._id);
           setPlaylists(rawPlaylists);
@@ -43,9 +50,7 @@ export default function FriendDetail() {
     try {
       const currentUser = await userService.getCurrentUser();
       const userId = currentUser._id;
-      console.log("userId extraído de currentUser:", userId);
       const conversaciones = await conversationService.getConversacionesDeUsuario(userId);
-      console.log("conversaciones extraídas:", conversaciones);
 
       const yaExiste = conversaciones.find(conversacion =>
         conversacion.usuario1_id &&
@@ -65,6 +70,16 @@ export default function FriendDetail() {
       }
     } catch (error) {
       console.error("Error al iniciar conversación:", error);
+    }
+  };
+
+  const handleEliminarAmistad = async () => {
+    if (!amistadId) return;
+    try {
+      await friendService.deleteFriend(amistadId);
+      navigate('/friends');
+    } catch (err) {
+      console.error('Error al eliminar amistad:', err);
     }
   };
 
@@ -89,15 +104,6 @@ export default function FriendDetail() {
       </div>
     );
   }
-
-  const obtenerNombreYFotoDelOtro = (conv) => {
-    const esUsuario1 = conv.usuario1_id._id === friend._id;
-    const otro = esUsuario1 ? conv.usuario2_id : conv.usuario1_id;
-    return {
-      nombre: otro.nombre,
-      foto: otro.foto_perfil || `https://picsum.photos/300/300?random=${Math.random()}`
-    };
-  };
 
   return (
     <div className="flex flex-col h-screen bg-harmony-primary">
@@ -256,6 +262,15 @@ export default function FriendDetail() {
                 >
                   {t('friendDetail.sendMessage')}
                 </button>
+                {amistadId && (
+                <button
+                  onClick={handleEliminarAmistad}
+                  className="inline-block mt-2 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-full hover:bg-red-700 transition"
+                >
+                  {t('friendDetail.deleteFriend')}
+                </button>
+              )}
+
               </div>
             </div>
           </div>
