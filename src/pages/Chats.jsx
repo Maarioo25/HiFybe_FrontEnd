@@ -17,16 +17,19 @@ export default function Chats() {
   useEffect(() => {
     const cargarConversaciones = async () => {
       const res = await userService.getCurrentUser();
-      const user = res?.usuario;
+      const user = res?.usuario || res;
       if (user?._id) {
         setUsuarioActualId(user._id);
-        const data = await conversationService.getConversacionesDeUsuario(user._id);
+        let data = await conversationService.getConversacionesDeUsuario(user._id);
+  
+        data = data.filter(conv => conv.usuario1_id && conv.usuario2_id);
+  
         setConversaciones(data);
       }
     };
-
     cargarConversaciones();
   }, []);
+  
 
   const obtenerNombreYFotoDelOtro = (conv) => {
     if (!conv.usuario1_id || !conv.usuario2_id) {
