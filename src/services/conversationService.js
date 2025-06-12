@@ -21,48 +21,28 @@ export const conversationService = {
       console.log(`📤 Solicitando mensajes de la conversación ${conversacionId}`);
       const res = await api.get(`/conversaciones/${conversacionId}/mensajes`);
       console.log(`📥 Mensajes recibidos (${res.data.length}):`, res.data);
-  
+
       if (!Array.isArray(res.data)) {
         console.error('❌ La respuesta no es un array:', res.data);
       }
-  
+
       return res.data;
     } catch (err) {
       console.error(`❌ Error al obtener mensajes de conversación ${conversacionId}:`, err);
       return [];
     }
   },
-  
+
 
   // Enviar un mensaje (con o sin canción)
-  enviarMensaje: async (conversacionId, emisorId, contenido, cancion) => {
-    const mensajeLimpio = contenido.trim();
-  
-    // Si no hay texto y no hay canción, no enviar
-    if (!mensajeLimpio) {
-      console.warn('⚠️ No se puede enviar un mensaje vacío.');
-      return;
-    }
-  
-    console.log('📨 Intentando enviar mensaje...');
-    console.log('🆔 Conversación:', conversacionId);
-    console.log('👤 Usuario actual ID:', emisorId);
-    console.log('✉️ Contenido:', mensajeLimpio);
-  
-    try {
-      const res = await api.post(`/conversaciones/${conversacionId}/mensajes`, {
-        emisor_id: emisorId,
-        contenido,
-        cancion
-      });
-      return res.data;
-    } catch (err) {
-      console.error('❌ Error al enviar mensaje:', err?.response?.data || err);
-      throw err;
-    }
+  enviarMensaje: async (conversacionId, emisorId, contenido, cancion = null) => {
+    const res = await api.post(`/conversaciones/${conversacionId}/mensajes`, {
+      emisor_id: emisorId,
+      contenido,
+      cancion
+    });
+    return res.data;
   },
-  
-  
 
   // Marcar un mensaje como leído
   marcarMensajeLeido: async (mensajeId) => {
