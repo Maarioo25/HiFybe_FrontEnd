@@ -115,25 +115,29 @@ export default function ChatDetalle() {
   const handleEnviar = async () => {
     if (!nuevoMensaje.trim()) return;
   
-    console.log('📨 Intentando enviar mensaje...');
-    console.log('🆔 Conversación:', conversacionId);
-    console.log('👤 Usuario actual ID:', usuarioActualId);
-    console.log('✉️ Contenido:', nuevoMensaje);
+    if (!usuarioActualId) {
+      console.warn('⚠️ No se ha cargado aún el usuarioActualId, esperando...');
+      return;
+    }
   
     try {
+      console.log("📨 Intentando enviar mensaje...");
+      console.log("🆔 Conversación:", conversacionId);
+      console.log("👤 Usuario actual ID:", usuarioActualId);
+      console.log("✉️ Contenido:", nuevoMensaje);
+  
       const res = await conversationService.enviarMensaje(
         conversacionId,
         usuarioActualId,
         nuevoMensaje
       );
-  
-      console.log('✅ Mensaje enviado correctamente:', res);
       setMensajes((prev) => [...prev, res]);
       setNuevoMensaje('');
     } catch (err) {
       console.error('❌ Error al enviar mensaje:', err);
     }
   };
+  
   
 
   const buscarCanciones = async (query) => {

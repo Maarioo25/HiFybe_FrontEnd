@@ -45,7 +45,7 @@ export const conversationService = {
       });
   
       const res = await api.post(`/conversaciones/${conversacionId}/mensajes`, {
-        emisor_id: emisorId, // ✅ corregido
+        emisor_id: emisorId,
         contenido,
         cancion
       });
