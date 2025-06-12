@@ -36,26 +36,20 @@ export const conversationService = {
 
   // Enviar un mensaje (con o sin canción)
   enviarMensaje: async (conversacionId, emisorId, contenido, cancion = null) => {
-    try {
-      console.log('📤 Enviando mensaje:', {
-        conversacionId,
-        emisor_id: emisorId,
-        contenido,
-        cancion
-      });
-  
-      const res = await api.post(`/conversaciones/${conversacionId}/mensajes`, {
-        emisor_id: emisorId,
-        contenido,
-        cancion
-      });
-  
-      console.log('📥 Respuesta del backend:', res.data);
-      return res.data;
-    } catch (err) {
-      console.error('❌ Error al enviar mensaje:', err.response?.data || err);
-      throw err;
-    }
+    console.log('📤 Enviando mensaje:', {
+      conversacionId,
+      emisor_id: emisorId,
+      contenido,
+      cancion
+    });
+
+    const res = await api.post(`/conversaciones/${conversacionId}/mensajes`, {
+      emisor_id: emisorId,
+      contenido,
+      cancion
+    });
+
+    return res.data;
   },
   
 
