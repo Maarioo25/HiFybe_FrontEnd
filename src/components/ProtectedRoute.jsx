@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 const ProtectedRoute = () => {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
+  console.log("🔐 ProtectedRoute - user:", user, "| loading:", loading);
 
   if (loading) {
     return (

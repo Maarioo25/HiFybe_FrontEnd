@@ -19,20 +19,29 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
+    console.log("🔍 Ejecutando checkAuth...");
     try {
       const data = await userService.getCurrentUser();
+      console.log("📦 Respuesta de /usuarios/me:", data);
+  
       if (data.usuario) {
+        console.log("✅ Usuario válido encontrado (data.usuario):", data.usuario);
         setUser(data.usuario);
-        console.log("✅ Usuario autenticado:", data.usuario);
+      } else if (data._id) {
+        console.log("✅ Usuario válido encontrado (data._id):", data);
+        setUser(data);
       } else {
+        console.warn("⚠️ Usuario no válido, data sin usuario ni _id:", data);
         setUser(null);
       }
-    } catch {
+    } catch (err) {
+      console.error("❌ Error en checkAuth:", err);
       setUser(null);
     } finally {
       setLoading(false);
     }
   };
+  
   
   const login = async ({ email, password }, showToast = true) => {
     setLoading(true);
