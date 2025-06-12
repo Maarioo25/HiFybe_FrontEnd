@@ -11,6 +11,7 @@ import Playlists from "./pages/Playlists";
 import PlaylistDetail from "./pages/PlaylistDetail";
 import ChatDetalle from "./pages/ChatDetalle";
 import { PlayerProvider } from './context/PlayerContext';
+import AuthCallback from './pages/AuthCallback';
 
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
               <Route path="/playlists" element={<Playlists />} />
               <Route path="/playlists/:id" element={<PlaylistDetail />} />
               <Route path="/public/:userId/:playlistId" element={<PlaylistDetail />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               
             </Route>
 

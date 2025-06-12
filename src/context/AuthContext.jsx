@@ -102,7 +102,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     googleLogin,
     appleLogin,
-    spotifyLogin
+    spotifyLogin,
+    setUser
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
