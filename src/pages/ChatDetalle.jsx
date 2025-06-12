@@ -213,7 +213,11 @@ export default function ChatDetalle() {
               }`}
             >
               <div className="text-sm font-semibold mb-1">{msg?.emisor_id?.nombre}</div>
-              {msg?.contenido && <div>{msg?.contenido}</div>}
+              {msg?.contenido && (
+                <div className="break-words max-h-40 overflow-hidden text-ellipsis whitespace-pre-wrap">
+                  {msg?.contenido}
+                </div>
+              )}
 
               {msg?.cancion && (
                 <div className="mt-2 p-2 bg-harmony-secondary/20 rounded-xl text-sm border border-harmony-text-secondary/10 flex gap-3 items-center">
