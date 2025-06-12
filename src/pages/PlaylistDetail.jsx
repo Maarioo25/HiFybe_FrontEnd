@@ -319,7 +319,14 @@ export default function PlaylistDetail() {
       <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="h-[calc(100vh-222px)] overflow-hidden bg-harmony-secondary/30 backdrop-blur-sm rounded-2xl border border-harmony-text-secondary/10 flex flex-col">
           <div className="p-6 flex-1 flex flex-col min-h-0">
-            {/* Imagen y detalles comunes */}
+            <button
+              onClick={() => navigate(-1)}
+              className="text-harmony-accent hover:text-harmony-accent/80 mb-6 w-fit flex items-center gap-2 text-sm font-medium hover:underline"
+            >
+              <FaArrowLeft />
+              {t('playlistDetail.back')}
+            </button>
+
             <div className="flex items-center gap-6 mb-6">
               <div
                 className={`relative w-48 h-48 rounded-lg overflow-hidden shadow-md 
@@ -350,7 +357,6 @@ export default function PlaylistDetail() {
                 )}
               </div>
               <div>
-                {/* Título editable vs. solo lectura */}
                 <div className="flex items-center gap-2">
                   {isOwnPlaylist && editMode ? (
                     <>
