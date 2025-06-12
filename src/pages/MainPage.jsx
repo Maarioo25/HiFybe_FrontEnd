@@ -61,11 +61,8 @@ export default function MainPage() {
       try {
         const currentUser = await userService.getCurrentUser();
         console.log("🧪 currentUser devuelto por getCurrentUser:", currentUser);
-        const userId =
-          currentUser?.usuario?._id ||
-          currentUser?.usuario?.id ||
-          currentUser?._id ||
-          currentUser?.id;
+        const userId = currentUser?._id || currentUser?.id;
+        console.log("🧪 userId extraído de currentUser:", userId);
 
         setCurrentUserId(userId);
         const friends = await friendService.getFriends(userId);
