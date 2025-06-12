@@ -74,14 +74,20 @@ export default function FriendDetail() {
   };
 
   const handleEliminarAmistad = async () => {
-    if (!amistadId) return;
+    console.log('🔍 Intentando eliminar amistad con ID:', amistadId);
+    if (!amistadId) {
+      console.warn('⚠️ amistadId no definido');
+      return;
+    }
     try {
       await friendService.deleteFriend(amistadId);
+      console.log('✅ Amistad eliminada correctamente');
       navigate('/friends');
     } catch (err) {
-      console.error('Error al eliminar amistad:', err);
+      console.error('❌ Error al eliminar amistad:', err);
     }
   };
+  
 
   if (error) {
     return (
