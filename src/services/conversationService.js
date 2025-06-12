@@ -37,7 +37,7 @@ export const conversationService = {
   // Enviar un mensaje (con o sin canción)
   enviarMensaje: async (conversacionId, emisorId, contenido, cancion = null) => {
     const res = await api.post(`/conversaciones/${conversacionId}/mensajes`, {
-      emisor_id: emisorId,
+      emisorId,
       contenido,
       cancion
     });
