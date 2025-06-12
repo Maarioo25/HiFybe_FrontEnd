@@ -21,7 +21,12 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const data = await userService.getCurrentUser();
-      setUser(data.usuario);
+      if (data.usuario) {
+        setUser(data.usuario);
+        navigate('/'); // 🔁 Redirige al home en caso de usuario válido.
+      } else {
+        setUser(null);
+      }
     } catch {
       setUser(null);
     } finally {
