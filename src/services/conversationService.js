@@ -36,13 +36,28 @@ export const conversationService = {
 
   // Enviar un mensaje (con o sin canción)
   enviarMensaje: async (conversacionId, emisorId, contenido, cancion = null) => {
-    const res = await api.post(`/conversaciones/${conversacionId}/mensajes`, {
-      emisorId,
-      contenido,
-      cancion
-    });
-    return res.data;
+    try {
+      console.log('📤 Enviando mensaje:', {
+        conversacionId,
+        emisor_id: emisorId,
+        contenido,
+        cancion
+      });
+  
+      const res = await api.post(`/conversaciones/${conversacionId}/mensajes`, {
+        emisor_id: emisorId, // ✅ corregido
+        contenido,
+        cancion
+      });
+  
+      console.log('📥 Respuesta del backend:', res.data);
+      return res.data;
+    } catch (err) {
+      console.error('❌ Error al enviar mensaje:', err.response?.data || err);
+      throw err;
+    }
   },
+  
 
   // Marcar un mensaje como leído
   marcarMensajeLeido: async (mensajeId) => {
