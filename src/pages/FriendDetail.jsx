@@ -41,8 +41,10 @@ export default function FriendDetail() {
   const handleIniciarConversacion = async () => {
     try {
       const currentUser = await userService.getCurrentUser();
-      const userId = currentUser.usuario._id;
+      const userId = currentUser._id;
+      console.log("userId extraído de currentUser:", userId);
       const conversaciones = await conversationService.getConversacionesDeUsuario(userId);
+      console.log("conversaciones extraídas:", conversaciones);
 
       const yaExiste = conversaciones.find(conversacion =>
         (conversacion.usuario1_id._id === userId && conversacion.usuario2_id._id === friend._id) ||
@@ -149,10 +151,8 @@ export default function FriendDetail() {
                               const currentUser = await userService.getCurrentUser();
                               const trackId = friend.song.spotifyUri?.split(':').pop();
                               if (trackId) {
-                                await userService.setCancionUsuario(
-                                  currentUser.usuario._id,
-                                  trackId
-                                );
+                                await userService.setCancionUsuario(currentUser._id, trackId);
+                                console.log("Canción de usuario guardada exitosamente");
                               }
                             } catch (err) {
                               console.error(
@@ -294,10 +294,8 @@ export default function FriendDetail() {
                                 const currentUser = await userService.getCurrentUser();
                                 const trackId = song.spotifyUri?.split(':').pop();
                                 if (trackId) {
-                                  await userService.setCancionUsuario(
-                                    currentUser.usuario._id,
-                                    trackId
-                                  );
+                                  await userService.setCancionUsuario(currentUser._id, trackId);
+                                  console.log("Canción de usuario guardada exitosamente");
                                 }
                               } catch (err) {
                                 console.error(

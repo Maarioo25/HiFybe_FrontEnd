@@ -142,7 +142,7 @@ const FooterPlayer = () => {
         console.log("Canción a guardar:", trackId);
         console.log("Usuario actual:", currentUser);
         await userService.setCancionUsuario(currentUser._id, trackId);
-        console.log("Canción guardada exitosamente");
+        console.log("Canción de usuario guardada exitosamente");
       } catch (err) {
         console.error('Error guardando canción en FooterPlayer:', err);
       }

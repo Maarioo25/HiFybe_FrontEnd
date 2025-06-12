@@ -1,6 +1,6 @@
 // src/pages/Playlists.jsx
 import React, { useEffect, useState } from 'react';
-import { FaPlus, FaPlay, FaSpotify } from 'react-icons/fa';
+import { FaPlay, FaSpotify } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import HeaderBar from '../components/HeaderBar';
 import { Link } from 'react-router-dom';
@@ -25,7 +25,7 @@ export default function Playlists() {
       const trackId = uri?.split(':').pop();
       if (!trackId) return;
       const currentUser = await userService.getCurrentUser();
-      await userService.setCancionUsuario(currentUser.usuario._id, trackId);
+      await userService.setCancionUsuario(currentUser._id, trackId);
     } catch (err) {
       console.error("Error al guardar canción desde Playlists:", err);
     }
@@ -72,12 +72,6 @@ export default function Playlists() {
               <h2 className="text-xl font-bold text-harmony-accent">
                 {t('playlists.title')}
               </h2>
-              {isConnected && (
-                <button className="flex items-center gap-2 px-4 py-2 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-white font-semibold">
-                  <FaPlus className="text-lg" />
-                  <span>{t('playlists.new_playlist')}</span>
-                </button>
-              )}
             </div>
 
             <div
