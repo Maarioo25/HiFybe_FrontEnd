@@ -29,13 +29,15 @@ export default function Chats() {
   }, []);
 
   const obtenerNombreYFotoDelOtro = (conv) => {
+    if (!conv.usuario1_id || !conv.usuario2_id) {
+      return { nombre: '[usuario desconocido]', foto: 'https://via.placeholder.com/100?text=?' };
+    }
+  
     const esUsuario1 = conv.usuario1_id._id === usuarioActualId;
     const otro = esUsuario1 ? conv.usuario2_id : conv.usuario1_id;
     return {
-      nombre: otro.nombre,
-      foto:
-        otro.foto_perfil ||
-        `https://picsum.photos/300/300?random=${Math.random()}`,
+      nombre: otro?.nombre || '[sin nombre]',
+      foto: otro?.foto_perfil || `https://picsum.photos/300/300?random=${Math.random()}`,
     };
   };
 
