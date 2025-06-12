@@ -29,7 +29,9 @@ export default function ChatDetalle() {
       console.log('🔍 Buscando usuario...');
       try {
         const res = await userService.getCurrentUser();
-        const user = res?.usuario;
+        console.log('🧪 Resultado de getCurrentUser:', res);
+        const user = res?.usuario || res;
+        console.log('👤 Usuario encontrado:', user);
         if (!user?._id) throw new Error('Usuario no válido');
   
         if (!isMounted) return;
