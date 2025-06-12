@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
       const data = await userService.getCurrentUser();
       if (data.usuario) {
         setUser(data.usuario);
-        navigate('/'); // 🔁 Redirige al home en caso de usuario válido.
+        console.log("✅ Usuario autenticado:", data.usuario);
       } else {
         setUser(null);
       }
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
-
+  
   const login = async ({ email, password }, showToast = true) => {
     setLoading(true);
     try {
