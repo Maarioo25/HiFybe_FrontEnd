@@ -24,44 +24,33 @@ export default function ChatDetalle() {
 
   // 1) Cargo usuario y mensajes una vez al inicializar o cuando cambia conversacionId
   useEffect(() => {
-    let isMounted = true; 
-    const cargarMensajes = async () => {
+    let isMounted = true;
+    const cargarUsuarioYMensajes = async () => {
+      console.log('🔍 Buscando usuario...');
       try {
         const res = await userService.getCurrentUser();
         const user = res?.usuario;
-        if (user?._id) {
-          if (!isMounted) return;
-          setUsuarioActualId(user._id);
-          console.log('🧠 ID usuario actual seteado en estado:', user._id);
-
-          const data = await conversationService.getMensajesDeConversacion(conversacionId);
-            console.log('➡️ ID conversación:', conversacionId);
-            console.log('👤 Usuario actual:', user);
-            console.log('📥 Mensajes recibidos:', data);
-
-            if (!Array.isArray(data)) {
-              console.error('❌ La respuesta no es un array. Es:', data);
-              return;
-            }
-            if (data.length === 0) {
-              console.warn('⚠️ La conversación no tiene mensajes.');
-            }
-
-
-          if (!isMounted) return;
-          setMensajes(data);
-        }
+        if (!user?._id) throw new Error('Usuario no válido');
+  
+        if (!isMounted) return;
+        setUsuarioActualId(user._id);
+        console.log('✅ Usuario cargado:', user._id);
+  
+        const data = await conversationService.getMensajesDeConversacion(conversacionId);
+        if (!isMounted) return;
+        console.log('📨 Mensajes:', data);
+        setMensajes(data);
       } catch (err) {
-        console.error('Error cargando mensajes:', err);
+        console.error('❌ Error al cargar usuario o mensajes:', err);
       }
     };
-
-    cargarMensajes();
-
+  
+    cargarUsuarioYMensajes();
     return () => {
       isMounted = false;
     };
   }, [conversacionId]);
+  
 
   // 2) Efecto que “escucha” nuevos mensajes cada cierto intervalo
   useEffect(() => {
@@ -113,19 +102,19 @@ export default function ChatDetalle() {
   }, [mostrarBusqueda]);
 
   const handleEnviar = async () => {
-    if (!nuevoMensaje.trim()) return;
-  
     if (!usuarioActualId) {
       console.warn('⚠️ No se ha cargado aún el usuarioActualId, esperando...');
       return;
     }
   
-    try {
-      console.log("📨 Intentando enviar mensaje...");
-      console.log("🆔 Conversación:", conversacionId);
-      console.log("👤 Usuario actual ID:", usuarioActualId);
-      console.log("✉️ Contenido:", nuevoMensaje);
+    if (!nuevoMensaje.trim()) return;
   
+    console.log('📨 Intentando enviar mensaje...');
+    console.log('🆔 Conversación:', conversacionId);
+    console.log('👤 Usuario actual ID:', usuarioActualId);
+    console.log('✉️ Contenido:', nuevoMensaje);
+  
+    try {
       const res = await conversationService.enviarMensaje(
         conversacionId,
         usuarioActualId,
@@ -134,9 +123,10 @@ export default function ChatDetalle() {
       setMensajes((prev) => [...prev, res]);
       setNuevoMensaje('');
     } catch (err) {
-      console.error('❌ Error al enviar mensaje:', err);
+      console.error('❌ Error al enviar mensaje:', err.response?.data || err.message);
     }
   };
+  
   
   
 
