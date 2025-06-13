@@ -99,7 +99,7 @@ src/
 
 ## 📜 Licencia
 
-Este proyecto está bajo la licencia **MIT**. Puedes usarlo, modificarlo y compartirlo libremente con atribución.
+Este proyecto ha sido desarrollado como parte de un **proyecto de final de grado**. Su uso, distribución y modificación están prohibidos sin autorización expresa del autor.
 
 ---
 
@@ -107,6 +107,6 @@ Este proyecto está bajo la licencia **MIT**. Puedes usarlo, modificarlo y compa
 
 Desarrollado por **Mario Bueno López**
 
-* 📧 [maarioo2525@gmail.com](mailto:maarioo2525@gmail.com)
-* 🔗 [LinkedIn](https://www.linkedin.com/in/mario-bueno25/)
+* 📧 [mariobueno060@gmail.com](mailto:mariobueno060@gmail.com)
+* 🔗 [LinkedIn](https://www.linkedin.com/in/mario-bueno-l%C3%B3pez-a35181250/)
 * 💻 [HiFybe\_BackEnd](https://github.com/Maarioo25/HiFybe_BackEnd)
