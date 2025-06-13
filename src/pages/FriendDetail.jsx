@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlay, FaArrowLeft, FaInstagram, FaTwitter, FaTiktok } from 'react-icons/fa';
+import { FaPlay, FaArrowLeft, FaInstagram, FaTwitter, FaTiktok, FaTrash } from 'react-icons/fa';
 import HeaderBar from '../components/HeaderBar';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import FooterPlayer from '../components/FooterPlayer';
@@ -270,11 +270,12 @@ export default function FriendDetail() {
                 </button>
                 {amistadId && (
                 <button
-                  onClick={handleEliminarAmistad}
-                  className="inline-block mt-2 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-full hover:bg-red-700 transition"
-                >
-                  {t('friendDetail.deleteFriend')}
-                </button>
+                onClick={handleEliminarAmistad}
+                className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-harmony-secondary/30 text-harmony-text-secondary text-sm font-semibold rounded-full hover:bg-harmony-secondary/50 hover:text-harmony-text-primary transition"
+              >
+                <FaTrash className="text-sm" />
+                {t('friendDetail.deleteFriend')}
+              </button>
               )}
 
               </div>

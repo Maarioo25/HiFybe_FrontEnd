@@ -45,6 +45,15 @@ export default function Friends() {
     loadData();
   }, [t]);
 
+  useEffect(() => {
+    const fetchFriends = async () => {
+      const currentUser = await userService.getCurrentUser();
+      const res = await friendService.getFriends(currentUser._id);
+      setFriendsList(res);
+    };
+    fetchFriends();
+  }, [location.pathname]);
+
   const openAddFriendModal = () => {
     setShowModal(true);
   };
