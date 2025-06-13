@@ -290,10 +290,10 @@ export default function ChatDetalle() {
                     className="w-10 h-10 rounded object-cover"
                   />
                   <div className="flex flex-col overflow-hidden">
-                    <div className="font-semibold text-harmony-text-primary truncate">
+                    <div className="font-semibold text-harmony-text-primary">
                       {track.name}
                     </div>
-                    <div className="text-sm text-harmony-text-secondary truncate">
+                    <div className="text-sm text-harmony-text-secondary">
                       {track.artists.map((a) => a.name).join(', ')}
                     </div>
                   </div>
