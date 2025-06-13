@@ -3,10 +3,10 @@
 
 Este repositorio contiene el **FrontEnd Web** de **HiFybe**, una red social musical que conecta a personas según sus gustos musicales y ubicación geográfica. Descubre usuarios cercanos, comparte canciones y crea conversaciones con tus amigos a través de una experiencia visual e interactiva.
 
-🔗 Repositorio: [HiFybe\_FrontEnd](https://github.com/Maarioo25/HiFybe_FrontEnd)
-🚪 Aplicación desplegada: [https://mariobueno.info](https://mariobueno.info)
-🚪 Backend desplegado: [https://api.mariobueno.info](https://api.mariobueno.info)
-📽️ Presentación: [Ver en Canva](https://www.canva.com/design/DAGqML3KOHU/Gmd0HagvLIDl1Kx24MKn_w/view?utm_content=DAGqML3KOHU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=haca5c05453)
+- 🔗 Repositorio: [HiFybe\_FrontEnd](https://github.com/Maarioo25/HiFybe_FrontEnd)
+- 🚪 Aplicación desplegada: [https://mariobueno.info](https://mariobueno.info)
+- 🚪 Backend desplegado: [https://api.mariobueno.info](https://api.mariobueno.info)
+- 📽️ Presentación: [Ver en Canva](https://www.canva.com/design/DAGqML3KOHU/Gmd0HagvLIDl1Kx24MKn_w/view?utm_content=DAGqML3KOHU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=haca5c05453)
 
 ---
 
