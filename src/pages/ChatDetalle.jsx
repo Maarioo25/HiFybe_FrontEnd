@@ -218,7 +218,7 @@ export default function ChatDetalle() {
             >
               <div className="text-sm font-semibold mb-1">{msg?.emisor_id?.nombre}</div>
               {msg?.contenido && (
-                <div className="break-words max-h-40 overflow-hidden text-ellipsis whitespace-pre-wrap">
+                <div className="break-words whitespace-pre-wrap">
                   {msg?.contenido}
                 </div>
               )}
