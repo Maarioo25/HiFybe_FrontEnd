@@ -1,5 +1,35 @@
-node_modules
+# node
+node_modules/
+dist/
 .env
-dist
-.vscode
+.env.local
+.env.*.local
+
+# sistema
 .DS_Store
+Thumbs.db
+
+# Vite
+.vite/
+.vite-cache/
+*.log
+
+# VSCode
+.vscode/
+
+# archivos de compilación
+*.local
+*.cache
+*.temp
+*.tmp
+
+# Vercel
+.vercel/
+
+# producciones que no deberían subirse
+*.zip
+*.tgz
+
+# build Vercel o custom
+build/
+out/
