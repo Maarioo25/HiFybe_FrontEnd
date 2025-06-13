@@ -33,6 +33,7 @@ const FooterPlayer = () => {
     setIsPlaying,
     isPremium,
   } = usePlayer();
+  
 
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [playlists, setPlaylists] = useState([]);
