@@ -1,7 +1,7 @@
-# HiFybe_FrontEnd
-# HiFybe – FrontEnd Web 🎷🌍
+# HiFybe
+# HiFybe – Aplicación Web 🎷🌍
 
-Este repositorio contiene el **frontend web** de **HiFybe**, una red social musical que conecta a personas según sus gustos musicales y ubicación geográfica. Descubre usuarios cercanos, comparte canciones y crea conversaciones con tus amigos a través de una experiencia visual e interactiva.
+Este repositorio contiene el **FrontEnd Web** de **HiFybe**, una red social musical que conecta a personas según sus gustos musicales y ubicación geográfica. Descubre usuarios cercanos, comparte canciones y crea conversaciones con tus amigos a través de una experiencia visual e interactiva.
 
 🔗 Repositorio: [HiFybe\_FrontEnd](https://github.com/Maarioo25/HiFybe_FrontEnd)
 🚪 Aplicación desplegada: [https://mariobueno.info](https://mariobueno.info)
