@@ -287,7 +287,7 @@ export default function HeaderBar({ children, onSongSelect }) {
         })}
       </div>
 
-      <div className="flex items-center gap-2 mt-8 md:mt-0">
+      <div className="flex items-center gap-2 mt-4 md:mt-0">
         <NotificationBell />
         <ProfileMenu user={user} logout={logout} onSettingsClick={() => setShowSettings(true)} />
       </div>
