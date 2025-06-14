@@ -327,35 +327,37 @@ function ProfileMenu({ user, logout, onSettingsClick }) {
         <FaUserCircle />
       </button>
       {open && (
-        <div className="absolute right-0 translate-x-[-10%] mt-2 w-48 bg-harmony-primary/95 rounded-xl shadow-xl border border-harmony-accent/20 z-50 animate-fade-in-down">
-          <div className="px-4 py-3 border-b border-harmony-accent/10">
-            <span className="font-semibold text-harmony-accent text-base block">
-              {user?.name || t('headerBar.profile.my_profile')}
-            </span>
-            <span className="text-xs text-harmony-text-secondary">
-              {user?.email}
-            </span>
-          </div>
-          <button
-            className="w-full flex items-center gap-2 px-4 py-3 hover:bg-harmony-accent/10 text-harmony-text-primary text-sm transition"
-            onClick={() => {
-              onSettingsClick();
-              setOpen(false);
-            }}
-          >
-            <FaCog className="text-lg" /> {t('headerBar.profile.settings')}
-          </button>
-          <button
-            className="w-full flex items-center gap-2 px-4 py-3 hover:bg-harmony-accent/10 text-harmony-text-primary text-sm transition"
-            onClick={() => {
-              logout();
-              setOpen(false);
-            }}
-          >
-            <FaSignOutAlt className="text-lg" /> {t('headerBar.profile.logout')}
-          </button>
-        </div>
-      )}
+  <div className="absolute right-2 mt-2 w-48 bg-harmony-primary/95 rounded-xl shadow-xl border border-harmony-accent/20 z-50 animate-fade-in-down">
+
+    <div className="px-4 py-3 border-b border-harmony-accent/10">
+      <span className="font-semibold text-harmony-accent text-base block">
+        {user?.name || t('headerBar.profile.my_profile')}
+      </span>
+      <span className="text-xs text-harmony-text-secondary">
+        {user?.email}
+      </span>
+    </div>
+    <button
+      className="w-full flex items-center gap-2 px-4 py-3 hover:bg-harmony-accent/10 text-harmony-text-primary text-sm transition"
+      onClick={() => {
+        onSettingsClick();
+        setOpen(false);
+      }}
+    >
+      <FaCog className="text-lg" /> {t('headerBar.profile.settings')}
+    </button>
+    <button
+      className="w-full flex items-center gap-2 px-4 py-3 hover:bg-harmony-accent/10 text-harmony-text-primary text-sm transition"
+      onClick={() => {
+        logout();
+        setOpen(false);
+      }}
+    >
+      <FaSignOutAlt className="text-lg" /> {t('headerBar.profile.logout')}
+    </button>
+  </div>
+)}
+
     </div>
   );
 }
