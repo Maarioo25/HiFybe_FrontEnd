@@ -12,6 +12,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const connectSpotifyUrl = 'https://api.mariobueno.info/usuarios/spotify/connect';
+
 
   useEffect(() => {
     checkAuth();
@@ -112,7 +114,8 @@ export const AuthProvider = ({ children }) => {
     appleLogin,
     spotifyLogin,
     setUser,
-    checkAuth
+    checkAuth,
+    connectSpotifyUrl
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
