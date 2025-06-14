@@ -28,7 +28,9 @@ export const userService = {
   },
 
   login: async (email, password) => {
-    const res = await api.post('/usuarios/login', { email, password });
+    const res = await api.post('/usuarios/login', { email, password }, {
+      withCredentials: true
+    });
     return res.data;
   },
 
