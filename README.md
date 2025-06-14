@@ -1,11 +1,12 @@
-# HiFybe_FrontEnd
-# HiFybe – FrontEnd Web 🎷🌍
+# HiFybe
+# HiFybe – Aplicación Web 🎷🌍
 
-Este repositorio contiene el **frontend web** de **HiFybe**, una red social musical que conecta a personas según sus gustos musicales y ubicación geográfica. Descubre usuarios cercanos, comparte canciones y crea conversaciones con tus amigos a través de una experiencia visual e interactiva.
+Este repositorio contiene el **FrontEnd Web** de **HiFybe**, una red social musical que conecta a personas según sus gustos musicales y ubicación geográfica. Descubre usuarios cercanos, comparte canciones y crea conversaciones con tus amigos a través de una experiencia visual e interactiva.
 
-🔗 Repositorio: [HiFybe\_FrontEnd](https://github.com/Maarioo25/HiFybe_FrontEnd)
-🚪 Aplicación desplegada: [https://mariobueno.info](https://mariobueno.info)
-🚪 Backend desplegado: [https://api.mariobueno.info](https://api.mariobueno.info)
+- 🔗 Repositorio: [HiFybe\_FrontEnd](https://github.com/Maarioo25/HiFybe_FrontEnd)
+- 🚪 Aplicación desplegada: [https://mariobueno.info](https://mariobueno.info)
+- 🚪 Backend desplegado: [https://api.mariobueno.info](https://api.mariobueno.info)
+- 📽️ Presentación: [Ver en Canva](https://www.canva.com/design/DAGqML3KOHU/Gmd0HagvLIDl1Kx24MKn_w/view?utm_content=DAGqML3KOHU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=haca5c05453)
 
 ---
 
@@ -99,7 +100,7 @@ src/
 
 ## 📜 Licencia
 
-Este proyecto está bajo la licencia **MIT**. Puedes usarlo, modificarlo y compartirlo libremente con atribución.
+Este proyecto ha sido desarrollado como parte de un **proyecto de final de grado**. Su uso, distribución y modificación están prohibidos sin autorización expresa del autor.
 
 ---
 
@@ -107,6 +108,6 @@ Este proyecto está bajo la licencia **MIT**. Puedes usarlo, modificarlo y compa
 
 Desarrollado por **Mario Bueno López**
 
-* 📧 [maarioo2525@gmail.com](mailto:maarioo2525@gmail.com)
-* 🔗 [LinkedIn](https://www.linkedin.com/in/mario-bueno25/)
+* 📧 [mariobueno060@gmail.com](mailto:mariobueno060@gmail.com)
+* 🔗 [LinkedIn](https://www.linkedin.com/in/mario-bueno-l%C3%B3pez-a35181250/)
 * 💻 [HiFybe\_BackEnd](https://github.com/Maarioo25/HiFybe_BackEnd)
