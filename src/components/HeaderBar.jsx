@@ -327,7 +327,7 @@ function ProfileMenu({ user, logout, onSettingsClick }) {
         <FaUserCircle />
       </button>
       {open && (
-  <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-harmony-primary/95 rounded-xl shadow-xl border border-harmony-accent/20 z-50 animate-fade-in-down">
+  <div className="absolute right-1/2 transform translate-x-1/2 mt-2 w-48 bg-harmony-primary/95 rounded-xl shadow-xl border border-harmony-accent/20 z-50 animate-fade-in-down">
     <div className="px-4 py-3 border-b border-harmony-accent/10">
       <span className="font-semibold text-harmony-accent text-base block">
         {user?.name || t('headerBar.profile.my_profile')}
