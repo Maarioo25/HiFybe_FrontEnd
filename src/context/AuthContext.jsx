@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("🔍 Comprobando autenticación...");
     checkAuth();
   }, []);
 
@@ -22,13 +21,13 @@ export const AuthProvider = ({ children }) => {
     console.log("🔍 Ejecutando checkAuth...");
     try {
       const data = await userService.getCurrentUser();
-      console.log("📦 Respuesta de /usuarios/me:", data);
+      if (data.spotifyAccessToken) {
+        localStorage.setItem('sp_token', data.spotifyAccessToken);
+        console.log("🎵 Token de Spotify guardado en localStorage.");
+      }
   
-      if (data.usuario) {
-        console.log("✅ Usuario válido encontrado (data.usuario):", data.usuario);
-        setUser(data.usuario);
-      } else if (data._id) {
-        console.log("✅ Usuario válido encontrado (data._id):", data);
+      if (data._id) {
+        console.log("✅ Usuario válido encontrado:", data);
         setUser(data);
       } else {
         console.warn("⚠️ Usuario no válido, data sin usuario ni _id:", data);
@@ -112,7 +111,8 @@ export const AuthProvider = ({ children }) => {
     googleLogin,
     appleLogin,
     spotifyLogin,
-    setUser
+    setUser,
+    checkAuth
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
