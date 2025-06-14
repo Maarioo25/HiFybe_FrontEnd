@@ -42,7 +42,7 @@ export default function NotificationBell() {
   const unreadCount = notifications.filter(n => !n.leido).length;
 
   return (
-    <div className="relative" ref={bellRef}>
+    <div className="relative " ref={bellRef}>
       <button
         className="relative p-2 text-harmony-accent hover:text-harmony-accent/80 focus:outline-none text-2xl"
         onClick={() => setOpen(v => !v)}
@@ -54,7 +54,7 @@ export default function NotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute right-2 translate-x-[-10%] mt-2 w-64 bg-harmony-primary/95 rounded-xl shadow-xl border border-harmony-accent/20 z-50 animate-fade-in-down text-sm">
+        <div className="absolute right-[-150px] mt-2 w-64 bg-harmony-primary/95 rounded-xl shadow-xl border border-harmony-accent/20 z-50 animate-fade-in-down text-sm">
           <div className="px-4 py-3 border-b border-harmony-accent/10 font-semibold text-harmony-accent">
             {t('notificationBell.title')}
           </div>
