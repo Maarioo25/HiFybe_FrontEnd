@@ -350,7 +350,7 @@ export default function FriendDetail() {
                       </h4>
                       <div className="flex items-center gap-2 text-harmony-text-secondary">
                         <span>
-                          {t('friendDetail.songsCount', { count: playlist.songs?.length || 0 })}
+                          {t('friendDetail.songsCount', { count: playlist.canciones || 0 })}
                         </span>
                         <span>•</span>
                         <span>{playlist.duracion || '---'}</span>
