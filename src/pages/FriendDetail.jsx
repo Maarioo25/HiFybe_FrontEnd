@@ -145,7 +145,7 @@ export default function FriendDetail() {
                 </h1>
 
                 <p className="text-sm text-harmony-text-secondary">
-                  {t('friendDetail.publicPlaylistsCount', { count: playlists.length })}
+                  {t('friendDetail.publicPlaylists', { count: playlists.length })}
                 </p>
 
                 {friend.song && (

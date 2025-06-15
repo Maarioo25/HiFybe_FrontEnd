@@ -42,7 +42,7 @@ export default function Playlists() {
           const pls = data.items.map(pl => ({
             id: pl.id,
             name: pl.name,
-            cover: (pl.images && Array.isArray(pl.images) && pl.images.length > 0) ? pl.images[0].url : 'default_image_url',
+            cover: (pl.images && Array.isArray(pl.images) && pl.images.length > 0) ? pl.images[0].url : 'https://via.placeholder.com/150',
             songs: pl.tracks.total,
             duration: '',
             description: pl.description || ''
