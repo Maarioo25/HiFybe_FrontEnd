@@ -297,8 +297,8 @@ export default function FriendDetail() {
               </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                console.log("🎵 Playlists recibidas:", playlists);
                 {playlists.map((playlist) => (
+                  console.log("🎵 Playlist recibida:", playlist),
                   <Link
                     key={playlist.id}
                     to={`/public/${friend._id}/${playlist.id}`}
