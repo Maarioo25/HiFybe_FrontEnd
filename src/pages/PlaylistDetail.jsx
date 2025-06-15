@@ -66,22 +66,22 @@ export default function PlaylistDetail() {
       const trackId = uri.split(":").pop();
       console.log("trackId extraído:", trackId);
   
-      // Verificación del usuario actual
+      // Corregido: Acceder directamente a currentUser._id en lugar de currentUser.usuario._id
       const currentUser = await userService.getCurrentUser();
       console.log("Usuario actual:", currentUser);
   
-      // Verificación del campo usuario._id
-      if (!currentUser || !currentUser.usuario || !currentUser.usuario._id) {
+      if (!currentUser || !currentUser._id) {
         throw new Error("No se encontró el usuario actual.");
       }
   
-      await userService.setCancionUsuario(currentUser.usuario._id, trackId);
+      await userService.setCancionUsuario(currentUser._id, trackId);
       console.log("Canción guardada con éxito.");
     } catch (err) {
       console.error("Error al reproducir o guardar la canción:", err);
       toast.error(t('playlistDetail.error.play_song'));
     }
   };
+  
   
 
 
