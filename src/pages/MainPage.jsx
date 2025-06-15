@@ -493,7 +493,7 @@ export default function MainPage() {
                         }}
                         className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
                       >
-                        {t("main.follow")}
+                        {t("main.addFriend")}
                       </button>
 
                       {selectedUser.song?.uri && (
@@ -501,7 +501,7 @@ export default function MainPage() {
                           onClick={() => playTrack(selectedUser.song.uri)}
                           className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent"
                         >
-                          {t("main.listen")}
+                          {t("chatDetalle.play")}
                         </button>
                       )}
                     </div>
