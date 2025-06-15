@@ -8,6 +8,8 @@ import { userService } from '../services/userService';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const [spotifyToken, setSpotifyToken] = useState(null);
+
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +27,7 @@ export const AuthProvider = ({ children }) => {
       const data = await userService.getCurrentUser();
       if (data.spotifyAccessToken) {
         localStorage.setItem('sp_token', data.spotifyAccessToken);
+        setSpotifyToken(data.spotifyAccessToken);
         console.log("🎵 Token de Spotify guardado en localStorage.");
       }
   
@@ -115,7 +118,8 @@ export const AuthProvider = ({ children }) => {
     spotifyLogin,
     setUser,
     checkAuth,
-    connectSpotifyUrl
+    connectSpotifyUrl,
+    spotifyToken
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

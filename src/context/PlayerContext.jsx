@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const PlayerContext = createContext();
 
 export const PlayerProvider = ({ children }) => {
+  const { spotifyToken } = useAuth();
   const [token, setToken] = useState(null);
   const [player, setPlayer] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
@@ -18,6 +20,12 @@ export const PlayerProvider = ({ children }) => {
   const [historyIndex, setHistoryIndex] = useState(-1);
 
 
+  useEffect(() => {
+    if (!spotifyToken) return; // todavía no ha llegado
+  
+    console.log("🎧 PlayerProvider usando token:", spotifyToken);
+    setToken(spotifyToken);
+  }, [spotifyToken]);
 
   // 1) Obtener token de URL o localStorage
   useEffect(() => {
