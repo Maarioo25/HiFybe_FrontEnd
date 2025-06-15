@@ -42,11 +42,12 @@ export default function Playlists() {
           const pls = data.items.map(pl => ({
             id: pl.id,
             name: pl.name,
-            cover: pl.images[0]?.url,
+            cover: (pl.images && Array.isArray(pl.images) && pl.images.length > 0) ? pl.images[0].url : 'default_image_url',
             songs: pl.tracks.total,
             duration: '',
             description: pl.description || ''
           }));
+          
           setPlaylists(pls);
         })
         .catch(err => console.error('Error al cargar playlists de Spotify:', err))
