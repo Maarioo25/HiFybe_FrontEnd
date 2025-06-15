@@ -1,4 +1,3 @@
-// src/services/playlistService.js
 import api from './api';
 
 export const playlistService = {
