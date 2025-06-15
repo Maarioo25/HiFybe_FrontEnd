@@ -77,25 +77,24 @@ export default function MainPage() {
   // Función para obtener usuarios cercanos
   const fetchUsersAtPosition = async (latitude, longitude) => {
     try {
+      console.log("🛰️ Enviando a backend (actualizarUbicacion):", { latitude, longitude });
       await userService.actualizarUbicacion(latitude, longitude);
-
+  
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
         { credentials: "include" }
       );
-
-      if (!res.ok) {
-        console.error("GET /cerca fallo:", await res.text());
-        return;
-      }
-
+  
       const data = await res.json();
+      console.log("📦 Respuesta de usuarios cercanos:", data);
+  
       if (Array.isArray(data)) setUsuariosCercanos(data);
-      else console.error("GET /cerca devolvió data no-array:", data);
+      else console.error("⚠️ /cerca devolvió algo que no es un array:", data);
     } catch (err) {
-      console.error("Error al obtener usuarios cercanos:", err);
+      console.error("❌ Error en fetchUsersAtPosition:", err);
     }
   };
+
 
   // Inicializar Leaflet con control de movimiento
   useEffect(() => {
@@ -199,16 +198,21 @@ export default function MainPage() {
       if (mostrarUbicacion) {
         navigator.geolocation.getCurrentPosition(
           ({ coords: { latitude, longitude } }) => {
+            console.log("📍 Ubicación obtenida:", { latitude, longitude });
             setCurrentPosition([latitude, longitude]);
+        
             if (mapInstance.current) {
               mapInstance.current.setView([latitude, longitude], 13);
             }
+        
+            // 🔍 Log dentro de fetchUsersAtPosition también
+            console.log("📡 Llamando a fetchUsersAtPosition...");
             fetchUsersAtPosition(latitude, longitude);
           },
           (error) => {
-            console.error("Error al obtener ubicación:", error);
+            console.error("❌ Error al obtener ubicación:", error);
           }
-        );
+        );        
       } else {
         try {
           await userService.ocultarUbicacion();
