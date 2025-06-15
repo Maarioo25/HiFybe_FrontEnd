@@ -461,50 +461,40 @@ export default function MainPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">
-                      <button
-                        onClick={async () => {
-                          try {
-                            await friendService.sendRequest(
-                              currentUserId,
-                              selectedUser._id
-                            );
+                    {selectedUser._id !== currentUserId && (
+                      <div className="flex flex-col gap-1 sm:gap-2 ml-1 sm:ml-2">
+                        <button
+                          onClick={async () => {
                             try {
+                              await friendService.sendRequest(currentUserId, selectedUser._id);
                               await notificationService.createNotification(
                                 selectedUser._id,
-                                `${selectedUser.nombre} ${t(
-                                  "main.sentFriendRequest"
-                                )}`
+                                `${selectedUser.nombre} ${t("main.sentFriendRequest")}`
                               );
-                            } catch (notifErr) {
-                              console.warn(
-                                "Error al crear notificación:",
-                                notifErr
+                              toast.success(t("main.requestSent"));
+                            } catch (error) {
+                              console.error("Error al enviar solicitud:", error);
+                              toast.error(
+                                error?.response?.data?.mensaje || t("main.requestError")
                               );
                             }
-                            toast.success(t("main.requestSent"));
-                          } catch (error) {
-                            console.error("Error al enviar solicitud:", error);
-                            toast.error(
-                              error?.response?.data?.mensaje ||
-                                t("main.requestError")
-                            );
-                          }
-                        }}
-                        className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
-                      >
-                        {t("main.addFriend")}
-                      </button>
-
-                      {selectedUser.song?.uri && (
-                        <button
-                          onClick={() => playTrack(selectedUser.song.uri)}
-                          className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent"
+                          }}
+                          className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-accent hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-white shadow"
                         >
-                          {t("chatDetalle.play")}
+                          {t("main.addFriend")}
                         </button>
-                      )}
-                    </div>
+
+                        {selectedUser.song?.uri && (
+                          <button
+                            onClick={() => playTrack(selectedUser.song.uri)}
+                            className="px-3 sm:px-4 py-1 sm:py-1.5 bg-harmony-primary hover:bg-harmony-accent/80 rounded-full text-xs sm:text-sm font-semibold text-harmony-accent shadow border border-harmony-accent"
+                          >
+                            {t("chatDetalle.play")}
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                   </div>
                 )}
               </div>
