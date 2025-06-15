@@ -34,22 +34,44 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
 
   const handleGuardar = async () => {
     try {
-      await Promise.all([
-        userService.updateProfile(user._id, {
-          nombre,
-          biografia: bio,
-          foto_perfil: foto,
-        }),
-        userService.updatePreferencias(user._id, {
-          ciudad,
-          generos_favoritos: generos.split(',').map((g) => g.trim()),
-        }),
-        userService.updateRedesSociales(user._id, {
-          instagram,
-          twitter,
-          tiktok,
-        }),
-      ]);
+      const updates = [];
+  
+      // Perfil
+      const perfil = {};
+      if (nombre.trim()) perfil.nombre = nombre.trim();
+      if (bio.trim()) perfil.biografia = bio.trim();
+      if (foto.trim()) perfil.foto_perfil = foto.trim();
+      if (Object.keys(perfil).length > 0) {
+        updates.push(userService.updateProfile(user._id, perfil));
+      }
+  
+      // Preferencias
+      const preferencias = {};
+      if (ciudad.trim()) preferencias.ciudad = ciudad.trim();
+  
+      const generosArray = generos
+        .split(',')
+        .map((g) => g.trim())
+        .filter((g) => g); // elimina vacíos
+      if (generosArray.length > 0) {
+        preferencias.generos_favoritos = generosArray;
+      }
+  
+      if (Object.keys(preferencias).length > 0) {
+        updates.push(userService.updatePreferencias(user._id, preferencias));
+      }
+  
+      // Redes sociales
+      const redes = {};
+      if (instagram.trim()) redes.instagram = instagram.trim();
+      if (twitter.trim()) redes.twitter = twitter.trim();
+      if (tiktok.trim()) redes.tiktok = tiktok.trim();
+  
+      if (Object.keys(redes).length > 0) {
+        updates.push(userService.updateRedesSociales(user._id, redes));
+      }
+  
+      await Promise.all(updates);
       toast.success(t('settings.profileUpdated'));
       onClose();
     } catch (err) {

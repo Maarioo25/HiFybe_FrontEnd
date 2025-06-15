@@ -207,7 +207,7 @@ export default function FriendDetail() {
                 {Array.isArray(friend.generos_favoritos) && friend.generos_favoritos.length > 0 && (
                   <>
                     <h4 className="text-sm font-semibold text-harmony-text-primary">
-                      🎵 {t('friendDetail.favoriteGenresTitle')}
+                      {t('friendDetail.favoriteGenresTitle')}
                     </h4>
                     <p className="text-sm text-harmony-text-secondary">
                       {friend.generos_favoritos.join(', ')}
