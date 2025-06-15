@@ -297,6 +297,7 @@ export default function FriendDetail() {
               </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                console.log("🎵 Playlists recibidas:", playlists);
                 {playlists.map((playlist) => (
                   <Link
                     key={playlist.id}
@@ -349,7 +350,7 @@ export default function FriendDetail() {
                       </h4>
                       <div className="flex items-center gap-2 text-harmony-text-secondary">
                         <span>
-                          {t('friendDetail.songsCount', { count: playlist.canciones?.length || 0 })}
+                          {t('friendDetail.songsCount', { count: playlist.songs?.length || 0 })}
                         </span>
                         <span>•</span>
                         <span>{playlist.duracion || '---'}</span>
