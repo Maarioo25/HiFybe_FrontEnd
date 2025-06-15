@@ -5,7 +5,6 @@ import {
   FaPause,
   FaStepBackward,
   FaStepForward,
-  FaShareAlt,
   FaRedo,
   FaVolumeUp,
   FaVolumeMute,
@@ -157,7 +156,7 @@ const FooterPlayer = () => {
         <span className="text-harmony-text-primary mb-2">
           {t('footerPlayer.connect_prompt')}
         </span>
-        
+
         <button
           onClick={handleConnectSpotify}
           className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
@@ -295,12 +294,6 @@ const FooterPlayer = () => {
                 aria-label={t('footerPlayer.aria.next')}
               >
                 <FaStepForward className="text-lg" />
-              </button>
-              <button
-                aria-label={t('footerPlayer.aria.share')}
-                className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-harmony-secondary/50 flex items-center justify-center hover:bg-harmony-secondary/60 transition shadow-lg"
-              >
-                <FaShareAlt className="text-lg" />
               </button>
               <button
                 onClick={() => setShowPlaylistModal(true)}
