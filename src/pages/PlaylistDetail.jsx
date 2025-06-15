@@ -57,16 +57,29 @@ export default function PlaylistDetail() {
 
   const playSingleTrack = async (uri) => {
     if (!uri) return;
+  
     try {
+      console.log("Reproduciendo canción:", uri);
       await playTrack(uri, 0, false, true);
+      console.log("Canción reproducida exitosamente");
+  
       const trackId = uri.split(":").pop();
+      if (!trackId) throw new Error('No se pudo extraer el trackId');
+      console.log("trackId:", trackId);
+  
       const currentUser = await userService.getCurrentUser();
-      await userService.setCancionUsuario(currentUser.usuario._id, trackId);
+      if (!currentUser.usuario || !currentUser.usuario.id) {
+        throw new Error("No se encontró el usuario actual.");
+      }
+  
+      await userService.setCancionUsuario(currentUser.usuario.id, trackId);
+      console.log("Canción guardada exitosamente");
     } catch (err) {
       console.error("Error al reproducir canción:", err);
       toast.error(t('playlistDetail.error.play_song'));
     }
   };
+
 
   useEffect(() => {
     async function fetchOwnPlaylist() {
