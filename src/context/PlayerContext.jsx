@@ -22,14 +22,15 @@ export const PlayerProvider = ({ children }) => {
   // 1) Obtener token de URL o localStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const t = params.get('spotify_token');
-    if (t) {
-      localStorage.setItem('sp_token', t);
-      setToken(t);
+    const spToken = params.get('spotify_token');
+    if (spToken) {
+      localStorage.setItem('sp_token', spToken);
+      setToken(spToken);
       window.history.replaceState({}, '', window.location.pathname);
       return;
     }
     const saved = localStorage.getItem('sp_token');
+    console.log("🚀 ~ PlayerProvider ~ saved:", saved)
     if (saved) setToken(saved);
   }, []);
 
@@ -97,7 +98,10 @@ export const PlayerProvider = ({ children }) => {
       );
     };
 
+    console.log("🚀 ~ PlayerProvider ~ token:", token)
+    console.log("🚀 ~ PlayerProvider ~ isPremium:", isPremium)
     return () => {
+      console.log("🚀 ~ PlayerProvider ~ player:", player)
       if (player) {
         player.disconnect();
       }
