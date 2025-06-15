@@ -5,6 +5,7 @@ import { userService } from '../services/userService';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
+// UserSettingsModal component
 export default function UserSettingsModal({ isOpen, onClose, user }) {
   const { t, i18n } = useTranslation();
   const [nombre, setNombre] = useState('');
@@ -17,6 +18,7 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
   const [tiktok, setTiktok] = useState('');
   const fileInputRef = React.useRef(null);
 
+  // useEffect para cargar los datos del usuario
   useEffect(() => {
     if (user) {
       setNombre(user.nombre || '');
@@ -30,8 +32,10 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
     }
   }, [user]);
 
+  // Renderiza el modal
   if (!isOpen) return null;
 
+  // Función para guardar los cambios
   const handleGuardar = async () => {
     try {
       const updates = [];
@@ -80,6 +84,7 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
     }
   };
 
+  // Función para subir una imagen
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -102,9 +107,11 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
     }
   };
 
+  // Clase para los inputs
   const inputClass =
     'w-full px-4 py-2 rounded-xl border border-harmony-text-secondary/20 bg-harmony-secondary/30 text-white placeholder-white/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-harmony-accent/40 transition';
 
+  // Renderiza el modal
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm grid place-items-center p-2 z-[999]">
       <div className="bg-harmony-primary rounded-2xl md:rounded-2xl rounded-t-3xl shadow-2xl border border-harmony-accent/20 w-full max-w-4xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto p-4 md:p-6 relative text-white scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 
 const PlayerContext = createContext();
 
+// PlayerProvider component 
 export const PlayerProvider = ({ children }) => {
   const { spotifyToken } = useAuth();
   const [token, setToken] = useState(null);
@@ -19,15 +20,15 @@ export const PlayerProvider = ({ children }) => {
   const [playHistory, setPlayHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
 
-
+  // useEffect para cargar el token al montar el componente
   useEffect(() => {
-    if (!spotifyToken) return; // todavía no ha llegado
+    if (!spotifyToken) return;
   
-    console.log("🎧 PlayerProvider usando token:", spotifyToken);
+    console.log("PlayerProvider usando token:", spotifyToken);
     setToken(spotifyToken);
   }, [spotifyToken]);
 
-  // 1) Obtener token de URL o localStorage
+  // useEffect para cargar el token de la URL o localStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const spToken = params.get('spotify_token');
@@ -38,11 +39,11 @@ export const PlayerProvider = ({ children }) => {
       return;
     }
     const saved = localStorage.getItem('sp_token');
-    console.log("🚀 ~ PlayerProvider ~ saved:", saved)
+    console.log("Saved:", saved)
     if (saved) setToken(saved);
   }, []);
 
-  // 2) Verificar si el usuario es Premium
+  // useEffect para verificar si el usuario es Premium
   useEffect(() => {
     if (!token) return;
 
@@ -62,7 +63,7 @@ export const PlayerProvider = ({ children }) => {
     checkPremiumStatus();
   }, [token]);
 
-  // 3) Cargar SDK solo si es Premium
+  // useEffect para cargar el SDK solo si es Premium
   useEffect(() => {
     if (!token || isPremium !== true) return;
 
@@ -106,17 +107,17 @@ export const PlayerProvider = ({ children }) => {
       );
     };
 
-    console.log("🚀 ~ PlayerProvider ~ token:", token)
-    console.log("🚀 ~ PlayerProvider ~ isPremium:", isPremium)
+    console.log("token:", token)
+    console.log("isPremium:", isPremium)
     return () => {
-      console.log("🚀 ~ PlayerProvider ~ player:", player)
+      console.log("player:", player)
       if (player) {
         player.disconnect();
       }
     };
   }, [token, isPremium]);
 
-  // 4) Polling para posición (Premium)
+  // useEffect para pulling para posición (Premium)
   useEffect(() => {
     if (!player || !isPlaying) return;
     const interval = setInterval(async () => {
@@ -129,7 +130,7 @@ export const PlayerProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, [player, isPlaying]);
 
-  // 5) Polling alternativo para usuarios Free
+  // useEffect para pulling alternativo para usuarios Free
   useEffect(() => {
     if (!token || isPremium === null || isPremium) return;
 

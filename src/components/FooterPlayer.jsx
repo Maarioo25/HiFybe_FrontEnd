@@ -1,4 +1,3 @@
-// src/components/FooterPlayer.jsx
 import React, { useState, useEffect } from 'react';
 import {
   FaPlay,
@@ -32,8 +31,6 @@ const FooterPlayer = () => {
     setIsPlaying,
     isPremium,
   } = usePlayer();
-  
-
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [loadingPlaylists, setLoadingPlaylists] = useState(false);
@@ -41,7 +38,6 @@ const FooterPlayer = () => {
   const [addingTrack, setAddingTrack] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [toastMessage, setToastMessage] = useState('');
-
   const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -49,11 +45,13 @@ const FooterPlayer = () => {
     return `${minutes}:${seconds}`;
   };
 
+  // Manejo de la conexión a Spotify
   const spotifyToken = localStorage.getItem('sp_token');
   const handleConnectSpotify = () => {
     window.location.href = 'https://api.mariobueno.info/usuarios/spotify/connect';
   };
 
+  // Manejo de la lista de reproducción
   useEffect(() => {
     if (!showPlaylistModal) return;
     const fetchPlaylists = async () => {
@@ -78,12 +76,14 @@ const FooterPlayer = () => {
     fetchPlaylists();
   }, [showPlaylistModal, spotifyToken, t]);
 
+  // Manejo del mensaje de toast
   useEffect(() => {
     if (!toastMessage) return;
     const timer = setTimeout(() => setToastMessage(''), 3000);
     return () => clearTimeout(timer);
   }, [toastMessage]);
 
+  // Manejo de la lista de reproducción
   const handleAddToPlaylist = async () => {
     if (!selectedPlaylistId || !currentTrack) return;
     setAddingTrack(true);
@@ -112,6 +112,7 @@ const FooterPlayer = () => {
     }
   };
 
+  // Manejo del play/pause
   const handlePlayPause = () => {
     if (isPlaying) {
       pause();
@@ -122,17 +123,20 @@ const FooterPlayer = () => {
     }
   };
 
+  // Manejo del seek
   const handleSeek = (e) => {
     const pct = Number(e.target.value);
     const ms = (pct / 100) * duration;
     seek(ms);
   };
 
+  // Manejo del volumen
   const handleVolumeChange = (e) => {
     const vol = Number(e.target.value);
     changeVolume(vol);
   };
 
+  // Manejo del guardado de la canción
   useEffect(() => {
     const guardarCancion = async () => {
       if (!currentTrack?.uri) return;
@@ -150,6 +154,7 @@ const FooterPlayer = () => {
     guardarCancion();
   }, [currentTrack]);
 
+  // Manejo de la conexión a Spotify
   if (!spotifyToken) {
     return (
       <div className="now-playing-bar sticky bottom-0 z-50 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex flex-col items-center justify-center p-4 text-center">
@@ -167,6 +172,7 @@ const FooterPlayer = () => {
     );
   }
 
+  // Manejo de la selección de la canción
   if (!currentTrack?.album?.images?.[0]?.url) {
     return (
       <div className="now-playing-bar sticky bottom-0 z-50 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
@@ -177,6 +183,7 @@ const FooterPlayer = () => {
     );
   }
 
+  // Renderiza el footer  
   return (
     <>
       {toastMessage && (

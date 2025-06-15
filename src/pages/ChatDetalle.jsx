@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FaPaperclip, FaSmile, FaPaperPlane } from 'react-icons/fa';
+import { FaPaperclip, FaPaperPlane } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { conversationService } from '../services/conversationService';
 import { userService } from '../services/userService';
 import { usePlayer } from '../context/PlayerContext';
 import HeaderBar from '../components/HeaderBar';
 import FooterPlayer from '../components/FooterPlayer';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'; 
 
+// ChatDetalle component
 export default function ChatDetalle() {
   const { t } = useTranslation();
   const { conversacionId } = useParams();
@@ -22,28 +23,28 @@ export default function ChatDetalle() {
   const busquedaRef = useRef(null);
   const spotifyToken = localStorage.getItem('sp_token');
 
-  // 1) Cargo usuario y mensajes una vez al inicializar o cuando cambia conversacionId
+  // Efecto para cargar el usuario y los mensajes una vez al inicializar o cuando cambia conversacionId
   useEffect(() => {
     let isMounted = true;
     const cargarUsuarioYMensajes = async () => {
-      console.log('🔍 Buscando usuario...');
+      console.log('Buscando usuario...');
       try {
         const res = await userService.getCurrentUser();
-        console.log('🧪 Resultado de getCurrentUser:', res);
+        console.log('Resultado de getCurrentUser:', res);
         const user = res?.usuario || res;
-        console.log('👤 Usuario encontrado:', user);
+        console.log('Usuario encontrado:', user);
         if (!user?._id) throw new Error('Usuario no válido');
   
         if (!isMounted) return;
         setUsuarioActualId(user._id);
-        console.log('✅ Usuario cargado:', user._id);
+        console.log('Usuario cargado:', user._id);
   
         const data = await conversationService.getMensajesDeConversacion(conversacionId);
         if (!isMounted) return;
-        console.log('📨 Mensajes:', data);
+        console.log('Mensajes:', data);
         setMensajes(data);
       } catch (err) {
-        console.error('❌ Error al cargar usuario o mensajes:', err);
+        console.error('Error al cargar usuario o mensajes:', err);
       }
     };
   
@@ -54,7 +55,7 @@ export default function ChatDetalle() {
   }, [conversacionId]);
   
 
-  // 2) Efecto que “escucha” nuevos mensajes cada cierto intervalo
+  // Efecto que “escucha” nuevos mensajes cada cierto intervalo
   useEffect(() => {
     let intervalId = null;
     const fetchNuevos = async () => {
@@ -79,12 +80,12 @@ export default function ChatDetalle() {
     };
   }, [conversacionId, usuarioActualId, mensajes.length]);
 
-  // 3) Scroll automático al cambiar mensajes
+  // Scroll automático al cambiar mensajes
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [mensajes]);
 
-  // 4) Manejo clic fuera de búsqueda (sin cambios)
+  // Manejo clic fuera de búsqueda (sin cambios)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (busquedaRef.current && !busquedaRef.current.contains(event.target)) {
@@ -105,16 +106,16 @@ export default function ChatDetalle() {
 
   const handleEnviar = async () => {
     if (!usuarioActualId) {
-      console.warn('⚠️ No se ha cargado aún el usuarioActualId, esperando...');
+      console.warn('No se ha cargado aún el usuarioActualId, esperando...');
       return;
     }
   
     if (!nuevoMensaje.trim()) return;
   
-    console.log('📨 Intentando enviar mensaje...');
-    console.log('🆔 Conversación:', conversacionId);
-    console.log('👤 Usuario actual ID:', usuarioActualId);
-    console.log('✉️ Contenido:', nuevoMensaje);
+    console.log('Intentando enviar mensaje...');
+    console.log('Conversación:', conversacionId);
+    console.log('Usuario actual ID:', usuarioActualId);
+    console.log('Contenido:', nuevoMensaje);
   
     try {
       const res = await conversationService.enviarMensaje(
@@ -122,20 +123,18 @@ export default function ChatDetalle() {
         usuarioActualId,
         nuevoMensaje
       );
-      console.log('✅ Mensaje enviado:', res);
+      console.log('Mensaje enviado:', res);
       setMensajes((prev) => [...prev, res]);
       setNuevoMensaje('');
     } catch (err) {
-      console.error('❌ Error al enviar mensaje:', err.response?.data || err.message);
+      console.error('Error al enviar mensaje:', err.response?.data || err.message);
     }
   };
-  
-  
-  
 
+  // Buscar canciones en Spotify
   const buscarCanciones = async (query) => {
     if (!query.trim()) return setResultados([]);
-    console.log('🔍 Buscando canciones para:', query);
+    console.log('Buscando canciones para:', query);
 
     if (!spotifyToken) {
       console.warn('No hay token de Spotify.');
@@ -157,9 +156,10 @@ export default function ChatDetalle() {
     } catch (err) {
       console.error('Error buscando canciones en Spotify:', err);
     }
-    console.log('✅ Resultado de búsqueda:', resultados);
+    console.log('Resultado de búsqueda:', resultados);
   };
 
+  // Enviar canción
   const enviarCancion = async (track) => {
     const cancion = {
       uri: track.uri,
@@ -175,7 +175,7 @@ export default function ChatDetalle() {
         '',
         cancion
       );
-      console.log('✅ Mensaje con canción enviado:', res);
+      console.log('Mensaje con canción enviado:', res);
       setMensajes((prev) => [...prev, res]);
       setMostrarBusqueda(false);
       setBusqueda('');
@@ -185,6 +185,7 @@ export default function ChatDetalle() {
     }
   };
 
+  // Render
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-harmony-primary">
       <div className="shrink-0">
@@ -199,8 +200,8 @@ export default function ChatDetalle() {
         )}
 
         {mensajes.map((msg) => (
-          console.log('🔁 Renderizando mensajes:', mensajes),
-          console.log('📌 Usuario actual ID (para comparar con emisor):', usuarioActualId),
+          console.log('Renderizando mensajes:', mensajes),
+          console.log('Usuario actual ID (para comparar con emisor):', usuarioActualId),
           <div
             key={msg._id}
             className={`flex ${

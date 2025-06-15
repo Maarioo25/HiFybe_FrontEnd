@@ -20,6 +20,7 @@ export default function FriendDetail() {
   const [error, setError] = useState(null);
   const { setCurrentSong, setIsPlaying } = usePlayer();
 
+  // Efecto para cargar los datos del amigo
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -46,6 +47,7 @@ export default function FriendDetail() {
     fetchData();
   }, [id, t]);
 
+  // Función para iniciar una conversación
   const handleIniciarConversacion = async () => {
     try {
       const currentUser = await userService.getCurrentUser();
@@ -73,6 +75,7 @@ export default function FriendDetail() {
     }
   };
 
+  // Función para eliminar la amistad
   const handleEliminarAmistad = async () => {
     console.log('🔍 Intentando eliminar amistad con ID:', amistadId);
     if (!amistadId) {
@@ -89,6 +92,7 @@ export default function FriendDetail() {
   };
   
 
+  // Render
   if (error) {
     return (
       <div className="flex flex-col h-screen bg-harmony-primary">
@@ -103,6 +107,7 @@ export default function FriendDetail() {
     );
   }
 
+  // Render
   if (!friend) {
     return (
       <div className="min-h-screen bg-harmony-primary flex items-center justify-center">
@@ -111,6 +116,7 @@ export default function FriendDetail() {
     );
   }
 
+  // Render
   return (
     <div className="flex flex-col h-screen bg-harmony-primary">
       <HeaderBar onSongSelect={(uri) => setCurrentSong(uri, 0, true)} />

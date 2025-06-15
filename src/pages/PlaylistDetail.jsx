@@ -1,4 +1,3 @@
-// src/pages/PlaylistDetail.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -24,22 +23,17 @@ export default function PlaylistDetail() {
   const navigate = useNavigate();
   const { playTrack } = usePlayer();
   const token = localStorage.getItem('sp_token');
-
-  // Estado común a ambos casos
   const [playlist, setPlaylist] = useState(null);
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Estados sólo si es “tuya” (editable)
   const [snapshotId, setSnapshotId] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [newName, setNewName] = useState('');
   const fileInputRef = useRef(null);
-
-  // ¿Es playlist propia o pública?
   const isOwnPlaylist = Boolean(id && !userId && !playlistId);
 
+  // Función para reproducir y guardar la playlist
   const playFullPlaylist = async () => {
     const uris = tracks.map(t => t.uri).filter(Boolean);
     if (uris.length === 0) return;
@@ -55,6 +49,7 @@ export default function PlaylistDetail() {
     }
   };
 
+  // Función para reproducir y guardar una canción
   const playSingleTrack = async (uri) => {
     if (!uri) return;
   
@@ -65,8 +60,7 @@ export default function PlaylistDetail() {
   
       const trackId = uri.split(":").pop();
       console.log("trackId extraído:", trackId);
-  
-      // Corregido: Acceder directamente a currentUser._id en lugar de currentUser.usuario._id
+
       const currentUser = await userService.getCurrentUser();
       console.log("Usuario actual:", currentUser);
   
@@ -81,10 +75,8 @@ export default function PlaylistDetail() {
       toast.error(t('playlistDetail.error.play_song'));
     }
   };
-  
-  
 
-
+  // Efecto para cargar la playlist
   useEffect(() => {
     async function fetchOwnPlaylist() {
       try {
@@ -165,8 +157,7 @@ export default function PlaylistDetail() {
     }
   }, [id, userId, playlistId, token, isOwnPlaylist, t]);
 
-  // ------------- FUNCIONES DE EDICIÓN (solo si isOwnPlaylist) -------------
-
+  // Función para guardar el nombre de la playlist
   const handleSaveName = async () => {
     if (!newName.trim()) {
       toast.error(t('playlistDetail.error.name_empty'));
@@ -200,6 +191,7 @@ export default function PlaylistDetail() {
     }
   };
 
+  // Función para convertir el archivo de imagen a base64
   const toBase64 = file =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -211,6 +203,7 @@ export default function PlaylistDetail() {
       reader.readAsDataURL(file);
     });
 
+  // Función para cambiar la imagen de la playlist
   const handleImageChange = async e => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -253,6 +246,7 @@ export default function PlaylistDetail() {
     }
   };
 
+  // Función para eliminar una canción de la playlist
   const handleRemoveTrack = async (e, trackUri) => {
     e.stopPropagation();
     if (!window.confirm(t('playlistDetail.confirm_remove_track'))) return;
@@ -283,14 +277,12 @@ export default function PlaylistDetail() {
     }
   };
 
-  // -------------------------------------------------------------------------
-
   // Calculamos duración total en minutos
   const totalDurationMin = Math.floor(
     tracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0) / 60000
   );
 
-  // ------------------ RENDERIZADO ------------------
+  // Renderizado
 
   if (loading || error || !playlist) {
     return (

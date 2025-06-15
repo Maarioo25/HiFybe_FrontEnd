@@ -11,6 +11,7 @@ import { toast } from 'react-hot-toast';
 import AddFriendModal from '../components/AddFriendModal';
 import { useTranslation } from 'react-i18next';
 
+// Componente Friends
 export default function Friends() {
   const { t } = useTranslation();
   const [friendsList, setFriendsList] = useState([]);
@@ -22,6 +23,7 @@ export default function Friends() {
   const [activeTab, setActiveTab] = useState('amigos');
   const { playTrack } = usePlayer();
 
+  // Efecto para cargar los datos del usuario
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -45,6 +47,7 @@ export default function Friends() {
     loadData();
   }, [t]);
 
+  // Efecto para cargar los amigos al cambiar la ruta
   useEffect(() => {
     const fetchFriends = async () => {
       const currentUser = await userService.getCurrentUser();
@@ -74,6 +77,7 @@ export default function Friends() {
     }
   };
 
+  // Render
   if (error)
     return (
       <div className="min-h-screen flex flex-col">

@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
@@ -7,6 +6,7 @@ import { userService } from '../services/userService';
 
 const AuthContext = createContext();
 
+// AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [spotifyToken, setSpotifyToken] = useState(null);
 
@@ -16,37 +16,37 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const connectSpotifyUrl = 'https://api.mariobueno.info/usuarios/spotify/connect';
 
-
+  // useEffect para cargar el usuario al montar el componente
   useEffect(() => {
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
-    console.log("🔍 Ejecutando checkAuth...");
+    console.log("Ejecutando checkAuth...");
     try {
       const data = await userService.getCurrentUser();
       if (data.spotifyAccessToken) {
         localStorage.setItem('sp_token', data.spotifyAccessToken);
         setSpotifyToken(data.spotifyAccessToken);
-        console.log("🎵 Token de Spotify guardado en localStorage.");
+        console.log("Token de Spotify guardado en localStorage.");
       }
   
       if (data._id) {
-        console.log("✅ Usuario válido encontrado:", data);
+        console.log("Usuario válido encontrado:", data);
         setUser(data);
       } else {
-        console.warn("⚠️ Usuario no válido, data sin usuario ni _id:", data);
+        console.warn("Usuario no válido, data sin usuario ni _id:", data);
         setUser(null);
       }
     } catch (err) {
-      console.error("❌ Error en checkAuth:", err);
+      console.error("Error en checkAuth:", err);
       setUser(null);
     } finally {
       setLoading(false);
     }
   };
   
-  
+  // Función para iniciar sesión
   const login = async ({ email, password }, showToast = true) => {
     setLoading(true);
     try {
@@ -61,6 +61,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Función para registrar un nuevo usuario
   const register = async (userData) => {
     setLoading(true);
     try {
@@ -80,6 +81,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Función para cerrar sesión
   const logout = async () => {
     setLoading(true);
     try {
@@ -97,16 +99,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Función para iniciar sesión con Google
   const googleLogin = () => {
     window.location.href = 'https://api.mariobueno.info/usuarios/google';
   };
 
+  // Función para iniciar sesión con Spotify
   const spotifyLogin = () => {
     window.location.href = 'http://api.mariobueno.info/usuarios/spotify';
   };
 
+  // Función para iniciar sesión con Apple (Implementar en un futuro)
   const appleLogin = () => {};
 
+  // Valor del contexto
   const value = {
     user,
     loading,

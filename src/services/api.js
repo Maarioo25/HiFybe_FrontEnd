@@ -1,11 +1,13 @@
 // src/services/api.js
 import axios from 'axios';
 
+// Crear instancia de axios con configuración base
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true
 });
 
+// Interceptor de respuesta para manejar errores
 api.interceptors.response.use(
   response => response,
   error => {

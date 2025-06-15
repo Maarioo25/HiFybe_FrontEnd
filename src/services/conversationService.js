@@ -18,17 +18,17 @@ export const conversationService = {
   // Obtener los mensajes de una conversación
   getMensajesDeConversacion: async (conversacionId) => {
     try {
-      console.log(`📤 Solicitando mensajes de la conversación ${conversacionId}`);
+      console.log(`Solicitando mensajes de la conversación ${conversacionId}`);
       const res = await api.get(`/conversaciones/${conversacionId}/mensajes`);
-      console.log(`📥 Mensajes recibidos (${res.data.length}):`, res.data);
+      console.log(`Mensajes recibidos (${res.data.length}):`, res.data);
 
       if (!Array.isArray(res.data)) {
-        console.error('❌ La respuesta no es un array:', res.data);
+        console.error('La respuesta no es un array:', res.data);
       }
 
       return res.data;
     } catch (err) {
-      console.error(`❌ Error al obtener mensajes de conversación ${conversacionId}:`, err);
+      console.error(`Error al obtener mensajes de conversación ${conversacionId}:`, err);
       return [];
     }
   },

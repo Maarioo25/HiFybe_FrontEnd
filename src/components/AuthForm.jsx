@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
+// Componente de formulario de autenticación
 const AuthForm = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('login');
@@ -21,7 +22,6 @@ const AuthForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { login, register, googleLogin, spotifyLogin, loading } = useAuth();
   const [imageError, setImageError] = useState(false);
-
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({
     nombre: '',
@@ -32,6 +32,7 @@ const AuthForm = () => {
     terms: false
   });
 
+  // Validación del formulario de registro
   const validateRegisterForm = (form) => {
     const inputs = form.querySelectorAll('input[required]');
     let errors = [];
@@ -68,6 +69,7 @@ const AuthForm = () => {
     return { isValid: true, error: null };
   };
 
+  // Manejo del envío del formulario de inicio de sesión
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -80,6 +82,7 @@ const AuthForm = () => {
     }
   };
 
+  // Manejo del envío del formulario de registro
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     const { isValid, error } = validateRegisterForm(e.target);
@@ -114,6 +117,7 @@ const AuthForm = () => {
     }
   };
 
+  // Renderiza el formulario  
   return (
     <>
       {/* Logo adaptable móvil */}

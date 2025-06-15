@@ -11,6 +11,7 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
   const [allUsers, setAllUsers] = useState([]);
   const [search, setSearch] = useState('');
 
+  // Carga los usuarios
   useEffect(() => {
     const fetchUsers = async () => {
       const users = await userService.getAllUsers();
@@ -23,6 +24,7 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
     fetchUsers();
   }, [currentUserId, existingFriends]);
 
+  // Envía una solicitud de amistad
   const handleAddFriend = async (targetId) => {
     try {
       const res = await userService.getCurrentUser();
@@ -43,6 +45,7 @@ export default function AddFriendModal({ currentUserId, existingFriends, onClose
     }
   };
 
+  // Renderiza el modal
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-harmony-primary rounded-xl w-11/12 max-w-md p-6 relative">

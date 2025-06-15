@@ -2,16 +2,17 @@
 import api from './api';
 
 export const userService = {
+  // Obtener todos los usuarios
   getAllUsers: async () => {
     const res = await api.get('/usuarios');
     return res.data;
   },
-
+  // Obtener un usuario por ID
   getUserById: async id => {
     const res = await api.get(`/usuarios/${id}`);
     return res.data;
   },
-
+  // Actualizar perfil
   updateProfile: async (id, data) => {
     const res = await api.put(`/usuarios/${id}`, {
       nombre: data.nombre,
@@ -21,34 +22,34 @@ export const userService = {
     });
     return res.data;
   },
-
+  // Eliminar un usuario
   deleteUser: async id => {
     const res = await api.delete(`/usuarios/${id}`);
     return res.data;
   },
-
+  // Iniciar sesión
   login: async (email, password) => {
     const res = await api.post('/usuarios/login', { email, password }, {
       withCredentials: true
     });
     return res.data;
   },
-
+  // Registrarse
   register: async data => {
     const res = await api.post('/usuarios/register', data);
     return res.data;
   },
-
+  // Obtener el usuario actual
   getCurrentUser: async () => {
     const res = await api.get('/usuarios/me');
     return res.data;
   },
-
+  // Cerrar sesión
   logout: async () => {
     const res = await api.post('/usuarios/logout');
     return res.data;
   },
-
+  // Guardar la canción del usuario
   setCancionUsuario: async (userId, trackId) => {
     try {
       const res = await api.put(`/usuarios/${userId}/cancion`, { trackId });
@@ -59,6 +60,7 @@ export const userService = {
     }
   },
 
+  // Obtener la canción del usuario
   getCancionUsuario: async (userId) => {
     try {
       const res = await api.get(`/usuarios/${userId}/cancion`);
@@ -69,6 +71,7 @@ export const userService = {
     }
   },
 
+  // Ocultar la ubicación del usuario
   ocultarUbicacion: async () => {
     try {
       const res = await api.post("/usuarios/ocultar-ubicacion");
@@ -79,6 +82,7 @@ export const userService = {
     }
   },
 
+  // Actualizar la ubicación del usuario
   actualizarUbicacion: async (latitude, longitude) => {
     try {
       const res = await api.post("/usuarios/ubicacion", {
@@ -92,6 +96,7 @@ export const userService = {
     }
   },
 
+  // Actualizar las redes sociales del usuario
   updateRedesSociales: async (id, redes) => {
     try {
       const res = await api.put(`/usuarios/${id}/redes`, redes);
@@ -102,6 +107,7 @@ export const userService = {
     }
   },
 
+  // Actualizar la foto del perfil del usuario
   updateFotoPerfil: async (id, file) => {
     const formData = new FormData();
     formData.append('foto', file);
@@ -110,6 +116,7 @@ export const userService = {
     return res.data;
   },
 
+  // Actualizar las preferencias del usuario
   updatePreferencias: async (id, preferencias) => {
     try {
       const res = await api.put(`/usuarios/${id}/preferencias`, preferencias);

@@ -18,8 +18,6 @@ function App() {
     <Router>
       <AuthProvider>
         <PlayerProvider>
-          
-          
         <div className="min-h-screen bg-gradient-to-br from-harmony-primary via-harmony-secondary to-harmony-accent">
           <Toaster
             position="top-right"
@@ -45,10 +43,7 @@ function App() {
           />
           <Routes>
             <Route path="/auth" element={<AuthForm />} />
-            
-            {/* Rutas protegidas */}
             <Route element={<ProtectedRoute />}>
-
               <Route path="/" element={<MainPage />} />
               <Route path="/friends" element={<Friends />} />
               <Route path="/friends/:id" element={<FriendDetail />} />
@@ -57,12 +52,7 @@ function App() {
               <Route path="/playlists" element={<Playlists />} />
               <Route path="/playlists/:id" element={<PlaylistDetail />} />
               <Route path="/public/:userId/:playlistId" element={<PlaylistDetail />} />
-              
             </Route>  
-
-            
-
-
             <Route path="*" element={<Navigate to="/auth" replace />} />
           </Routes>
         </div>

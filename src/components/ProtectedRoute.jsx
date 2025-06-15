@@ -2,6 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
+// ProtectedRoute component
 const ProtectedRoute = () => {
   const { t } = useTranslation();
   const { user, loading } = useAuth();

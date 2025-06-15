@@ -28,16 +28,15 @@ export default function MainPage() {
   const [currentPosition, setCurrentPosition] = useState([40.4165, -3.7026]);
   const [mostrarUbicacion, setMostrarUbicacion] = useState(false);
   const [mapMoving, setMapMoving] = useState(false);
-
   const { loading } = useAuth();
   const navigate = useNavigate();
   const { playTrack } = usePlayer();
-
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markerRefs = useRef([]);
   const userInfoRef = useRef(null);
 
+  // Función para reproducir y guardar la canción
   const playAndStoreTrack = async (uri) => {
     try {
       await playTrack(uri);
@@ -94,7 +93,6 @@ export default function MainPage() {
       console.error("❌ Error en fetchUsersAtPosition:", err);
     }
   };
-
 
   // Inicializar Leaflet con control de movimiento
   useEffect(() => {
@@ -313,12 +311,14 @@ export default function MainPage() {
     }
   };
 
+  // Función para centrar el mapa
   const centerMap = () => {
     if (mapInstance.current) {
       mapInstance.current.setView(currentPosition, 13);
     }
   };
 
+  // Render
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-harmony-primary">

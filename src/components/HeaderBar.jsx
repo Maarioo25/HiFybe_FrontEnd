@@ -1,4 +1,3 @@
-// src/components/HeaderBar.jsx
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   FaUserFriends,
@@ -18,31 +17,30 @@ import { userService } from '../services/userService';
 import debounce from 'lodash.debounce';
 import NotificationBell from './NotificationBell';
 
+// HeaderBar component
 export default function HeaderBar({ children, onSongSelect }) {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showSettings, setShowSettings] = useState(false);
-
-  // Estados para búsqueda
   const [showSearch, setShowSearch] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
-
   const searchInputRef = useRef(null);
   const searchContainerRef = useRef(null);
-
   const spotifyToken = localStorage.getItem('sp_token');
 
+  // useEffect para enfocar el input de búsqueda
   useEffect(() => {
     if (showSearch) {
       searchInputRef.current?.focus();
     }
   }, [showSearch]);
 
+  // useEffect para manejar el evento de clic fuera del input de búsqueda
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -60,6 +58,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showSearch]);
 
+  // Función para buscar en Spotify
   const fetchSpotifySearch = async (query) => {
     if (!query) {
       setSearchResults([]);
@@ -104,6 +103,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     }
   };
 
+  // Función para buscar en Spotify
   const debouncedSearch = useCallback(
     debounce((term) => {
       fetchSpotifySearch(term);
@@ -111,6 +111,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     [spotifyToken, t]
   );
 
+  // Función para verificar si una ruta está activa
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
     if (path === '/chats') {
@@ -124,6 +125,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     );
   };
 
+  // Función para manejar el cambio en el input de búsqueda
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
@@ -131,6 +133,7 @@ export default function HeaderBar({ children, onSongSelect }) {
     debouncedSearch(value);
   };
 
+  // Función para manejar la selección de una canción
   const handleSelectTrack = async (track) => {
     if (onSongSelect) {
       onSongSelect(track.uri);
@@ -150,12 +153,14 @@ export default function HeaderBar({ children, onSongSelect }) {
     setErrorMsg(null);
   };
 
+  // Función para manejar la tecla Enter
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && searchResults.length > 0) {
       handleSelectTrack(searchResults[0]);
     }
   };
 
+  // Renderiza el header
   return (
     <nav
       className="relative flex flex-col md:flex-row items-center justify-between

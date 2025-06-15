@@ -14,6 +14,7 @@ export default function Chats() {
   const { playTrack } = usePlayer();
   const navigate = useNavigate();
 
+  // Efecto para cargar las conversaciones una vez al inicializar
   useEffect(() => {
     const cargarConversaciones = async () => {
       const res = await userService.getCurrentUser();
@@ -31,6 +32,7 @@ export default function Chats() {
   }, []);
   
 
+  // Función para obtener el nombre y foto del otro usuario
   const obtenerNombreYFotoDelOtro = (conv) => {
     if (!conv.usuario1_id || !conv.usuario2_id) {
       return { nombre: '[usuario desconocido]', foto: 'https://via.placeholder.com/100?text=?' };
@@ -44,6 +46,7 @@ export default function Chats() {
     };
   };
 
+  // Render
   return (
     <div className="flex flex-col h-screen bg-harmony-primary">
       <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />

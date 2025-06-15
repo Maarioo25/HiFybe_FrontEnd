@@ -1,4 +1,3 @@
-// src/pages/Playlists.jsx
 import React, { useEffect, useState } from 'react';
 import { FaPlay, FaSpotify } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
@@ -14,11 +13,11 @@ export default function Playlists() {
   const { connectSpotifyUrl } = useAuth();
   const spotifyToken = localStorage.getItem('sp_token');
   const isConnected = Boolean(spotifyToken);
-
   const { playTrack } = usePlayer();
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Función para reproducir y guardar la canción
   const playAndStoreTrack = async (uri) => {
     try {
       await playTrack(uri);
@@ -31,6 +30,7 @@ export default function Playlists() {
     }
   };
 
+  // Efecto para cargar las playlists
   useEffect(() => {
     if (spotifyToken) {
       setLoading(true);
@@ -58,6 +58,7 @@ export default function Playlists() {
     }
   }, [spotifyToken]);
 
+  // Función para conectar con Spotify
   const handleConnectSpotify = () => {
     window.location.href = connectSpotifyUrl;
   };

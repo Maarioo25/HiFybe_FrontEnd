@@ -4,6 +4,7 @@ import { notificationService } from '../services/notificationService';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
+// NotificationBell component
 export default function NotificationBell() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -11,6 +12,7 @@ export default function NotificationBell() {
   const bellRef = useRef(null);
   const { user } = useAuth();
 
+  // useEffect para manejar el evento de clic fuera del input de búsqueda
   useEffect(() => {
     function handleClickOutside(event) {
       if (bellRef.current && !bellRef.current.contains(event.target)) {
@@ -21,12 +23,14 @@ export default function NotificationBell() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // useEffect para manejar el evento de clic fuera del input de búsqueda
   useEffect(() => {
     if (open && user?._id) {
       notificationService.get(user._id).then(setNotifications).catch(() => {});
     }
   }, [open, user]);
 
+  // Función para marcar una notificación como leida
   const handleMarkAsRead = async (id) => {
     await notificationService.marcarLeida(id);
     setNotifications((prev) =>
@@ -34,13 +38,16 @@ export default function NotificationBell() {
     );
   };
 
+  // Función para eliminar una notificación
   const handleDelete = async (id) => {
     await notificationService.eliminar(id);
     setNotifications((prev) => prev.filter(n => n._id !== id));
   };
 
+  // Cantidad de notificaciones no leidas
   const unreadCount = notifications.filter(n => !n.leido).length;
 
+  // Renderiza el header
   return (
     <div className="relative " ref={bellRef}>
       <button
