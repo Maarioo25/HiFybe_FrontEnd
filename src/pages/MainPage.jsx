@@ -44,7 +44,7 @@ export default function MainPage() {
       const trackId = uri?.split(":").pop();
       if (!trackId) return;
       const currentUser = await userService.getCurrentUser();
-      await userService.setCancionUsuario(currentUser.usuario._id, trackId);
+      await userService.setCancionUsuario(currentUser._id, trackId);
     } catch (err) {
       console.error("Error al reproducir o guardar canción:", err);
     }
