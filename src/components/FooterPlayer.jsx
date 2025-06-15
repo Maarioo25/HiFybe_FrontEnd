@@ -157,6 +157,7 @@ const FooterPlayer = () => {
         <span className="text-harmony-text-primary mb-2">
           {t('footerPlayer.connect_prompt')}
         </span>
+        
         <button
           onClick={handleConnectSpotify}
           className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
