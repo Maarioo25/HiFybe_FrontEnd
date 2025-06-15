@@ -171,7 +171,7 @@
   "publicPlaylists": "{{count}} playlists públicas",
   "noBio": "Sin biografía.",
   "livesIn": "🌍 Vive en {{city}}",
-  "favoriteGenres": "🎵 Géneros favoritos: {{genres}}",
+  "favoriteGenresTitle": "🎵 Géneros favoritos",
   "instagram": "Instagram",
   "twitter": "Twitter",
   "tiktok": "TikTok",

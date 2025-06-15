@@ -144,12 +144,9 @@ export default function FriendDetail() {
                   {friend.nombre}
                 </h1>
 
-                <div className="flex items-center gap-4 text-harmony-text-secondary">
-                  <span>
-                    {playlists.length}{' '}
-                    {t('friendDetail.publicPlaylists', { count: playlists.length })}
-                  </span>
-                </div>
+                <p className="text-sm text-harmony-text-secondary">
+                  {t('friendDetail.publicPlaylistsCount', { count: playlists.length })}
+                </p>
 
                 {friend.song && (
                   <div className="flex items-center gap-4 group">
@@ -207,13 +204,17 @@ export default function FriendDetail() {
                   </p>
                 )}
 
-                {friend.generos_favoritos?.length > 0 && (
-                  <p className="text-sm text-harmony-text-secondary">
-                    {t('friendDetail.favoriteGenres', {
-                      genres: friend.generos_favoritos.join(', ')
-                    })}
-                  </p>
+                {Array.isArray(friend.generos_favoritos) && friend.generos_favoritos.length > 0 && (
+                  <>
+                    <h4 className="text-sm font-semibold text-harmony-text-primary">
+                      🎵 {t('friendDetail.favoriteGenresTitle')}
+                    </h4>
+                    <p className="text-sm text-harmony-text-secondary">
+                      {friend.generos_favoritos.join(', ')}
+                    </p>
+                  </>
                 )}
+
 
                 {(friend.redes?.instagram ||
                   friend.redes?.twitter ||
