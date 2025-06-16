@@ -59,9 +59,9 @@ export default function MainPage() {
     const fetchFriends = async () => {
       try {
         const currentUser = await userService.getCurrentUser();
-        console.log("🧪 currentUser devuelto por getCurrentUser:", currentUser);
+        console.log("currentUser devuelto por getCurrentUser:", currentUser);
         const userId = currentUser?._id || currentUser?.id;
-        console.log("🧪 userId extraído de currentUser:", userId);
+        console.log("userId extraído de currentUser:", userId);
 
         setCurrentUserId(userId);
         const friends = await friendService.getFriends(userId);
@@ -76,7 +76,7 @@ export default function MainPage() {
   // Función para obtener usuarios cercanos
   const fetchUsersAtPosition = async (latitude, longitude) => {
     try {
-      console.log("🛰️ Enviando a backend (actualizarUbicacion):", { latitude, longitude });
+      console.log("Enviando a backend (actualizarUbicacion):", { latitude, longitude });
       await userService.actualizarUbicacion(latitude, longitude);
   
       const res = await fetch(
@@ -85,12 +85,12 @@ export default function MainPage() {
       );
   
       const data = await res.json();
-      console.log("📦 Respuesta de usuarios cercanos:", data);
+      console.log("Respuesta de usuarios cercanos:", data);
   
       if (Array.isArray(data)) setUsuariosCercanos(data);
-      else console.error("⚠️ /cerca devolvió algo que no es un array:", data);
+      else console.error("/cerca devolvió algo que no es un array:", data);
     } catch (err) {
-      console.error("❌ Error en fetchUsersAtPosition:", err);
+      console.error("Error en fetchUsersAtPosition:", err);
     }
   };
 
@@ -203,12 +203,11 @@ export default function MainPage() {
               mapInstance.current.setView([latitude, longitude], 13);
             }
         
-            // 🔍 Log dentro de fetchUsersAtPosition también
-            console.log("📡 Llamando a fetchUsersAtPosition...");
+            console.log("Llamando a fetchUsersAtPosition...");
             fetchUsersAtPosition(latitude, longitude);
           },
           (error) => {
-            console.error("❌ Error al obtener ubicación:", error);
+            console.error("Error al obtener ubicación:", error);
           }
         );        
       } else {

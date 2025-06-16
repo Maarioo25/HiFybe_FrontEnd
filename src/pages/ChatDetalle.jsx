@@ -61,7 +61,6 @@ export default function ChatDetalle() {
     const fetchNuevos = async () => {
       try {
         const data = await conversationService.getMensajesDeConversacion(conversacionId);
-        // Si el número de mensajes aumentó, los actualizo
         if (data.length !== mensajes.length) {
           setMensajes(data);
         }
@@ -70,9 +69,8 @@ export default function ChatDetalle() {
       }
     };
 
-    // Arranco el intervalo solo si ya tengo usuarioActualId (para evitar llamadas redundantes muy tempranas)
     if (usuarioActualId) {
-      intervalId = setInterval(fetchNuevos, 3000); // cada 3 segundos
+      intervalId = setInterval(fetchNuevos, 3000);
     }
 
     return () => {

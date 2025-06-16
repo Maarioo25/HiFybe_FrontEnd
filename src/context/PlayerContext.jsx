@@ -160,7 +160,8 @@ export const PlayerProvider = ({ children }) => {
 
     return () => clearInterval(interval);
   }, [token, isPremium]);
-
+  
+  // Función para reproducir una canción
   const playTrack = async (
     spotifyUriOrUris,
     startIndex = 0,
@@ -200,10 +201,13 @@ export const PlayerProvider = ({ children }) => {
     }
   };
   
-  
+  // Función para pausar la canción
   const pause = () => player && player.pause();
+  
+  // Función para reanudar la canción
   const resume = () => player && player.resume();
-
+  
+  // Función para agregar una canción al historial
   const addToHistory = (uri) => {
     setPlayHistory((prev) => {
       const newHistory = [...prev];
@@ -217,8 +221,7 @@ export const PlayerProvider = ({ children }) => {
     });
   };
   
-  
-  
+  // Función para obtener una canción aleatoria
   const getRandomTrackUri = async () => {
     try {
       const res = await fetch("https://api.spotify.com/v1/me/top/tracks?limit=20", {
@@ -236,7 +239,7 @@ export const PlayerProvider = ({ children }) => {
     }
   };
   
-
+  // Función para reproducir la siguiente canción
   const nextTrack = async () => {
     const nextIndex = queueIndex + 1;
   
@@ -251,7 +254,7 @@ export const PlayerProvider = ({ children }) => {
     }
   };
   
-  
+  // Función para reproducir la canción anterior
   const previousTrack = async () => {
     try {
       const state = await player.getCurrentState();
@@ -277,8 +280,10 @@ export const PlayerProvider = ({ children }) => {
     }
   };
   
-
+  // Función para saltar a una posición específica
   const seekTo = (ms) => player && player.seek(ms);
+  
+  // Función para cambiar el volumen
   const changeVolume = (vol) => {
     setVolume(vol);
     if (player) player.setVolume(vol / 100);

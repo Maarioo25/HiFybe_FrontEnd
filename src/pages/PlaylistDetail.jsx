@@ -104,7 +104,6 @@ export default function PlaylistDetail() {
     async function fetchPublicPlaylist() {
       try {
         setLoading(true);
-        // playlistService.getSpotifyPlaylistById devuelve un objeto con campos: nombre, descripcion, imagen, owner, canciones (array)
         const playlistInfo = await playlistService.getSpotifyPlaylistById(userId, playlistId);
         setPlaylist({
           name: playlistInfo.nombre,
@@ -112,7 +111,6 @@ export default function PlaylistDetail() {
           images: [{ url: playlistInfo.imagen }],
           owner: { display_name: playlistInfo.owner?.nombre || t('playlistDetail.unknown_owner') }
         });
-        // Adaptamos “canciones” públicas al formato básico que usa la UI (title, artist, duration y cover)
         setTracks(
           playlistInfo.canciones.map(track => ({
             id: track._id,

@@ -157,7 +157,9 @@ const FooterPlayer = () => {
   // Manejo de la conexión a Spotify
   if (!spotifyToken) {
     return (
-      <div className="now-playing-bar sticky bottom-0 z-50 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex flex-col items-center justify-center p-4 text-center">
+      <div className="now-playing-bar sticky bottom-0 z-50 w-full 
+      bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 
+      shadow-2xl flex flex-col items-center justify-center p-4 text-center">
         <span className="text-harmony-text-primary mb-2">
           {t('footerPlayer.connect_prompt')}
         </span>
@@ -175,7 +177,9 @@ const FooterPlayer = () => {
   // Manejo de la selección de la canción
   if (!currentTrack?.album?.images?.[0]?.url) {
     return (
-      <div className="now-playing-bar sticky bottom-0 z-50 w-full bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 shadow-2xl flex items-center justify-center p-4">
+      <div className="now-playing-bar sticky bottom-0 z-50 w-full 
+      bg-harmony-secondary/80 backdrop-blur-lg border-t border-harmony-text-secondary/40 
+      shadow-2xl flex items-center justify-center p-4">
         <span className="text-harmony-text-primary">
           {t('footerPlayer.select_song')}
         </span>
