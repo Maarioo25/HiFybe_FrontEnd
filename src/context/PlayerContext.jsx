@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 
 const PlayerContext = createContext();
 
-// PlayerProvider component 
 export const PlayerProvider = ({ children }) => {
   const { spotifyToken } = useAuth();
   const [token, setToken] = useState(null);
@@ -20,28 +19,35 @@ export const PlayerProvider = ({ children }) => {
   const [playHistory, setPlayHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
 
-  // useEffect para cargar el token al montar el componente
+  // useEffect para cargar el token
   useEffect(() => {
-    if (!spotifyToken) return;
-  
-    console.log("PlayerProvider usando token:", spotifyToken);
-    setToken(spotifyToken);
-  }, [spotifyToken]);
+    // Prioridad 1: spotifyToken del AuthContext
+    if (spotifyToken) {
+      console.log("✅ Usando token de AuthContext:", spotifyToken.substring(0, 20) + "...");
+      setToken(spotifyToken);
+      return;
+    }
 
-  // useEffect para cargar el token de la URL o localStorage
-  useEffect(() => {
+    // Prioridad 2: URL params
     const params = new URLSearchParams(window.location.search);
     const spToken = params.get('spotify_token');
     if (spToken) {
+      console.log("✅ Usando token de URL");
       localStorage.setItem('sp_token', spToken);
       setToken(spToken);
       window.history.replaceState({}, '', window.location.pathname);
       return;
     }
+
+    // Prioridad 3: localStorage
     const saved = localStorage.getItem('sp_token');
-    console.log("Saved:", saved)
-    if (saved) setToken(saved);
-  }, []);
+    if (saved) {
+      console.log("✅ Usando token de localStorage");
+      setToken(saved);
+    } else {
+      console.warn("⚠️ No se encontró token de Spotify");
+    }
+  }, [spotifyToken]);
 
   // useEffect para verificar si el usuario es Premium
   useEffect(() => {
@@ -52,10 +58,19 @@ export const PlayerProvider = ({ children }) => {
         const res = await fetch('https://api.spotify.com/v1/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
+        
+        if (!res.ok) {
+          console.error('❌ Error al verificar Premium:', res.status);
+          setIsPremium(false);
+          return;
+        }
+
         const data = await res.json();
-        setIsPremium(data.product === 'premium');
+        const premium = data.product === 'premium';
+        console.log(`✅ Usuario es ${premium ? 'Premium' : 'Free'}`);
+        setIsPremium(premium);
       } catch (err) {
-        console.error('[Spotify] Error al verificar Premium:', err);
+        console.error('❌ Error al verificar Premium:', err);
         setIsPremium(false);
       }
     };
@@ -65,7 +80,14 @@ export const PlayerProvider = ({ children }) => {
 
   // useEffect para cargar el SDK solo si es Premium
   useEffect(() => {
-    if (!token || isPremium !== true) return;
+    if (!token || isPremium !== true) {
+      if (isPremium === false) {
+        console.log("ℹ️ Usuario Free - SDK de Spotify no disponible");
+      }
+      return;
+    }
+
+    console.log("🎵 Cargando Spotify Web Playback SDK...");
 
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
@@ -73,17 +95,22 @@ export const PlayerProvider = ({ children }) => {
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
+      console.log("✅ Spotify SDK listo");
+      
       const spotifyPlayer = new window.Spotify.Player({
         name: 'Harmony Spotify Player',
-        getOAuthToken: cb => cb(token),
+        getOAuthToken: cb => {
+          console.log("🔑 Enviando token al SDK");
+          cb(token);
+        },
         volume: volume / 100
       });
 
-      spotifyPlayer.connect();
-      setPlayer(spotifyPlayer);
-
       spotifyPlayer.addListener('ready', ({ device_id }) => {
+        console.log("✅ Dispositivo listo con ID:", device_id);
         setDeviceId(device_id);
+        
+        // Transferir reproducción a este dispositivo
         fetch('https://api.spotify.com/v1/me/player', {
           method: 'PUT',
           headers: {
@@ -91,7 +118,15 @@ export const PlayerProvider = ({ children }) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ device_ids: [device_id], play: false })
+        }).then(() => {
+          console.log("✅ Dispositivo configurado correctamente");
+        }).catch(err => {
+          console.error("❌ Error configurando dispositivo:", err);
         });
+      });
+
+      spotifyPlayer.addListener('not_ready', ({ device_id }) => {
+        console.warn("⚠️ Dispositivo no está listo:", device_id);
       });
 
       spotifyPlayer.addListener('player_state_changed', state => {
@@ -103,21 +138,28 @@ export const PlayerProvider = ({ children }) => {
       });
 
       ['initialization_error', 'authentication_error', 'account_error', 'playback_error'].forEach(evt =>
-        spotifyPlayer.addListener(evt, ({ message }) => console.error(`Spotify Player ${evt}:`, message))
+        spotifyPlayer.addListener(evt, ({ message }) => console.error(`❌ Spotify Player ${evt}:`, message))
       );
+
+      spotifyPlayer.connect().then(success => {
+        if (success) {
+          console.log("✅ Player conectado exitosamente");
+          setPlayer(spotifyPlayer);
+        } else {
+          console.error("❌ Error al conectar player");
+        }
+      });
     };
 
-    console.log("token:", token)
-    console.log("isPremium:", isPremium)
     return () => {
-      console.log("player:", player)
       if (player) {
+        console.log("🔌 Desconectando player");
         player.disconnect();
       }
     };
   }, [token, isPremium]);
 
-  // useEffect para pulling para posición (Premium)
+  // useEffect para actualizar posición (Premium)
   useEffect(() => {
     if (!player || !isPlaying) return;
     const interval = setInterval(async () => {
@@ -130,7 +172,7 @@ export const PlayerProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, [player, isPlaying]);
 
-  // useEffect para pulling alternativo para usuarios Free
+  // useEffect para polling en usuarios Free
   useEffect(() => {
     if (!token || isPremium === null || isPremium) return;
 
@@ -154,13 +196,13 @@ export const PlayerProvider = ({ children }) => {
           setDuration(data.item.duration_ms || 0);
         }
       } catch (err) {
-        console.error('[Spotify] Error obteniendo track actual (free):', err);
+        console.error('❌ Error obteniendo track actual (free):', err);
       }
     }, 5000);
 
     return () => clearInterval(interval);
   }, [token, isPremium]);
-  
+
   // Función para reproducir una canción
   const playTrack = async (
     spotifyUriOrUris,
@@ -168,46 +210,67 @@ export const PlayerProvider = ({ children }) => {
     resetQueue = true,
     updateHistory = true
   ) => {
-    if (!deviceId) return;
-  
+    console.log("🎵 playTrack llamado con:", { spotifyUriOrUris, deviceId, isPremium });
+
+    if (!token) {
+      console.error("❌ No hay token disponible");
+      return;
+    }
+
+    if (isPremium && !deviceId) {
+      console.error("❌ deviceId no está disponible aún. Esperando...");
+      return;
+    }
+
     const uris = Array.isArray(spotifyUriOrUris)
       ? spotifyUriOrUris
       : [spotifyUriOrUris];
-  
+
     if (resetQueue) {
       setQueue(uris);
       setQueueIndex(startIndex);
     }
-  
+
     try {
-      await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+      const url = isPremium
+        ? `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`
+        : `https://api.spotify.com/v1/me/player/play`;
+
+      const body = {
+        uris,
+        offset: { position: startIndex }
+      };
+
+      console.log("📤 Enviando petición a Spotify:", url);
+      
+      const response = await fetch(url, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          uris,
-          offset: { position: startIndex }
-        })
+        body: JSON.stringify(body)
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ Error de Spotify:", response.status, errorText);
+        throw new Error(`Spotify API error: ${response.status} - ${errorText}`);
+      }
+
+      console.log("✅ Canción reproducida correctamente");
     } catch (err) {
-      console.warn('[Spotify] Error en playTrack:', err.message || err);
+      console.error('❌ Error en playTrack:', err);
     }
-    
-  
+
     if (updateHistory && !Array.isArray(spotifyUriOrUris)) {
       addToHistory(spotifyUriOrUris);
     }
   };
-  
-  // Función para pausar la canción
+
   const pause = () => player && player.pause();
-  
-  // Función para reanudar la canción
   const resume = () => player && player.resume();
-  
-  // Función para agregar una canción al historial
+
   const addToHistory = (uri) => {
     setPlayHistory((prev) => {
       const newHistory = [...prev];
@@ -215,13 +278,11 @@ export const PlayerProvider = ({ children }) => {
         newHistory.splice(historyIndex + 1);
       }
       newHistory.push(uri);
-      console.log("Historial actualizado:", newHistory);
       setHistoryIndex(newHistory.length - 1);
       return newHistory;
     });
   };
-  
-  // Función para obtener una canción aleatoria
+
   const getRandomTrackUri = async () => {
     try {
       const res = await fetch("https://api.spotify.com/v1/me/top/tracks?limit=20", {
@@ -230,7 +291,6 @@ export const PlayerProvider = ({ children }) => {
       const data = await res.json();
       const uris = data.items?.map(t => t.uri).filter(Boolean);
       if (!uris?.length) return null;
-  
       const randomIndex = Math.floor(Math.random() * uris.length);
       return uris[randomIndex];
     } catch (err) {
@@ -238,52 +298,42 @@ export const PlayerProvider = ({ children }) => {
       return null;
     }
   };
-  
-  // Función para reproducir la siguiente canción
+
   const nextTrack = async () => {
     const nextIndex = queueIndex + 1;
-  
     if (nextIndex < queue.length) {
       setQueueIndex(nextIndex);
       await playTrack(queue, nextIndex);
     } else {
       const randomUri = await getRandomTrackUri();
-      if (randomUri) {
-        await playTrack(randomUri); 
-      }
+      if (randomUri) await playTrack(randomUri);
     }
   };
-  
-  // Función para reproducir la canción anterior
+
   const previousTrack = async () => {
     try {
+      if (!player) return;
       const state = await player.getCurrentState();
       if (!state) return;
-  
+
       const currentPosition = state.position;
-  
       if (currentPosition > 2000) {
         await seekTo(0);
         return;
       }
-  
+
       const newIndex = historyIndex === -1 ? playHistory.length - 2 : historyIndex - 1;
-  
       if (newIndex >= 0 && playHistory[newIndex]) {
         setHistoryIndex(newIndex);
         await playTrack(playHistory[newIndex], 0, false, false);
-      } else {
-        console.log("No hay más canciones anteriores en el historial.");
       }
     } catch (err) {
       console.error("Error en previousTrack:", err);
     }
   };
-  
-  // Función para saltar a una posición específica
+
   const seekTo = (ms) => player && player.seek(ms);
-  
-  // Función para cambiar el volumen
+
   const changeVolume = (vol) => {
     setVolume(vol);
     if (player) player.setVolume(vol / 100);
@@ -308,8 +358,8 @@ export const PlayerProvider = ({ children }) => {
       queue,
       queueIndex,
       setQueue,
+      deviceId, // ⬅️ Exponemos deviceId para debug
     }}>
-
       {children}
     </PlayerContext.Provider>
   );
