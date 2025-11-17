@@ -1,36 +1,60 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { userService } from '../services/userService';
 
 export default function AuthCallback() {
   const { setUser } = useAuth();
   const navigate = useNavigate();
 
-  // useEffect para cargar el usuario al montar el componente
   useEffect(() => {
-    (async () => {
-      console.log("Entrando en AuthCallback...");
+    const handleCallback = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/me`, { credentials: 'include' });
-  
-        console.log("Fetch /usuarios/me status:", res.status);
-        const data = await res.json();
-        console.log("Datos recibidos:", data);
-  
-        if (data?._id || data?.email || data?.usuario) {
-          console.log("Usuario recibido, redirigiendo a /");
-          setUser(data.usuario || data);
-          navigate('/');
+        // Obtener token de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const spotifyToken = urlParams.get('spotify_token');
+
+        console.log('🔍 URL actual:', window.location.href);
+        console.log('🔑 Token recibido:', token);
+        console.log('🎵 Spotify token:', spotifyToken);
+
+        if (token) {
+          // Guardar token en localStorage
+          localStorage.setItem('token', token);
+          console.log('✅ Token guardado en localStorage');
+          
+          // Si hay token de Spotify, también guardarlo
+          if (spotifyToken) {
+            localStorage.setItem('sptoken', spotifyToken);
+            console.log('✅ Spotify token guardado');
+          }
+
+          // Obtener información del usuario usando el token
+          const userData = await userService.getCurrentUser();
+          console.log('👤 Usuario obtenido:', userData);
+          
+          setUser(userData);
+          navigate('/', { replace: true });
         } else {
-          console.warn("Datos inválidos, redirigiendo a /auth");
-          navigate('/auth');
+          console.error('❌ No se encontró token en la URL');
+          navigate('/auth', { replace: true });
         }
       } catch (err) {
-        console.error("Error en AuthCallback:", err);
-        navigate('/auth');
+        console.error('❌ Error en AuthCallback:', err);
+        navigate('/auth', { replace: true });
       }
-    })();
-  }, []);
+    };
 
-  return <p className="text-center mt-10">Iniciando sesión...</p>;
+    handleCallback();
+  }, [setUser, navigate]);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+        <p className="text-lg text-white">Iniciando sesión...</p>
+      </div>
+    </div>
+  );
 }
