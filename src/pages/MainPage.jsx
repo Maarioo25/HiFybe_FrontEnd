@@ -335,7 +335,10 @@ export default function MainPage() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
+    <div className="flex flex-col h-screen bg-harmony-primary text-harmony-text-primary">
+      <HeaderBar onSongSelect={(uri) => playTrack(uri, 0, false, true)} />
+
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
       {isPremium === false && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4">
           <div className="bg-yellow-500/20 backdrop-blur-sm border border-yellow-500/50 rounded-xl px-4 py-2 mb-4 shadow-lg">
@@ -348,7 +351,8 @@ export default function MainPage() {
             </div>
           </div>
         </div>
-      )}
+        )}
+      </div>
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-harmony-accent/40 scrollbar-track-transparent">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
