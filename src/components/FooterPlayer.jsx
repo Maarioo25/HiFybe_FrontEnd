@@ -31,6 +31,7 @@ const FooterPlayer = () => {
     setIsPlaying,
     isPremium,
   } = usePlayer();
+  
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [loadingPlaylists, setLoadingPlaylists] = useState(false);
@@ -38,12 +39,14 @@ const FooterPlayer = () => {
   const [addingTrack, setAddingTrack] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [toastMessage, setToastMessage] = useState('');
+  
   const songNameRef = useRef(null);
   const artistNameRef = useRef(null);
   const freeAccountRef = useRef(null);
   const [isSongNameTruncated, setIsSongNameTruncated] = useState(false);
   const [isArtistNameTruncated, setIsArtistNameTruncated] = useState(false);
   const [isFreeAccountTruncated, setIsFreeAccountTruncated] = useState(false);
+
   const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -51,12 +54,12 @@ const FooterPlayer = () => {
     return `${minutes}:${seconds}`;
   };
 
-  // Manejo de la conexión a Spotify
   const spotifyToken = localStorage.getItem('sp_token');
   const handleConnectSpotify = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/usuarios/spotify/connect`;
   };
 
+  // Detectar si el texto está truncado
   useEffect(() => {
     const checkTruncation = () => {
       if (songNameRef.current) {
@@ -76,10 +79,16 @@ const FooterPlayer = () => {
       }
     };
 
-    checkTruncation();
+    // Usar setTimeout para esperar a que el DOM se actualice
+    const timer = setTimeout(checkTruncation, 100);
+    
     window.addEventListener('resize', checkTruncation);
-    return () => window.removeEventListener('resize', checkTruncation);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkTruncation);
+    };
   }, [currentTrack, isPremium]);
+
   // Manejo de la lista de reproducción
   useEffect(() => {
     if (!showPlaylistModal) return;
@@ -112,7 +121,7 @@ const FooterPlayer = () => {
     return () => clearTimeout(timer);
   }, [toastMessage]);
 
-  // Manejo de la lista de reproducción
+  // Manejo de añadir a playlist
   const handleAddToPlaylist = async () => {
     if (!selectedPlaylistId || !currentTrack) return;
     setAddingTrack(true);
@@ -165,17 +174,14 @@ const FooterPlayer = () => {
     changeVolume(vol);
   };
 
-  // Manejo del guardado de la canción
+  // Guardar canción actual
   useEffect(() => {
     const guardarCancion = async () => {
       if (!currentTrack?.uri) return;
       try {
         const currentUser = await userService.getCurrentUser();
         const trackId = currentTrack.uri.split(':').pop();
-        console.log("Canción a guardar:", trackId);
-        console.log("Usuario actual:", currentUser);
         await userService.setCancionUsuario(currentUser._id, trackId);
-        console.log("Canción de usuario guardada exitosamente");
       } catch (err) {
         console.error('Error guardando canción en FooterPlayer:', err);
       }
@@ -183,7 +189,7 @@ const FooterPlayer = () => {
     guardarCancion();
   }, [currentTrack]);
 
-  // Manejo de la conexión a Spotify
+  // Sin token de Spotify
   if (!spotifyToken) {
     return (
       <div className="now-playing-bar sticky bottom-0 z-50 w-full 
@@ -192,7 +198,6 @@ const FooterPlayer = () => {
         <span className="text-harmony-text-primary mb-2">
           {t('footerPlayer.connect_prompt')}
         </span>
-
         <button
           onClick={handleConnectSpotify}
           className="px-4 py-2 bg-harmony-accent text-white rounded-lg shadow hover:bg-harmony-accent/80 transition"
@@ -203,7 +208,7 @@ const FooterPlayer = () => {
     );
   }
 
-  // Manejo de la selección de la canción
+  // Sin canción seleccionada
   if (!currentTrack?.album?.images?.[0]?.url) {
     return (
       <div className="now-playing-bar sticky bottom-0 z-50 w-full 
@@ -216,7 +221,7 @@ const FooterPlayer = () => {
     );
   }
 
-  // Renderiza el footer  
+  // Renderizado principal
   return (
     <>
       {toastMessage && (
@@ -247,6 +252,8 @@ const FooterPlayer = () => {
               }}
             />
           </div>
+          
+          {/* Info de la canción */}
           <div className="flex items-center z-10 gap-2 md:gap-4 min-w-[150px] md:min-w-[200px] max-w-[full] md:max-w-[320px] w-full md:w-[320px] overflow-hidden">
             <img
               src={currentTrack?.album?.images?.[0]?.url}
@@ -254,8 +261,7 @@ const FooterPlayer = () => {
               className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg"
             />
             
-            {/* ⬇️ ACTUALIZAR ESTA PARTE ⬇️ */}
-            <div className="text-harmony-text-primary max-w-[150px] md:max-w-[210px]">
+            <div className="text-harmony-text-primary max-w-[150px] md:max-w-[210px] flex-1 min-w-0">
               {/* Nombre de la canción */}
               <div className={`font-semibold text-sm md:text-base ${isSongNameTruncated ? 'marquee-container' : ''}`}>
                 <div 
@@ -289,6 +295,8 @@ const FooterPlayer = () => {
               )}
             </div>
           </div>
+
+          {/* Controles de reproducción */}
           <div className="flex-1 flex flex-col items-center justify-center min-w-0 z-10 w-full">
             <div className="w-full flex items-center gap-2 md:gap-3 mb-2">
               <span className="text-xs text-harmony-text-secondary w-8 md:w-10 text-right select-none">
@@ -365,6 +373,8 @@ const FooterPlayer = () => {
               </button>
             </div>
           </div>
+
+          {/* Control de volumen */}
           <div className="flex items-center gap-1 md:gap-2 min-w-[100px] md:min-w-[120px] justify-end z-10 w-full md:w-auto mt-2 md:mt-0">
             {volume > 0 ? (
               <FaVolumeUp className="text-xs md:text-sm text-harmony-text-secondary" />
@@ -388,6 +398,8 @@ const FooterPlayer = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de playlist */}
       {showPlaylistModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-harmony-primary rounded-xl w-11/12 max-w-md p-6 shadow-xl relative">
