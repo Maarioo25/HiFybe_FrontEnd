@@ -4,6 +4,7 @@ import { friendService } from "../services/friendService";
 import { userService } from "../services/userService";
 import { usePlayer } from "../context/PlayerContext";
 import { useNavigate } from "react-router-dom";
+import api from '../services/api';
 import HeaderBar from "../components/HeaderBar";
 import FooterPlayer from "../components/FooterPlayer";
 import { notificationService } from "../services/notificationService";
