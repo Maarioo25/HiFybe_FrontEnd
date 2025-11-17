@@ -75,24 +75,31 @@ export default function MainPage() {
 
   // Función para obtener usuarios cercanos
   const fetchUsersAtPosition = async (latitude, longitude) => {
-    try {
-      console.log("Enviando a backend (actualizarUbicacion):", { latitude, longitude });
-      await userService.actualizarUbicacion(latitude, longitude);
-  
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/usuarios/cerca?latitude=${latitude}&longitude=${longitude}&radio=5000`,
-        { credentials: "include" }
-      );
-  
-      const data = await res.json();
-      console.log("Respuesta de usuarios cercanos:", data);
-  
-      if (Array.isArray(data)) setUsuariosCercanos(data);
-      else console.error("/cerca devolvió algo que no es un array:", data);
-    } catch (err) {
-      console.error("Error en fetchUsersAtPosition:", err);
+  try {
+    console.log("Enviando a backend (actualizarUbicacion):", { latitude, longitude });
+    await userService.actualizarUbicacion(latitude, longitude);
+
+    // ⬇️ CAMBIO: Usar api en lugar de fetch
+    const response = await api.get(`/usuarios/cerca`, {
+      params: {
+        latitude,
+        longitude,
+        radio: 5000
+      }
+    });
+
+    const data = response.data;
+    console.log("Respuesta de usuarios cercanos:", data);
+
+    if (Array.isArray(data)) {
+      setUsuariosCercanos(data);
+    } else {
+      console.error("/cerca devolvió algo que no es un array:", data);
     }
-  };
+  } catch (err) {
+    console.error("Error en fetchUsersAtPosition:", err);
+  }
+};
 
   // Inicializar Leaflet con control de movimiento
   useEffect(() => {
