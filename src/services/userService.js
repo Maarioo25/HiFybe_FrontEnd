@@ -6,11 +6,13 @@ export const userService = {
     const res = await api.get('/usuarios');
     return res.data;
   },
+
   // Obtener un usuario por ID
   getUserById: async id => {
     const res = await api.get(`/usuarios/${id}`);
     return res.data;
   },
+
   // Actualizar perfil
   updateProfile: async (id, data) => {
     const res = await api.put(`/usuarios/${id}`, {
@@ -21,33 +23,54 @@ export const userService = {
     });
     return res.data;
   },
+
   // Eliminar un usuario
   deleteUser: async id => {
     const res = await api.delete(`/usuarios/${id}`);
     return res.data;
   },
+
   // Iniciar sesión
   login: async (email, password) => {
     const res = await api.post('/usuarios/login', { email, password }, {
       withCredentials: true
     });
+    
+    // ⬇️ AÑADIR: Guardar token si viene en la respuesta
+    if (res.data.token) {
+      localStorage.setItem('token', res.data.token);
+    }
+    
     return res.data;
   },
+
   // Registrarse
   register: async data => {
     const res = await api.post('/usuarios/register', data);
+    
+    // ⬇️ AÑADIR: Guardar token si viene en la respuesta
+    if (res.data.token) {
+      localStorage.setItem('token', res.data.token);
+    }
+    
     return res.data;
   },
+
   // Obtener el usuario actual
   getCurrentUser: async () => {
     const res = await api.get('/usuarios/me');
     return res.data;
   },
+
   // Cerrar sesión
   logout: async () => {
+    // ⬇️ AÑADIR: Limpiar token de localStorage
+    localStorage.removeItem('token');
+    
     const res = await api.post('/usuarios/logout');
     return res.data;
   },
+
   // Guardar la canción del usuario
   setCancionUsuario: async (userId, trackId) => {
     try {
