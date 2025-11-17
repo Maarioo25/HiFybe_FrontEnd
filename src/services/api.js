@@ -6,11 +6,29 @@ const api = axios.create({
   withCredentials: true
 });
 
+// ⬇️ INTERCEPTOR DE REQUEST - AÑADE EL TOKEN A LOS HEADERS ⬇️
+api.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token');
+    console.log('📤 Enviando petición con token:', token ? 'Presente' : 'Ausente');
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  error => Promise.reject(error)
+);
+
 // Interceptor de respuesta para manejar errores
 api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
+      console.error('🔴 Error 401 - Token inválido o expirado');
+      localStorage.removeItem('token'); // Limpiar token inválido
+      
       return Promise.reject({
         response: {
           data: {

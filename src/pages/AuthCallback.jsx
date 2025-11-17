@@ -19,26 +19,45 @@ export default function AuthCallback() {
         console.log('🔑 Token recibido:', token);
         console.log('🎵 Spotify token:', spotifyToken);
 
-        if (token) {
-          // Guardar token en localStorage
-          localStorage.setItem('token', token);
-          console.log('✅ Token guardado en localStorage');
-          
-          // Si hay token de Spotify, también guardarlo
-          if (spotifyToken) {
-            localStorage.setItem('sptoken', spotifyToken);
-            console.log('✅ Spotify token guardado');
-          }
+        if (!token) {
+          console.error('❌ No se encontró token en la URL');
+          navigate('/auth', { replace: true });
+          return;
+        }
 
-          // Obtener información del usuario usando el token
+        // Guardar token en localStorage
+        localStorage.setItem('token', token);
+        console.log('✅ Token guardado en localStorage');
+        
+        // Si hay token de Spotify, también guardarlo
+        if (spotifyToken) {
+          localStorage.setItem('sptoken', spotifyToken);
+          console.log('✅ Spotify token guardado');
+        }
+
+        // ⬇️ IMPORTANTE: Esperar un momento para que el token esté disponible
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Obtener información del usuario usando el token
+        try {
           const userData = await userService.getCurrentUser();
           console.log('👤 Usuario obtenido:', userData);
           
           setUser(userData);
           navigate('/', { replace: true });
-        } else {
-          console.error('❌ No se encontró token en la URL');
-          navigate('/auth', { replace: true });
+        } catch (error) {
+          console.error('❌ Error al obtener usuario:', error);
+          // Si falla, intentar una vez más
+          try {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            const userData = await userService.getCurrentUser();
+            console.log('👤 Usuario obtenido (segundo intento):', userData);
+            setUser(userData);
+            navigate('/', { replace: true });
+          } catch (retryError) {
+            console.error('❌ Error en segundo intento:', retryError);
+            navigate('/auth', { replace: true });
+          }
         }
       } catch (err) {
         console.error('❌ Error en AuthCallback:', err);
