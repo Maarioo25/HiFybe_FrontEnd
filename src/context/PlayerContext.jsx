@@ -204,69 +204,84 @@ export const PlayerProvider = ({ children }) => {
   }, [token, isPremium]);
 
   // Función para reproducir una canción
-  const playTrack = async (
-    spotifyUriOrUris,
-    startIndex = 0,
-    resetQueue = true,
-    updateHistory = true
-  ) => {
-    console.log("🎵 playTrack llamado con:", { spotifyUriOrUris, deviceId, isPremium });
+  // Función para reproducir (versión con soporte Free)
+const playTrack = async (
+  spotifyUriOrUris,
+  startIndex = 0,
+  resetQueue = true,
+  updateHistory = true
+) => {
+  console.log("🎵 playTrack llamado con:", { spotifyUriOrUris, isPremium });
 
-    if (!token) {
-      console.error("❌ No hay token disponible");
-      return;
+  if (!token) {
+    console.error("❌ No hay token disponible");
+    return;
+  }
+
+  const uris = Array.isArray(spotifyUriOrUris)
+    ? spotifyUriOrUris
+    : [spotifyUriOrUris];
+
+  // Si NO es Premium, abrir en Spotify
+  if (isPremium === false) {
+    console.log("ℹ️ Usuario Free - Abriendo en Spotify");
+    const uri = uris[0];
+    window.open(`https://open.spotify.com/track/${uri.split(':')[2]}`, '_blank');
+    return;
+  }
+
+  // Si es Premium pero no hay deviceId, esperar
+  if (isPremium && !deviceId) {
+    console.error("❌ deviceId no está disponible aún. Esperando...");
+    return;
+  }
+
+  if (resetQueue) {
+    setQueue(uris);
+    setQueueIndex(startIndex);
+  }
+
+  try {
+    const url = `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`;
+
+    const body = {
+      uris,
+      offset: { position: startIndex }
+    };
+
+    console.log("📤 Enviando petición a Spotify:", url);
+    
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ Error de Spotify:", response.status, errorText);
+      throw new Error(`Spotify API error: ${response.status} - ${errorText}`);
     }
 
-    if (isPremium && !deviceId) {
-      console.error("❌ deviceId no está disponible aún. Esperando...");
-      return;
+    console.log("✅ Canción reproducida correctamente");
+  } catch (err) {
+    console.error('❌ Error en playTrack:', err);
+    // Si hay error 403, mostrar mensaje al usuario
+    if (err.message.includes('403')) {
+      alert('Para reproducir música en el navegador, necesitas Spotify Premium. Abriendo en Spotify...');
+      const uri = uris[0];
+      window.open(`https://open.spotify.com/track/${uri.split(':')[2]}`, '_blank');
     }
+  }
 
-    const uris = Array.isArray(spotifyUriOrUris)
-      ? spotifyUriOrUris
-      : [spotifyUriOrUris];
+  if (updateHistory && !Array.isArray(spotifyUriOrUris)) {
+    addToHistory(spotifyUriOrUris);
+  }
+};
 
-    if (resetQueue) {
-      setQueue(uris);
-      setQueueIndex(startIndex);
-    }
-
-    try {
-      const url = isPremium
-        ? `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`
-        : `https://api.spotify.com/v1/me/player/play`;
-
-      const body = {
-        uris,
-        offset: { position: startIndex }
-      };
-
-      console.log("📤 Enviando petición a Spotify:", url);
-      
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("❌ Error de Spotify:", response.status, errorText);
-        throw new Error(`Spotify API error: ${response.status} - ${errorText}`);
-      }
-
-      console.log("✅ Canción reproducida correctamente");
-    } catch (err) {
-      console.error('❌ Error en playTrack:', err);
-    }
-
-    if (updateHistory && !Array.isArray(spotifyUriOrUris)) {
-      addToHistory(spotifyUriOrUris);
-    }
-  };
 
   const pause = () => player && player.pause();
   const resume = () => player && player.resume();
