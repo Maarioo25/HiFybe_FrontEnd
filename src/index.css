@@ -93,3 +93,30 @@
     box-shadow: 0 0 0 0 rgba(78, 204, 163, 0);
   }
 } 
+
+/* Animación marquesina para el FooterPlayer */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(-30%);
+  }
+  55% {
+    transform: translateX(-30%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.marquee-text {
+  animation: marquee 8s ease-in-out infinite;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+}

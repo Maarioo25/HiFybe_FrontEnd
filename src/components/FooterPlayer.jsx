@@ -224,18 +224,16 @@ const FooterPlayer = () => {
               alt={currentTrack?.name}
               className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg"
             />
-            <div className="truncate text-harmony-text-primary">
-              <div
-                className="font-semibold truncate max-w-[150px] md:max-w-[210px] text-sm md:text-base"
-                title={currentTrack?.name}
-              >
-                {currentTrack?.name}
+            <div className="text-harmony-text-primary max-w-[150px] md:max-w-[210px]">
+              <div className="marquee-container font-semibold text-sm md:text-base">
+                <div className="marquee-text">
+                  {currentTrack?.name}
+                </div>
               </div>
-              <div
-                className="text-xs text-harmony-text-secondary truncate max-w-[150px] md:max-w-[210px]"
-                title={currentTrack?.artists?.map((a) => a.name).join(', ')}
-              >
-                {currentTrack?.artists?.map((a) => a.name).join(', ')}
+              <div className="marquee-container text-xs text-harmony-text-secondary">
+                <div className="marquee-text">
+                  {currentTrack?.artists?.map((a) => a.name).join(', ')}
+                </div>
               </div>
               {!isPremium && (
                 <div className="text-xs text-yellow-500 mt-1">
