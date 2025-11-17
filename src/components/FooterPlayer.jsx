@@ -38,6 +38,12 @@ const FooterPlayer = () => {
   const [addingTrack, setAddingTrack] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [toastMessage, setToastMessage] = useState('');
+  const songNameRef = useRef(null);
+  const artistNameRef = useRef(null);
+  const freeAccountRef = useRef(null);
+  const [isSongNameTruncated, setIsSongNameTruncated] = useState(false);
+  const [isArtistNameTruncated, setIsArtistNameTruncated] = useState(false);
+  const [isFreeAccountTruncated, setIsFreeAccountTruncated] = useState(false);
   const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -51,6 +57,29 @@ const FooterPlayer = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/usuarios/spotify/connect`;
   };
 
+  useEffect(() => {
+    const checkTruncation = () => {
+      if (songNameRef.current) {
+        setIsSongNameTruncated(
+          songNameRef.current.scrollWidth > songNameRef.current.clientWidth
+        );
+      }
+      if (artistNameRef.current) {
+        setIsArtistNameTruncated(
+          artistNameRef.current.scrollWidth > artistNameRef.current.clientWidth
+        );
+      }
+      if (freeAccountRef.current) {
+        setIsFreeAccountTruncated(
+          freeAccountRef.current.scrollWidth > freeAccountRef.current.clientWidth
+        );
+      }
+    };
+
+    checkTruncation();
+    window.addEventListener('resize', checkTruncation);
+    return () => window.removeEventListener('resize', checkTruncation);
+  }, [currentTrack, isPremium]);
   // Manejo de la lista de reproducción
   useEffect(() => {
     if (!showPlaylistModal) return;
@@ -224,20 +253,38 @@ const FooterPlayer = () => {
               alt={currentTrack?.name}
               className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg"
             />
+            
+            {/* ⬇️ ACTUALIZAR ESTA PARTE ⬇️ */}
             <div className="text-harmony-text-primary max-w-[150px] md:max-w-[210px]">
-              <div className="marquee-container font-semibold text-sm md:text-base">
-                <div className="marquee-text">
+              {/* Nombre de la canción */}
+              <div className={`font-semibold text-sm md:text-base ${isSongNameTruncated ? 'marquee-container' : ''}`}>
+                <div 
+                  ref={songNameRef}
+                  className={`${isSongNameTruncated ? 'marquee-text' : 'truncate'}`}
+                >
                   {currentTrack?.name}
                 </div>
               </div>
-              <div className="marquee-container text-xs text-harmony-text-secondary">
-                <div className="marquee-text">
+
+              {/* Nombre del artista */}
+              <div className={`text-xs text-harmony-text-secondary ${isArtistNameTruncated ? 'marquee-container' : ''}`}>
+                <div 
+                  ref={artistNameRef}
+                  className={`${isArtistNameTruncated ? 'marquee-text' : 'truncate'}`}
+                >
                   {currentTrack?.artists?.map((a) => a.name).join(', ')}
                 </div>
               </div>
+
+              {/* Aviso cuenta Free */}
               {!isPremium && (
-                <div className="text-xs text-yellow-500 mt-1">
-                  {t('footerPlayer.free_account')}
+                <div className={`text-xs text-yellow-500 mt-1 ${isFreeAccountTruncated ? 'marquee-container' : ''}`}>
+                  <div 
+                    ref={freeAccountRef}
+                    className={`${isFreeAccountTruncated ? 'marquee-text' : 'truncate'}`}
+                  >
+                    {t('footerPlayer.free_account')}
+                  </div>
                 </div>
               )}
             </div>
