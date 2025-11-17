@@ -11,9 +11,7 @@ export default function AuthCallback() {
     (async () => {
       console.log("Entrando en AuthCallback...");
       try {
-        const res = await fetch('https://api.mariobueno.info/usuarios/me', {
-          credentials: 'include'
-        });
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/me`, { credentials: 'include' });
   
         console.log("Fetch /usuarios/me status:", res.status);
         const data = await res.json();

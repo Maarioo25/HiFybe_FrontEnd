@@ -14,7 +14,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const connectSpotifyUrl = 'https://api.mariobueno.info/usuarios/spotify/connect';
+  const connectSpotifyUrl = `${import.meta.env.VITE_API_URL}/usuarios/spotify/connect`;
+
 
   // useEffect para cargar el usuario al montar el componente
   useEffect(() => {
@@ -100,14 +101,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Función para iniciar sesión con Google
-  const googleLogin = () => {
-    window.location.href = 'https://api.mariobueno.info/usuarios/google';
-  };
+  const googleLogin = () => { window.location.href = `${import.meta.env.VITE_API_URL}/usuarios/google`; };
+  
 
   // Función para iniciar sesión con Spotify
-  const spotifyLogin = () => {
-    window.location.href = 'http://api.mariobueno.info/usuarios/spotify';
-  };
+  const spotifyLogin = () => { window.location.href = `${import.meta.env.VITE_API_URL}/usuarios/spotify`; };
 
   // Función para iniciar sesión con Apple (Implementar en un futuro)
   const appleLogin = () => {};

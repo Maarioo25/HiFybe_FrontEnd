@@ -48,7 +48,7 @@ const FooterPlayer = () => {
   // Manejo de la conexión a Spotify
   const spotifyToken = localStorage.getItem('sp_token');
   const handleConnectSpotify = () => {
-    window.location.href = 'https://api.mariobueno.info/usuarios/spotify/connect';
+    window.location.href = `${import.meta.env.VITE_API_URL}/usuarios/spotify/connect`;
   };
 
   // Manejo de la lista de reproducción

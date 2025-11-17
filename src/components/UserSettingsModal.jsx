@@ -92,11 +92,7 @@ export default function UserSettingsModal({ isOpen, onClose, user }) {
     try {
       const res = await userService.updateFotoPerfil(user._id, file);
       if (res?.url) {
-        setFoto(
-          res.url.startsWith('/uploads/')
-            ? `https://api.mariobueno.info${res.url}`
-            : res.url
-        );
+        setFoto(res.url.startsWith('uploads') ? `${import.meta.env.VITE_API_URL}/${res.url}` : res.url);
         toast.success(t('settings.uploadSuccess'));
       } else {
         throw new Error('No se recibió una URL');

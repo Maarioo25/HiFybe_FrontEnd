@@ -51,7 +51,7 @@ export default function MainPage() {
 
   const spotifyToken = localStorage.getItem("sp_token");
   const handleConnectSpotify = () => {
-    window.location.href = "https://api.mariobueno.info/usuarios/spotify/connect";
+    window.location.href = `${import.meta.env.VITE_API_URL}/usuarios/spotify/connect`;
   };
 
   // Obtener lista de amigos
