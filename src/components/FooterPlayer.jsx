@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import {
   FaPlay,
   FaPause,
@@ -13,6 +13,21 @@ import {
 import { useTranslation } from 'react-i18next';
 import { userService } from '../services/userService';
 import { usePlayer } from '../context/PlayerContext';
+
+const AnimatedText = memo(({ text, isLongText, refProp, className }) => {
+  return (
+    <div className={`${isLongText ? 'marquee-container' : ''} ${className}`}>
+      <div 
+        ref={refProp}
+        className={`${isLongText ? 'marquee-text' : 'truncate'}`}
+      >
+        {text}
+      </div>
+    </div>
+  );
+});
+
+AnimatedText.displayName = 'AnimatedText';
 
 const FooterPlayer = () => {
   const { t } = useTranslation();
@@ -87,7 +102,7 @@ const FooterPlayer = () => {
       clearTimeout(timer);
       window.removeEventListener('resize', checkTruncation);
     };
-  }, [currentTrack, isPremium]);
+  }, [currentTrack?.uri, isPremium]);
 
   // Manejo de la lista de reproducción
   useEffect(() => {
@@ -261,7 +276,7 @@ const FooterPlayer = () => {
               className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border-2 border-harmony-accent shadow-lg"
             />
             
-            <div className="text-harmony-text-primary max-w-[150px] md:max-w-[210px] flex-1 min-w-0">
+            <div className="text-harmony-text-primary max-w-[150px] md:max-w-[210px] flex-1 min-w-0" key={currentTrack?.uri}>
               {/* Nombre de la canción */}
               <div className={`font-semibold text-sm md:text-base ${isSongNameTruncated ? 'marquee-container' : ''}`}>
                 <div 
